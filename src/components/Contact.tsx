@@ -87,7 +87,7 @@ const Contact = () => {
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-2 text-muted-foreground">
               <MapPin className="w-4 h-4" />
-              <span>São Paulo, SP - Atendimento em todo o Brasil</span>
+              <span>Ribeirão Preto, SP - Atendimento em todo o Brasil e em todo o mundo!</span>
             </div>
           </div>
         </div>
