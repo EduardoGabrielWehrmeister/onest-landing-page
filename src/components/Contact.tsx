@@ -1,41 +1,43 @@
-import { Mail, Phone, Instagram, MessageCircle, Calendar, MapPin } from "lucide-react";
-import { Button } from "./ui/button";
+import type { ComponentType, SVGProps } from "react";
+import { Mail, Instagram, MessageCircle, MapPin, Facebook } from "lucide-react";
+
+type ContactLink = {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: string;
+  href: string;
+  description: string;
+  forceWrap?: boolean;
+};
+
+const contactLinks: ContactLink[] = [
+  {
+    icon: MessageCircle,
+    label: "WhatsApp",
+    href: "https://api.whatsapp.com/send?phone=5511916807522",
+    description: "Fale direto pelo WhatsApp",
+  },
+  {
+    icon: Mail,
+    label: "E-mail",
+    href: "mailto:contato@onestacidadania.com.br",
+    description: "contato@onestacidadania.com.br",
+    forceWrap: true,
+  },
+  {
+    icon: Instagram,
+    label: "Instagram",
+    href: "https://www.instagram.com/onesta.cidadania",
+    description: "@onesta.cidadania",
+  },
+  {
+    icon: Facebook,
+    label: "Facebook",
+    href: "https://www.facebook.com/onesta.cidadania",
+    description: "/onesta.cidadania",
+  },
+];
 
 const Contact = () => {
-  const contactLinks = [
-    {
-      icon: MessageCircle,
-      label: "WhatsApp",
-      href: "https://wa.me/5511999999999",
-      description: "Atendimento rápido",
-      highlight: true,
-    },
-    {
-      icon: Mail,
-      label: "E-mail",
-      href: "mailto:contato@onestacidadania.com.br",
-      description: "contato@onestacidadania.com.br",
-    },
-    {
-      icon: Phone,
-      label: "Telefone",
-      href: "tel:+5511999999999",
-      description: "+55 11 99999-9999",
-    },
-    {
-      icon: Calendar,
-      label: "Agendar Reunião",
-      href: "#",
-      description: "Consulta gratuita online",
-    },
-    {
-      icon: Instagram,
-      label: "Instagram",
-      href: "https://instagram.com/onestacidadania",
-      description: "@onestacidadania",
-    },
-  ];
-
   return (
     <section id="contato" className="py-20 md:py-32 bg-background">
       <div className="section-container">
@@ -55,46 +57,24 @@ const Contact = () => {
           </div>
 
           {/* Contact Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {contactLinks.map((contact, index) => (
               <a
                 key={index}
                 href={contact.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group flex items-center gap-4 p-6 rounded-xl border transition-all duration-300 ${
-                  contact.highlight
-                    ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 col-span-full sm:col-span-2 lg:col-span-1"
-                    : "bg-card border-border hover:border-primary/30 card-elevated"
-                }`}
+                className="group flex h-full items-start gap-4 rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40"
               >
-                <div
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    contact.highlight
-                      ? "bg-primary-foreground/20"
-                      : "bg-primary/10 group-hover:bg-primary/20"
-                  } transition-colors duration-300`}
-                >
-                  <contact.icon
-                    className={`w-6 h-6 ${
-                      contact.highlight ? "text-primary-foreground" : "text-primary"
-                    }`}
-                  />
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary/15">
+                  <contact.icon className="h-5 w-5" />
                 </div>
-                <div>
-                  <p
-                    className={`font-semibold ${
-                      contact.highlight ? "text-primary-foreground" : "text-foreground"
-                    }`}
-                  >
+                <div className="space-y-1">
+                  <p className="text-base font-semibold text-foreground">
                     {contact.label}
                   </p>
                   <p
-                    className={`text-sm ${
-                      contact.highlight
-                        ? "text-primary-foreground/80"
-                        : "text-muted-foreground"
-                    }`}
+                    className={`text-sm text-muted-foreground ${contact.forceWrap ? "break-all" : ""}`}
                   >
                     {contact.description}
                   </p>
