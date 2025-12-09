@@ -6,8 +6,8 @@ const Hero = () => {
     <section className="relative min-h-screen gradient-hero overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_80%,_hsl(40_30%_97%_/_0.1)_0%,_transparent_50%)]" />
-        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,_hsl(40_30%_97%_/_0.1)_0%,_transparent_50%)]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_80%,_hsl(0_0%_98%_/_0.1)_0%,_transparent_50%)]" />
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,_hsl(0_0%_98%_/_0.1)_0%,_transparent_50%)]" />
       </div>
 
       <div className="section-container relative z-10 pt-32 pb-20 md:pt-40 md:pb-32">
@@ -74,7 +74,7 @@ const Hero = () => {
         >
           <path
             d="M0 120L60 110C120 100 240 80 360 75C480 70 600 80 720 85C840 90 960 90 1080 85C1200 80 1320 70 1380 65L1440 60V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-            fill="hsl(40, 30%, 97%)"
+            fill="hsl(0, 0%, 98%)"
           />
         </svg>
       </div>
