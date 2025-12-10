@@ -1,5 +1,6 @@
-import type { ComponentType, SVGProps } from "react";
+import type { ComponentType, SVGProps, MouseEvent } from "react";
 import { Mail, Instagram, MessageCircle, MapPin, Facebook } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 type ContactLink = {
   icon: ComponentType<SVGProps<SVGSVGElement>>;
@@ -7,37 +8,101 @@ type ContactLink = {
   href: string;
   description: string;
   forceWrap?: boolean;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  newTab?: boolean;
 };
 
-const contactLinks: ContactLink[] = [
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    href: "https://api.whatsapp.com/send?phone=5511916807522",
-    description: "Fale direto pelo WhatsApp",
-  },
-  {
-    icon: Mail,
-    label: "E-mail",
-    href: "mailto:contato@onestacidadania.com.br",
-    description: "contato@onestacidadania.com.br",
-    forceWrap: true,
-  },
-  {
-    icon: Instagram,
-    label: "Instagram",
-    href: "https://www.instagram.com/onesta.cidadania",
-    description: "@onesta.cidadania",
-  },
-  {
-    icon: Facebook,
-    label: "Facebook",
-    href: "https://www.facebook.com/onesta.cidadania",
-    description: "/onesta.cidadania",
-  },
-];
+const EMAIL_ADDRESS = "contato@onestacidadania.com.br";
+const EMAIL_SUBJECT = "Quero falar sobre cidadania italiana";
+const EMAIL_BODY = `Olá, equipe Onestà Cidadania,
+
+Gostaria de conversar sobre o processo de cidadania italiana e entender as opções de assessoria disponíveis.
+
+Obrigado(a) e aguardo o retorno.`;
+const EMAIL_MAILTO = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`;
+
+const WHATSAPP_MESSAGE =
+  "Olá, equipe Onestà Cidadania! Gostaria de saber mais sobre o processo de cidadania italiana e entender os próximos passos.";
+const WHATSAPP_URL = `https://api.whatsapp.com/send?phone=5511916807522&text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+
+const copyEmailToClipboard = async () => {
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(EMAIL_ADDRESS);
+      return true;
+    }
+  } catch (error) {
+    console.error("Erro ao copiar com a API do Clipboard", error);
+  }
+
+  if (typeof document !== "undefined") {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = EMAIL_ADDRESS;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return successful;
+    } catch (fallbackError) {
+      console.error("Erro ao copiar com o fallback", fallbackError);
+    }
+  }
+
+  return false;
+};
 
 const Contact = () => {
+  const handleEmailClick = async (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+
+    const copied = await copyEmailToClipboard();
+    toast({
+      title: copied ? "E-mail copiado!" : "Copie o e-mail manualmente",
+      description: copied
+        ? "E-mail copiado com sucesso!"
+        : `Não foi possível copiar automaticamente, mas o e-mail é ${EMAIL_ADDRESS}.`,
+    });
+
+    if (typeof window !== "undefined") {
+      window.location.href = EMAIL_MAILTO;
+    }
+  };
+
+  const contactLinks: ContactLink[] = [
+    {
+      icon: MessageCircle,
+      label: "WhatsApp",
+      href: WHATSAPP_URL,
+      description: "Fale direto pelo WhatsApp",
+    },
+    {
+      icon: Mail,
+      label: "E-mail",
+      href: EMAIL_MAILTO,
+      description: EMAIL_ADDRESS,
+      forceWrap: true,
+      onClick: handleEmailClick,
+      newTab: false,
+    },
+    {
+      icon: Instagram,
+      label: "Instagram",
+      href: "https://www.instagram.com/onesta.cidadania",
+      description: "@onesta.cidadania",
+    },
+    {
+      icon: Facebook,
+      label: "Facebook",
+      href: "https://www.facebook.com/onesta.cidadania",
+      description: "/onesta.cidadania",
+    },
+  ];
+
   return (
     <section id="contato" className="py-20 md:py-32 bg-background">
       <div className="section-container">
@@ -62,8 +127,9 @@ const Contact = () => {
               <a
                 key={index}
                 href={contact.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={contact.newTab === false ? undefined : "_blank"}
+                rel={contact.newTab === false ? undefined : "noopener noreferrer"}
+                onClick={contact.onClick}
                 className="group flex h-full items-start gap-4 rounded-2xl border border-border/60 bg-card/90 p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40"
               >
                 <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary/15">
