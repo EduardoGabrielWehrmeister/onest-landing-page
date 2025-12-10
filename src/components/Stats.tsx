@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
+import { getExperienceYears } from "@/lib/utils";
+
 interface StatProps {
   value: number;
   suffix?: string;
@@ -61,10 +63,17 @@ const StatItem = ({ value, suffix = "", label }: StatProps) => {
 };
 
 const Stats = () => {
+  const experienceYears = getExperienceYears();
+  const experienceLabel = experienceYears > 1 ? "Anos" : "Ano";
+
   const stats = [
     { value: 2500, suffix: "+", label: "Famílias Atendidas" },
     { value: 15000, suffix: "+", label: "Documentos Processados" },
-    { value: 15, suffix: "+", label: "Anos de Experiência" },
+    {
+      value: experienceYears,
+      suffix: "+",
+      label: `${experienceLabel} de Experiência`,
+    },
     { value: 98, suffix: "%", label: "Taxa de Aprovação" },
   ];
 

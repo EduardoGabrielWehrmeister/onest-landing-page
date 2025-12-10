@@ -1,7 +1,15 @@
 import { ArrowRight, Shield, Award, Users } from "lucide-react";
+
+import { getExperienceYears } from "@/lib/utils";
+
 import { Button } from "./ui/button";
 
 const Hero = () => {
+  const experienceYears = getExperienceYears();
+  const experienceLabel = `+${experienceYears} ${
+    experienceYears > 1 ? "Anos" : "Ano"
+  } de Experiência`;
+
   return (
     <section className="relative min-h-screen gradient-hero overflow-hidden">
       {/* Background Pattern */}
@@ -49,7 +57,7 @@ const Hero = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 animate-fade-up opacity-0 delay-400">
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Award className="w-5 h-5" />
-              <span className="text-sm font-medium">+15 Anos de Experiência</span>
+              <span className="text-sm font-medium">{experienceLabel}</span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Users className="w-5 h-5" />
