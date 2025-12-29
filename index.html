@@ -4,22 +4,256 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Onestà Cidadania Italiana | Assessoria Especializada</title>
-    <meta name="description" content="Assessoria completa para cidadania italiana. Mais de 15 anos de experiência, 2.500+ famílias atendidas. Passaporte, documentos, traduções e AIRE." />
+    <meta name="description" content="Assessoria completa para cidadania italiana. Mais de 15 anos de experiência, 2.500+ famílias atendidas em São Paulo, Rio de Janeiro, Belo Horizonte e todo Brasil. Passaporte italiano, documentos, traduções juramentadas, AIRE e Prenotami. Atendimento via consulado ou judicial. Consulta gratuita." />
     <meta name="author" content="Onestà Cidadania Italiana" />
-    <meta name="keywords" content="cidadania italiana, passaporte italiano, cidadania italiana Brasil, assessoria cidadania italiana, AIRE, tradução juramentada" />
+    <meta name="keywords" content="cidadania italiana, passaporte italiano, cidadania italiana São Paulo, cidadania italiana Rio de Janeiro, cidadania italiana Brasil, assessoria cidadania italiana, AIRE, Prenotami, tradução juramentada italiano, consulado italiano, cidadania italiana judicial, documentos cidadania italiana, quanto custa cidadania italiana, quanto tempo demora cidadania italiana" />
 
     <meta property="og:title" content="Onestà Cidadania Italiana | Realize o Sonho da Cidadania" />
     <meta property="og:description" content="Assessoria completa e personalizada para você conquistar sua cidadania italiana com segurança e tranquilidade." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="https://onestacidadania.com.br/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Onestà Cidadania Italiana - Assessoria especializada com +15 anos de experiência atendendo famílias em todo o Brasil" />
     <meta property="og:locale" content="pt_BR" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Onestà Cidadania Italiana" />
     <meta name="twitter:description" content="Assessoria especializada em cidadania italiana. +15 anos de experiência." />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:image" content="https://onestacidadania.com.br/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Onestà Cidadania Italiana - Assessoria especializada em cidadania italiana" />
 
     <link rel="canonical" href="https://onestacidadania.com.br" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#315E33" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Onestà" />
+
+    <!-- Schema.org Dados Estruturados -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://onestacidadania.com.br/#organization",
+          "name": "Onestà Cidadania Italiana",
+          "url": "https://onestacidadania.com.br",
+          "logo": "https://onestacidadania.com.br/logo-sem-fundo.png",
+          "description": "Assessoria especializada em cidadania italiana. Mais de 15 anos de experiência, 2.500+ famílias atendidas.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Ribeirão Preto",
+            "addressRegion": "SP",
+            "addressCountry": "BR"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+55-11-9168-07522",
+            "contactType": "customer service",
+            "email": "contato@onestacidadania.com.br",
+            "availableLanguage": ["Portuguese", "Italian"]
+          },
+          "sameAs": [
+            "https://www.instagram.com/onesta.cidadania",
+            "https://www.facebook.com/onesta.cidadania"
+          ],
+          "areaServed": "BR"
+        },
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://onestacidadania.com.br/#localbusiness",
+          "name": "Onestà Cidadania Italiana",
+          "image": "https://onestacidadania.com.br/logo-sem-fundo.png",
+          "priceRange": "$$",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Ribeirão Preto",
+            "addressRegion": "SP",
+            "addressCountry": "BR"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "-21.1775",
+            "longitude": "-47.8103"
+          },
+          "openingHours": "Mo-Fr 09:00-18:00",
+          "telephone": "+55-11-9168-07522",
+          "email": "contato@onestacidadania.com.br"
+        },
+        {
+          "@type": "ProfessionalService",
+          "@id": "https://onestacidadania.com.br/#service",
+          "name": "Assessoria em Cidadania Italiana",
+          "description": "Assessoria completa para cidadania italiana via consular ou judicial. Inclui passaporte, documentos, traduções e AIRE.",
+          "provider": {
+            "@id": "https://onestacidadania.com.br/#organization"
+          },
+          "areaServed": ["BR", "IT"],
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Serviços de Cidadania Italiana",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Passaporte Italiano"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Documentos para Cidadania"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Tradução Juramentada"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Service",
+                  "name": "Registro AIRE"
+                }
+              }
+            ]
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "reviewCount": "2500"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://onestacidadania.com.br/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Quanto tempo demora o processo de cidadania italiana?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O tempo varia conforme o tipo de processo. Via consulado, pode levar de 2 a 5 anos. Via judicial, geralmente entre 12 a 24 meses. Nossa equipe analisa seu caso e define a melhor estratégia."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quais documentos necessários para cidadania italiana?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Os documentos básicos incluem: certidões de nascimento, casamento e óbito da linha italiana, além de documentos de identidade. Comprovamos a documentação completa e orientamos sobre eventuais retificações."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Vocês atendem qual cidades do Brasil?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Atendemos todo o Brasil e brasileiros residentes no exterior. Nossa equipe é especializada em processos em todos os consulados italianos no Brasil e na via judicial."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Qual o valor da assessoria para cidadania italiana?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O valor varia conforme o tipo de processo (consular ou judicial) e a complexidade da documentação. Oferecemos consulta gratuita para análise do seu caso e orçamento personalizado."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Preciso ir à Itália para conseguir a cidadania?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não é obrigatório ir à Itália. A cidadania pode ser reconhecida via consulado italiano no Brasil ou através de ação judicial no Brasil, sem necessidade de viagem."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "O que é AIRE e por que preciso me registrar?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "AIRE (Anagrafe degli Italiani Residenti all'Estero) é o registro de cidadãos italianos residentes fora da Itália. É obrigatório para cidadãos italianos e necessário para acessar serviços consulares e benefícios na Itália."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Vocês fazem traduções de documentos?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim, oferecemos serviço completo de tradução juramentada de documentos brasileiros para italiano e vice-versa, realizado por tradutores certificados e reconhecidos pelo consulado."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Como agendar o Prenotami (consulado)?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O Prenotami é o sistema de agendamento online do consulado italiano. Nossa equipe auxilia em todo o processo de agendamento, preenchimento e preparação da documentação necessária."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Início",
+              "item": "https://onestacidadania.com.br"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Serviços",
+              "item": "https://onestacidadania.com.br/#servicos"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Sobre",
+              "item": "https://onestacidadania.com.br/#sobre"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "FAQ",
+              "item": "https://onestacidadania.com.br/#faq"
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "name": "Contato",
+              "item": "https://onestacidadania.com.br/#contato"
+            }
+          ]
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://onestacidadania.com.br/#webpage",
+          "url": "https://onestacidadania.com.br",
+          "name": "Onestà Cidadania Italiana | Assessoria Especializada",
+          "description": "Assessoria completa para cidadania italiana. Mais de 15 anos de experiência, 2.500+ famílias atendidas. Passaporte, documentos, traduções e AIRE.",
+          "inLanguage": "pt-BR",
+          "about": {
+            "@type": "Thing",
+            "name": "Cidadania Italiana"
+          },
+          "keywords": "cidadania italiana, passaporte italiano, AIRE, consulado italiano, tradução juramentada, documentos italianos"
+        }
+      ]
+    }
+    </script>
   </head>
 
   <body>
