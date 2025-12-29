@@ -36,15 +36,17 @@ const Hero = () => {
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up opacity-0 delay-200">
-            A Onestà oferece assessoria completa e personalizada para você
-            conquistar sua cidadania italiana com segurança e tranquilidade.
+            Assessoria completa e personalizada para sua cidadania italiana, com
+            segurança, transparência e acompanhamento em todas as etapas.
+            Atuamos nos processos via Consulado ou Judicial, além de serviços
+            essenciais como agendamento no Prenotami, traduções e AIRE.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-up opacity-0 delay-300">
             <Button variant="hero" size="xl" asChild>
               <a href="#contato">
-                Iniciar Minha Jornada
+                Entrar em Contato
                 <ArrowRight className="w-5 h-5" />
               </a>
             </Button>
@@ -57,15 +59,17 @@ const Hero = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 animate-fade-up opacity-0 delay-400">
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Award className="w-5 h-5" />
-              <span className="text-sm font-medium">{experienceLabel}</span>
+              <span className="text-sm font-medium">Desde 2024</span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">+2.000 Famílias Atendidas</span>
+              <span className="text-sm font-medium">
+                +2.000 Famílias Atendidas
+              </span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Shield className="w-5 h-5" />
-              <span className="text-sm font-medium">Processo 100% Seguro</span>
+              <span className="text-sm font-medium">Processo Seguro!</span>
             </div>
           </div>
         </div>
