@@ -53,7 +53,7 @@ const FAQ = () => {
     <section id="faq" className="py-20 md:py-32 bg-background">
       <div className="section-container">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8">
           <span className="inline-block text-sm font-semibold text-accent uppercase tracking-wider mb-4">
             Perguntas Frequentes
           </span>
