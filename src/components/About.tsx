@@ -1,6 +1,12 @@
 import { CheckCircle2 } from "lucide-react";
 
+import { getExperienceYears } from "@/lib/utils";
+import logoFull from "@/assets/logo.jpeg";
+import logoSemFundo from "@/assets/logo-sem-fundo.png";
+
 const About = () => {
+  const experienceYears = getExperienceYears();
+  const isPlural = experienceYears > 1;
   const highlights = [
     "Equipe especializada com experiência comprovada",
     "Acompanhamento personalizado em cada etapa",
@@ -24,8 +30,8 @@ const About = () => {
             <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
               A <strong className="text-foreground">Onestà Cidadania Italiana</strong> nasceu da
               paixão pela cultura italiana e do desejo de conectar pessoas às
-              suas raízes. Há mais de 15 anos, ajudamos famílias brasileiras a
-              conquistar o reconhecimento da cidadania italiana.
+              suas raízes. Há mais de {experienceYears} {isPlural ? "anos" : "ano"}, ajudamos
+              famílias brasileiras a conquistar o reconhecimento da cidadania italiana.
             </p>
             <p className="text-muted-foreground mb-8 leading-relaxed">
               Nossa missão é tornar esse processo acessível, transparente e
@@ -53,16 +59,25 @@ const About = () => {
                 <div className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-primary/20 blur-3xl" />
               </div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="font-serif text-6xl md:text-8xl font-bold text-primary/30 mb-2">
-                    🇮🇹
+                <div className="text-center p-6 md:p-8 space-y-4">
+                  <picture className="block">
+                    <source srcSet={logoSemFundo} type="image/png" />
+                    <img
+                      src={logoFull}
+                      alt="Logo Onestà Cidadania Italiana"
+                      className="mx-auto max-w-[200px] md:max-w-xs w-full drop-shadow-xl"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
+                  <div>
+                    <p className="font-serif text-2xl md:text-3xl text-foreground italic">
+                      "Onestà"
+                    </p>
+                    <p className="text-muted-foreground">
+                      Honestidade em italiano
+                    </p>
                   </div>
-                  <p className="font-serif text-2xl md:text-3xl text-foreground italic">
-                    "Onestà"
-                  </p>
-                  <p className="text-muted-foreground mt-2">
-                    Honestidade em italiano
-                  </p>
                 </div>
               </div>
             </div>
@@ -74,7 +89,9 @@ const About = () => {
                   <span className="text-2xl">🏆</span>
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">+15 Anos</p>
+                  <p className="font-semibold text-foreground">
+                    +{experienceYears} {isPlural ? "Anos" : "Ano"}
+                  </p>
                   <p className="text-sm text-muted-foreground">de Experiência</p>
                 </div>
               </div>

@@ -1,13 +1,21 @@
 import { ArrowRight, Shield, Award, Users } from "lucide-react";
+
+import { getExperienceYears } from "@/lib/utils";
+
 import { Button } from "./ui/button";
 
 const Hero = () => {
+  const experienceYears = getExperienceYears();
+  const experienceLabel = `+${experienceYears} ${
+    experienceYears > 1 ? "Anos" : "Ano"
+  } de Experiência`;
+
   return (
     <section className="relative min-h-screen gradient-hero overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_80%,_hsl(40_30%_97%_/_0.1)_0%,_transparent_50%)]" />
-        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,_hsl(40_30%_97%_/_0.1)_0%,_transparent_50%)]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_80%,_hsl(0_0%_98%_/_0.1)_0%,_transparent_50%)]" />
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,_hsl(0_0%_98%_/_0.1)_0%,_transparent_50%)]" />
       </div>
 
       <div className="section-container relative z-10 pt-32 pb-20 md:pt-40 md:pb-32">
@@ -28,15 +36,17 @@ const Hero = () => {
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up opacity-0 delay-200">
-            A Onestà oferece assessoria completa e personalizada para você
-            conquistar sua cidadania italiana com segurança e tranquilidade.
+            Assessoria completa e personalizada para sua cidadania italiana, com
+            segurança, transparência e acompanhamento em todas as etapas.
+            Atuamos nos processos via Consulado ou Judicial, além de serviços
+            essenciais como agendamento no Prenotami, traduções e AIRE.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-up opacity-0 delay-300">
             <Button variant="hero" size="xl" asChild>
               <a href="#contato">
-                Iniciar Minha Jornada
+                Entrar em Contato
                 <ArrowRight className="w-5 h-5" />
               </a>
             </Button>
@@ -49,15 +59,17 @@ const Hero = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 animate-fade-up opacity-0 delay-400">
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Award className="w-5 h-5" />
-              <span className="text-sm font-medium">+15 Anos de Experiência</span>
+              <span className="text-sm font-medium">Desde 2024</span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">+2.000 Famílias Atendidas</span>
+              <span className="text-sm font-medium">
+                +2.000 Famílias Atendidas
+              </span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Shield className="w-5 h-5" />
-              <span className="text-sm font-medium">Processo 100% Seguro</span>
+              <span className="text-sm font-medium">Processo Seguro!</span>
             </div>
           </div>
         </div>
@@ -74,7 +86,7 @@ const Hero = () => {
         >
           <path
             d="M0 120L60 110C120 100 240 80 360 75C480 70 600 80 720 85C840 90 960 90 1080 85C1200 80 1320 70 1380 65L1440 60V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-            fill="hsl(40, 30%, 97%)"
+            fill="hsl(0, 0%, 98%)"
           />
         </svg>
       </div>
