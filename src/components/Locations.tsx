@@ -59,17 +59,19 @@ const Locations = () => {
             <span className="text-primary">Todo o Brasil</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Atuamos em todos os consulados italianos no Brasil e via judicial para
-            todo o território nacional
+            Atuamos em todos os consulados italianos no Brasil e via judicial
+            para todo o território nacional
           </p>
         </div>
 
         {/* Locations Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {locations.map((location, index) => (
             <div
               key={index}
-              className="bg-card rounded-xl p-6 border border-border hover:border-primary/20 transition-colors"
+              className={`bg-card rounded-xl p-6 border border-border hover:border-primary/20 transition-colors ${
+                locations.length % 3 === 1 && index === locations.length - 1 ? 'lg:col-start-2' : ''
+              }`}
             >
               <div className="flex items-start gap-3 mb-3">
                 <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
@@ -87,28 +89,6 @@ const Locations = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* National Coverage Banner */}
-        <div className="bg-primary/5 rounded-2xl p-8 md:p-12 text-center border border-primary/20">
-          <h3 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-4">
-            Atendimento Nacional e Internacional
-          </h3>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            Além de todo o Brasil, atendemos brasileiros residentes no exterior que
-            buscam reconhecer sua cidadania italiana. Nossa equipe é especializada
-            em processos internacionais e via judicial.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              <span>(11) 9168-07522</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              <span>contato@onestacidadania.com.br</span>
-            </div>
-          </div>
         </div>
       </div>
     </section>

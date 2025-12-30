@@ -20,9 +20,9 @@ const Index = () => {
       <Stats />
       <Testimonials />
       <Consultancy />
-      <FAQ />
       <Locations />
       <Contact />
+      <FAQ />
       <Footer />
     </main>
   );

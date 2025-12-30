@@ -69,28 +69,22 @@ const FAQ = () => {
 
         {/* FAQ Accordion */}
         <div className="max-w-3xl mx-auto">
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full space-y-4">
             {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left hover:text-primary transition-colors">
-                  <span className="text-lg">{faq.question}</span>
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="bg-card rounded-xl border border-border hover:border-primary/20 transition-all duration-300 px-6"
+              >
+                <AccordionTrigger className="text-left hover:text-primary transition-colors py-5">
+                  <span className="text-lg font-semibold">{faq.question}</span>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-5">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
-
-        {/* CTA */}
-        <div className="text-center mt-12">
-          <a
-            href="#contato"
-            className="inline-flex items-center gap-2 text-primary font-semibold hover:underline"
-          >
-            Ainda tem dúvidas? Fale com um especialista →
-          </a>
         </div>
       </div>
     </section>
