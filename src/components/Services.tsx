@@ -1,7 +1,19 @@
-import { FileText, Globe, Languages, MapPin } from "lucide-react";
+import { AtSign, File, FileText, Globe, Languages, MapPin } from "lucide-react";
 
 const Services = () => {
   const services = [
+    {
+      icon: File,
+      title: "Cidadania Italiana",
+      description:
+        "Assessoria completa para o reconhecimento da sua cidadania por via Judicial ou Consular, cuidando de toda a estratégia técnica e jurídica do processo.",
+    },
+    {
+      icon: AtSign,
+      title: "Agendamentos Prenot@mi",
+      description:
+        "Consultoria técnica para agendamento de serviços consulares, como emissão de Passaporte e reconhecimento de Cidadania, através do portal Prenot@mi para consulados de todo o mundo.",
+    },
     {
       icon: Globe,
       title: "Passaporte Italiano",

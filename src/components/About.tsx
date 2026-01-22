@@ -24,20 +24,27 @@ const About = () => {
               Sobre Nós
             </span>
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-              Sua Jornada para a{" "}
-              <span className="text-primary">Itália</span> Começa Aqui
+              Sua Jornada para a <span className="text-primary">Itália</span>{" "}
+              Começa Aqui
             </h2>
             <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-              A <strong className="text-foreground">Onestà Cidadania Italiana</strong> nasceu da
-              paixão pela cultura italiana e do desejo de conectar pessoas às
-              suas raízes. Há mais de {experienceYears} {isPlural ? "anos" : "ano"}, ajudamos
-              famílias brasileiras a conquistar o reconhecimento da cidadania italiana.
+              Fundada em 2024 por descendentes de italianos, nossa empresa
+              nasceu da experiência real: conhecemos na prática cada dificuldade
+              e a extensa burocracia que os requerentes enfrentam. Criamos a
+              Onestà exatamente para mudar essa realidade, tornando o
+              reconhecimento da cidadania um processo mais simples, transparente
+              e acessível do início ao fim. Atuamos de forma totalmente online,
+              o que nos permite oferecer um atendimento ágil e eficiente para
+              clientes em qualquer lugar do mundo. Essa estrutura digital
+              garante que você tenha suporte especializado e acompanhamento
+              constante, sem as barreiras da distância.
             </p>
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              Nossa missão é tornar esse processo acessível, transparente e
-              seguro. Entendemos que cada família tem uma história única, e por
-              isso oferecemos um atendimento personalizado, guiando você em cada
-              passo dessa importante jornada.
+              Nosso compromisso é com a clareza e a segurança jurídica.
+              Acreditamos que a busca pelas suas raízes deve ser uma jornada de
+              realização, e não de estresse. Por isso, cuidamos de toda a
+              complexidade documental e burocrática para que você conquiste seu
+              passaporte italiano com o máximo de agilidade e confiança.
             </p>
 
             {/* Highlights */}
@@ -94,7 +101,9 @@ const About = () => {
                   <p className="font-semibold text-foreground">
                     +{experienceYears} {isPlural ? "Anos" : "Ano"}
                   </p>
-                  <p className="text-sm text-muted-foreground">de Experiência</p>
+                  <p className="text-sm text-muted-foreground">
+                    de Experiência
+                  </p>
                 </div>
               </div>
             </div>

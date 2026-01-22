@@ -18,15 +18,9 @@ const Hero = () => {
         <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,_hsl(0_0%_98%_/_0.1)_0%,_transparent_50%)]" />
       </div>
 
-      <div className="section-container relative z-10 pt-32 pb-20 md:pt-40 md:pb-32">
+      <div className="section-container relative z-10 pt-32 pb-20 md:pt-30 md:pb-32">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 mb-8 animate-fade-up opacity-0">
-            <Shield className="w-4 h-4 text-primary-foreground" />
-            <span className="text-sm font-medium text-primary-foreground">
-              Especialistas em Cidadania Italiana
-            </span>
-          </div>
 
           {/* Headline */}
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-up opacity-0 delay-100">
@@ -69,7 +63,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Shield className="w-5 h-5" />
-              <span className="text-sm font-medium">Processo Seguro!</span>
+              <span className="text-sm font-medium">Processo Seguro</span>
             </div>
           </div>
         </div>
