@@ -33,11 +33,14 @@ const About = () => {
               e a extensa burocracia que os requerentes enfrentam. Criamos a
               Onestà exatamente para mudar essa realidade, tornando o
               reconhecimento da cidadania um processo mais simples, transparente
-              e acessível do início ao fim. Atuamos de forma totalmente online,
-              o que nos permite oferecer um atendimento ágil e eficiente para
-              clientes em qualquer lugar do mundo. Essa estrutura digital
-              garante que você tenha suporte especializado e acompanhamento
-              constante, sem as barreiras da distância.
+              e acessível do início ao fim.
+            </p>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              Atuamos de forma totalmente online, o que nos permite oferecer um
+              atendimento ágil e eficiente para clientes em qualquer lugar do
+              mundo. Essa estrutura digital garante que você tenha suporte
+              especializado e acompanhamento constante, sem as barreiras da
+              distância.
             </p>
             <p className="text-muted-foreground mb-8 leading-relaxed">
               Nosso compromisso é com a clareza e a segurança jurídica.
