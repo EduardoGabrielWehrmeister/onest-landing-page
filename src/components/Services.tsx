@@ -1,7 +1,19 @@
-import { FileText, Globe, Languages, MapPin } from "lucide-react";
+import { AtSign, File, FileText, Globe, Languages, MapPin } from "lucide-react";
 
 const Services = () => {
   const services = [
+    {
+      icon: File,
+      title: "Cidadania Italiana",
+      description:
+        "Assessoria completa para o reconhecimento da sua cidadania por via Judicial ou Consular, cuidando de toda a estratégia técnica e jurídica do processo.",
+    },
+    {
+      icon: AtSign,
+      title: "Agendamentos Prenot@mi",
+      description:
+        "Consultoria técnica para agendamento de serviços consulares, como emissão de Passaporte e reconhecimento de Cidadania, através do portal Prenot@mi para consulados de todo o mundo.",
+    },
     {
       icon: Globe,
       title: "Passaporte Italiano",
@@ -46,11 +58,11 @@ const Services = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {services.map((service, index) => (
             <div
               key={index}
-              className="group bg-card rounded-2xl p-8 card-elevated border border-border hover:border-primary/20 transition-all duration-300"
+              className="group bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-all duration-300"
             >
               {/* Icon */}
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors duration-300">
