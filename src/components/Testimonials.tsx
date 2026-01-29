@@ -19,12 +19,7 @@ const Testimonials = () => {
       text: "O acompanhamento personalizado fez toda a diferença. Sempre me senti segura e bem informada sobre cada etapa do processo. Minha família toda já é cidadã italiana!",
       image: dopoimento03,
     },
-    {
-      name: "Maria Fernanda Silva",
-      location: "São Paulo, SP",
-      text: "A Onestà foi fundamental na conquista da minha cidadania italiana. O processo foi conduzido com extrema competência e transparência. Recomendo de olhos fechados!",
-      image: dopoimento01,
-    },
+
     {
       name: "Lucas Ferreira",
       location: "Belo Horizonte, MG",
@@ -61,6 +56,12 @@ const Testimonials = () => {
       text: "A Onestà transformou um processo complicado em algo simples e rápido. Recomendo para todos que buscam a cidadania italiana. Nota 10!",
       image: dopoimento08,
     },
+    {
+      name: "Maria Fernanda Silva",
+      location: "São Paulo, SP",
+      text: "A Onestà foi fundamental na conquista da minha cidadania italiana. O processo foi conduzido com extrema competência e transparência. Recomendo de olhos fechados!",
+      image: dopoimento01,
+    },
   ];
 
   return (
@@ -83,37 +84,42 @@ const Testimonials = () => {
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className="relative rounded-2xl overflow-hidden group card-elevated cursor-pointer"
+            <a
+              href="https://www.instagram.com/onesta.cidadania/"
+              target="_blank"
             >
-              {/* Background Image */}
-              <img
-                src={testimonial.image}
-                alt={`Foto de ${testimonial.name}`}
-                className="w-full h-100 object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+              <div
+                key={index}
+                className="relative rounded-2xl overflow-hidden group card-elevated cursor-pointer"
+              >
+                {/* Background Image */}
+                <img
+                  src={testimonial.image}
+                  alt={`Foto de ${testimonial.name}`}
+                  className="w-full h-100 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
 
-              {/* Dark Overlay on Bottom Half */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/90 via-black/10 to-transparent p-6 flex flex-col justify-end">
-                {/* Testimonial Text */}
-                {/* <p className="text-black text-sm leading-relaxed mb-4 line-clamp-4">
+                {/* Dark Overlay on Bottom Half */}
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/90 via-black/10 to-transparent p-6 flex flex-col justify-end">
+                  {/* Testimonial Text */}
+                  {/* <p className="text-black text-sm leading-relaxed mb-4 line-clamp-4">
                   "{testimonial.text}"
                 </p> */}
 
-                {/* Author Info */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-semibold text-base">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-white/70 text-sm">
-                      {testimonial.location}
-                    </p>
+                  {/* Author Info */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-semibold text-base">
+                        {testimonial.name}
+                      </p>
+                      <p className="text-white/70 text-sm">
+                        {testimonial.location}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </div>
