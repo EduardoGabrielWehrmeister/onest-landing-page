@@ -152,7 +152,6 @@ const Contact = () => {
           {/* Location */}
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-2 text-primary-foreground/80">
-              <MapPin className="w-4 h-4" />
               <span>Ribeirão Preto, SP - Atendimento em todo o Brasil e em todo o mundo!</span>
             </div>
           </div>

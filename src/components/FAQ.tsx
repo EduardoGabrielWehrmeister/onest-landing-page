@@ -10,7 +10,7 @@ const FAQ = () => {
     {
       question: "Quanto tempo demora o processo de cidadania italiana?",
       answer:
-        "O tempo varia conforme o tipo de processo. Via consulado, pode levar de 2 a 5 anos. Via judicial, geralmente entre 12 a 24 meses. Nossa equipe analisa seu caso e define a melhor estratégia.",
+        "O tempo varia conforme o tipo de processo. Via consulado pode levar pelo menos 5 anos para mais. Via judicial em torno de 2 anos. Nossa equipe analisa seu caso e define a melhor estratégia.",
     },
     {
       question: "Quais documentos necessários para cidadania italiana?",
@@ -43,9 +43,9 @@ const FAQ = () => {
         "Sim, oferecemos serviço completo de tradução juramentada de documentos brasileiros para italiano e vice-versa, realizado por tradutores certificados e reconhecidos pelo consulado.",
     },
     {
-      question: "Como agendar o Prenotami (consulado)?",
+      question: "Vocês fazem agendamentos no Prenotami?",
       answer:
-        "O Prenotami é o sistema de agendamento online do consulado italiano. Nossa equipe auxilia em todo o processo de agendamento, preenchimento e preparação da documentação necessária.",
+        "Sim! Fazemos agendamento de serviços de",
     },
   ];
 

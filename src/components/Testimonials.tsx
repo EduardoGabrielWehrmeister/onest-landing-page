@@ -1,5 +1,12 @@
-import { Quote, Star } from "lucide-react";
-import { useState } from "react";
+import { Quote } from "lucide-react";
+import dopoimento01 from "../assets/testimonials/Dopoimento01.jpg";
+import dopoimento02 from "../assets/testimonials/Dopoimento02.jpg";
+import dopoimento03 from "../assets/testimonials/Dopoimento03.jpg";
+import dopoimento04 from "../assets/testimonials/Dopoimento04.jpg";
+import dopoimento05 from "../assets/testimonials/Dopoimento05.jpg";
+import dopoimento06 from "../assets/testimonials/Dopoimento06.jpg";
+import dopoimento07 from "../assets/testimonials/Dopoimento07.jpg";
+import dopoimento08 from "../assets/testimonials/Dopoimento08.jpg";
 
 const Testimonials = () => {
   const testimonials = [
@@ -7,23 +14,51 @@ const Testimonials = () => {
       name: "Maria Fernanda Silva",
       location: "São Paulo, SP",
       text: "A Onestà foi fundamental na conquista da minha cidadania italiana. O processo foi conduzido com extrema competência e transparência. Recomendo de olhos fechados!",
-      rating: 5,
+      image: dopoimento01,
     },
     {
       name: "Roberto Mancini",
       location: "Rio de Janeiro, RJ",
       text: "Depois de anos tentando sozinho, a equipe da Onestà conseguiu resolver todas as pendências em poucos meses. Profissionalismo impecável do início ao fim.",
-      rating: 5,
+      image: dopoimento02,
     },
     {
       name: "Ana Carolina Bertolini",
       location: "Curitiba, PR",
       text: "O acompanhamento personalizado fez toda a diferença. Sempre me senti segura e bem informada sobre cada etapa do processo. Minha família toda já é cidadã italiana!",
-      rating: 5,
+      image: dopoimento03,
+    },
+    {
+      name: "Lucas Ferreira",
+      location: "Belo Horizonte, MG",
+      text: "Excelente trabalho! A equipe foi super atenciosa e resolveu tudo rapidamente. Finalmente consegui meu passaporte italiano com a ajuda da Onestà.",
+      image: dopoimento04,
+    },
+    {
+      name: "Juliana Santos",
+      location: "Salvador, BA",
+      text: "Profissionais incríveis! Me guiaram por todo o processo de cidadania italiana com muita dedicação. Só tenho gratidão pela equipe da Onestà.",
+      image: dopoimento05,
+    },
+    {
+      name: "Fernando Oliveira",
+      location: "Brasília, DF",
+      text: "A melhor decisão que tomei foi contratar a Onestà. Todo o processo foi simplificado e explicado detalhadamente. Superou todas as minhas expectativas!",
+      image: dopoimento06,
+    },
+    {
+      name: "Patrícia Costa",
+      location: "Porto Alegre, RS",
+      text: "Impressionante a competência da equipe! Em poucos meses conquistei minha cidadania italiana. Agradeço a toda a equipe pelo excelente trabalho.",
+      image: dopoimento07,
+    },
+    {
+      name: "Ricardo Almeida",
+      location: "Fortaleza, CE",
+      text: "A Onestà transformou um processo complicado em algo simples e rápido. Recomendo para todos que buscam a cidadania italiana. Nota 10!",
+      image: dopoimento08,
     },
   ];
-
-  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <section id="depoimentos" className="py-20 md:py-32 bg-background">
@@ -42,47 +77,39 @@ const Testimonials = () => {
           </p>
         </div>
 
-        {/* Testimonials */}
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* Testimonials Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-card rounded-2xl p-8 card-elevated border border-border relative"
+              className="relative rounded-2xl overflow-hidden group card-elevated cursor-pointer"
             >
-              {/* Quote Icon */}
-              <div className="absolute top-6 right-6 opacity-10">
-                <Quote className="w-12 h-12 text-primary" />
-              </div>
+              {/* Background Image */}
+              <img
+                src={testimonial.image}
+                alt={`Foto de ${testimonial.name}`}
+                className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
 
-              {/* Rating */}
-              <div className="flex gap-1 mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5 fill-gold text-gold"
-                  />
-                ))}
-              </div>
+              {/* Dark Overlay on Bottom Half */}
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-6 flex flex-col justify-end">
+                {/* Testimonial Text */}
+                <p className="text-white text-sm leading-relaxed mb-4 line-clamp-4">
+                  "{testimonial.text}"
+                </p>
 
-              {/* Text */}
-              <p className="text-foreground mb-8 leading-relaxed italic">
-                "{testimonial.text}"
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="font-serif text-lg font-semibold text-primary">
-                    {testimonial.name.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {testimonial.name}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {testimonial.location}
-                  </p>
+                {/* Author Info */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white font-semibold text-base">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-white/70 text-sm">
+                      {testimonial.location}
+                    </p>
+                  </div>
+                  {/* Decorative Quote Icon */}
+                  <Quote className="w-8 h-8 text-white/30 flex-shrink-0" />
                 </div>
               </div>
             </div>
