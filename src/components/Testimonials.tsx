@@ -1,4 +1,4 @@
-import { Quote } from "lucide-react";
+import { LocateIcon, Quote } from "lucide-react";
 import dopoimento01 from "../assets/testimonials/Dopoimento01.jpg";
 import dopoimento02 from "../assets/testimonials/Dopoimento02.jpg";
 import dopoimento03 from "../assets/testimonials/Dopoimento03.jpg";
@@ -7,21 +7,12 @@ import dopoimento05 from "../assets/testimonials/Dopoimento05.jpg";
 import dopoimento06 from "../assets/testimonials/Dopoimento06.jpg";
 import dopoimento07 from "../assets/testimonials/Dopoimento07.jpg";
 import dopoimento08 from "../assets/testimonials/Dopoimento08.jpg";
+import dopoimento09 from "../assets/testimonials/Dopoimento09.jpg";
+import dopoimento10 from "../assets/testimonials/Dopoimento10.jpg";
+import dopoimento11 from "../assets/testimonials/Dopoimento11.jpg";
 
 const Testimonials = () => {
   const testimonials = [
-    {
-      name: "Maria Fernanda Silva",
-      location: "São Paulo, SP",
-      text: "A Onestà foi fundamental na conquista da minha cidadania italiana. O processo foi conduzido com extrema competência e transparência. Recomendo de olhos fechados!",
-      image: dopoimento01,
-    },
-    {
-      name: "Roberto Mancini",
-      location: "Rio de Janeiro, RJ",
-      text: "Depois de anos tentando sozinho, a equipe da Onestà conseguiu resolver todas as pendências em poucos meses. Profissionalismo impecável do início ao fim.",
-      image: dopoimento02,
-    },
     {
       name: "Ana Carolina Bertolini",
       location: "Curitiba, PR",
@@ -29,10 +20,16 @@ const Testimonials = () => {
       image: dopoimento03,
     },
     {
+      name: "Maria Fernanda Silva",
+      location: "São Paulo, SP",
+      text: "A Onestà foi fundamental na conquista da minha cidadania italiana. O processo foi conduzido com extrema competência e transparência. Recomendo de olhos fechados!",
+      image: dopoimento01,
+    },
+    {
       name: "Lucas Ferreira",
       location: "Belo Horizonte, MG",
       text: "Excelente trabalho! A equipe foi super atenciosa e resolveu tudo rapidamente. Finalmente consegui meu passaporte italiano com a ajuda da Onestà.",
-      image: dopoimento04,
+      image: dopoimento11,
     },
     {
       name: "Juliana Santos",
@@ -44,13 +41,19 @@ const Testimonials = () => {
       name: "Fernando Oliveira",
       location: "Brasília, DF",
       text: "A melhor decisão que tomei foi contratar a Onestà. Todo o processo foi simplificado e explicado detalhadamente. Superou todas as minhas expectativas!",
-      image: dopoimento06,
+      image: dopoimento09,
+    },
+    {
+      name: "Roberto Mancini",
+      location: "Rio de Janeiro, RJ",
+      text: "Depois de anos tentando sozinho, a equipe da Onestà conseguiu resolver todas as pendências em poucos meses. Profissionalismo impecável do início ao fim.",
+      image: dopoimento02,
     },
     {
       name: "Patrícia Costa",
       location: "Porto Alegre, RS",
       text: "Impressionante a competência da equipe! Em poucos meses conquistei minha cidadania italiana. Agradeço a toda a equipe pelo excelente trabalho.",
-      image: dopoimento07,
+      image: dopoimento10,
     },
     {
       name: "Ricardo Almeida",
@@ -88,15 +91,15 @@ const Testimonials = () => {
               <img
                 src={testimonial.image}
                 alt={`Foto de ${testimonial.name}`}
-                className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-100 object-cover group-hover:scale-105 transition-transform duration-500"
               />
 
               {/* Dark Overlay on Bottom Half */}
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-6 flex flex-col justify-end">
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/90 via-black/10 to-transparent p-6 flex flex-col justify-end">
                 {/* Testimonial Text */}
-                <p className="text-white text-sm leading-relaxed mb-4 line-clamp-4">
+                {/* <p className="text-black text-sm leading-relaxed mb-4 line-clamp-4">
                   "{testimonial.text}"
-                </p>
+                </p> */}
 
                 {/* Author Info */}
                 <div className="flex items-center justify-between">
@@ -108,8 +111,6 @@ const Testimonials = () => {
                       {testimonial.location}
                     </p>
                   </div>
-                  {/* Decorative Quote Icon */}
-                  <Quote className="w-8 h-8 text-white/30 flex-shrink-0" />
                 </div>
               </div>
             </div>
