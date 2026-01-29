@@ -41,7 +41,7 @@ const Services = () => {
   ];
 
   return (
-    <section id="servicos" className="py-20 md:py-32 gradient-section">
+    <section id="servicos" className="py-20 md:py-32 bg-background">
       <div className="section-container">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">

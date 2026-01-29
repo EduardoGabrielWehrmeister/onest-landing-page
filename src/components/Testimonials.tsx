@@ -65,7 +65,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section id="depoimentos" className="py-20 md:py-32 bg-background">
+    <section id="depoimentos" className="py-20 md:py-32 gradient-section">
       <div className="section-container">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">

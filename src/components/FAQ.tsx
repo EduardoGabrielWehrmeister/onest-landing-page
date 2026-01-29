@@ -45,12 +45,12 @@ const FAQ = () => {
     {
       question: "Vocês fazem agendamentos no Prenotami?",
       answer:
-        "Sim! Fazemos agendamento de serviços de",
+        "Sim! Fazemos agendamento de serviços de passaporte, cidadania e entrega de documentos. Também fazemos parcerias para agendamentos para outras assessorias",
     },
   ];
 
   return (
-    <section id="faq" className="py-20 md:py-32 bg-background">
+    <section id="faq" className="py-20 md:py-32 gradient-section">
       <div className="section-container">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-8">
