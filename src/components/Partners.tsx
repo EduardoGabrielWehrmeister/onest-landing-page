@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 const Partners = () => {
   return (
-    <section className="py-20 md:py-32 relative overflow-hidden gradient-section">
+    <section id="parcerias" className="py-20 md:py-32 relative overflow-hidden gradient-section">
       <div className="section-container">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
