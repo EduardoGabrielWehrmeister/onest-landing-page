@@ -6,7 +6,7 @@ const Partners = () => {
   return (
     <section id="parcerias" className="py-20 md:py-32 relative overflow-hidden gradient-section">
       <div className="section-container">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Content */}
           <div>
             {/* Eyebrow */}

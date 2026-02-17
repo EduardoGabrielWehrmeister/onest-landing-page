@@ -22,7 +22,7 @@ Obrigado(a) e aguardo o retorno.`;
 const EMAIL_MAILTO = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`;
 
 const WHATSAPP_MESSAGE =
-  "Olá, equipe Onestà Cidadania! Gostaria de saber mais sobre o processo de cidadania italiana e entender os próximos passos.";
+  "Olá, equipe Onestà Cidadania! \n\nGostaria de saber mais sobre o processo de cidadania italiana e entender os próximos passos.";
 const WHATSAPP_URL = `https://api.whatsapp.com/send?phone=5511916807522&text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 const copyEmailToClipboard = async () => {

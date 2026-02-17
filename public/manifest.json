@@ -3,10 +3,12 @@
   "short_name": "Onestà",
   "description": "Assessoria especializada em cidadania italiana. Mais de 15 anos de experiência, 2.500+ famílias atendidas.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#315E33",
   "orientation": "portrait-primary",
+  "lang": "pt-BR",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -14,10 +16,31 @@
       "type": "image/x-icon"
     },
     {
-      "src": "/logo-sem-fundo.png",
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ],
   "categories": ["business", "legal", "finance"],
@@ -25,7 +48,28 @@
     {
       "src": "/og-image.jpg",
       "sizes": "1200x630",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Onestà Cidadania Italiana - Landing Page"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Serviços",
+      "url": "/#servicos",
+      "description": "Conheça nossos serviços de cidadania italiana"
+    },
+    {
+      "name": "Contato",
+      "url": "/#contato",
+      "description": "Entre em contato conosco"
+    },
+    {
+      "name": "FAQ",
+      "url": "/#faq",
+      "description": "Perguntas frequentes sobre cidadania italiana"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
