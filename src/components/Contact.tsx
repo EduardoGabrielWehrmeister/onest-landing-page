@@ -22,7 +22,7 @@ Obrigado(a) e aguardo o retorno.`;
 const EMAIL_MAILTO = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`;
 
 const WHATSAPP_MESSAGE =
-  "Olá, equipe Onestà Cidadania! Gostaria de saber mais sobre o processo de cidadania italiana e entender os próximos passos.";
+  "Olá, equipe Onestà Cidadania! \n\nGostaria de saber mais sobre o processo de cidadania italiana e entender os próximos passos.";
 const WHATSAPP_URL = `https://api.whatsapp.com/send?phone=5511916807522&text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
 const copyEmailToClipboard = async () => {
@@ -152,7 +152,6 @@ const Contact = () => {
           {/* Location */}
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-2 text-primary-foreground/80">
-              <MapPin className="w-4 h-4" />
               <span>Ribeirão Preto, SP - Atendimento em todo o Brasil e em todo o mundo!</span>
             </div>
           </div>

@@ -93,23 +93,6 @@ const About = () => {
                 </div>
               </div>
             </div>
-
-            {/* Floating Badge */}
-            <div className="absolute -bottom-6 -left-6 bg-card rounded-xl p-4 shadow-lg border border-border">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-2xl">🏆</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    +{experienceYears} {isPlural ? "Anos" : "Ano"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    de Experiência
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
