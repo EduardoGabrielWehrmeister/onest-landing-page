@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
 import { getExperienceYears } from "@/lib/utils";
+import { useTotalAccumulated, usePrenotamiAccumulated } from "@/hooks/use-supabase";
 
 interface StatProps {
   value: number;
@@ -52,12 +53,12 @@ const StatItem = ({ value, suffix = "", label }: StatProps) => {
   }, [isVisible, value]);
 
   return (
-    <div ref={ref} className="text-center">
-      <div className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-primary-foreground mb-2">
+    <div ref={ref} className="text-center min-w-0">
+      <div className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-1 sm:mb-2">
         {count.toLocaleString("pt-BR")}
         {suffix}
       </div>
-      <p className="text-primary-foreground/80 text-lg">{label}</p>
+      <p className="text-primary-foreground/80 text-sm sm:text-base md:text-lg">{label}</p>
     </div>
   );
 };
@@ -66,9 +67,29 @@ const Stats = () => {
   const experienceYears = getExperienceYears();
   const experienceLabel = experienceYears > 1 ? "Anos" : "Ano";
 
+  // Buscar dados do Supabase
+  const { data: totalClientes, loading: loadingTotal, error: errorTotal } = useTotalAccumulated();
+  const { data: totalPrenotami, loading: loadingPrenotami, error: errorPrenotami } = usePrenotamiAccumulated();
+
+  // Verificar se há erro em alguma das chamadas
+  const hasError = errorTotal || errorPrenotami;
+  const isLoading = loadingTotal || loadingPrenotami;
+
+  // Garantir que os valores são números, usar valores padrão se houver erro ou não houver dados
+  const clientesValue = (typeof totalClientes === 'number' ? totalClientes : 9999);
+  const prenotamiValue = (typeof totalPrenotami === 'number' ? totalPrenotami : 999);
+
   const stats = [
-    { value: 2500, suffix: "+", label: "Famílias Atendidas" },
-    { value: 15000, suffix: "+", label: "Documentos Processados" },
+    { 
+      value: clientesValue, 
+      suffix: "+", 
+      label: "Clientes Atendidos" 
+    },
+    { 
+      value: prenotamiValue, 
+      suffix: "+", 
+      label: "Agendamentos no Prenotami" 
+    },
     {
       value: experienceYears,
       suffix: "+",
@@ -98,11 +119,25 @@ const Stats = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
           {stats.map((stat, index) => (
             <StatItem key={index} {...stat} />
           ))}
         </div>
+
+        {/* Loading Indicator */}
+        {isLoading && (
+          <div className="mt-4 text-center text-primary-foreground/70 text-sm">
+            Atualizando estatísticas...
+          </div>
+        )}
+
+        {/* Error Indicator */}
+        {hasError && !isLoading && (
+          <div className="mt-4 text-center text-yellow-300/90 text-sm">
+            ⚠️ Algumas estatísticas podem estar desatualizadas
+          </div>
+        )}
       </div>
     </section>
   );

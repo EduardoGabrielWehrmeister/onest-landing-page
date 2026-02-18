@@ -19,7 +19,7 @@ const About = () => {
       <div className="section-container">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Content */}
-          <div className="order-2 lg:order-1">
+          <div>
             <span className="inline-block text-sm font-semibold text-accent uppercase tracking-wider mb-4">
               Sobre Nós
             </span>
@@ -62,8 +62,8 @@ const About = () => {
           </div>
 
           {/* Image/Visual */}
-          <div className="order-1 lg:order-2 relative">
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 relative">
+          <div className="relative">
+            <div className="min-h-[300px] md:aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10 relative">
               {/* Decorative Elements */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-primary/20 blur-3xl" />
