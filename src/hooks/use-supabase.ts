@@ -314,4 +314,42 @@ export const useConnectionTest = () => {
   return { isConnected, loading, error };
 };
 
+/**
+ * Hook para testar permissão de escrita da chave pública
+ * @returns Estado com testResult, loading e error
+ * 
+ * @example
+ * ```tsx
+ * const { testResult, loading, runTest } = useWritePermissionTest();
+ * 
+ * return (
+ *   <button onClick={runTest} disabled={loading}>
+ *     Testar Permissão
+ *   </button>
+ *   {testResult && <p>{testResult.message}</p>}
+ * );
+ * ```
+ */
+export const useWritePermissionTest = () => {
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const runTest = async () => {
+    try {
+      setLoading(true);
+      const result = await connectionService.testWritePermission();
+      setTestResult(result);
+    } catch (error) {
+      setTestResult({
+        success: false,
+        message: `Erro ao testar: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { testResult, loading, runTest };
+};
+
 export default useSupabase;

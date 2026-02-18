@@ -221,6 +221,68 @@ export const connectionService = {
   },
 
   /**
+   * Testa se a chave pública tem permissão de escrita (INSERT)
+   * @returns Promise<{ success: boolean; message: string }> - resultado do teste
+   */
+  async testWritePermission(): Promise<{ success: boolean; message: string }> {
+    try {
+      // Tenta inserir um registro fictício
+      const testData = {
+        year: 9999,
+        passaporte: 0,
+        cidadania_fila: 0,
+        identidade: 0,
+        cidadania_menores: 0,
+        outros: 0,
+        comments: 'TESTE DE SEGURANÇA - DEVE SER REMOVIDO',
+      };
+
+      const { error } = await supabase()
+        .from('services_done')
+        .insert(testData);
+
+      if (error) {
+        // Se houver erro, isso é bom - significa que não tem permissão de escrita
+console.log(error.message)
+
+        if (error.code === '42501' || error.code === '23503' || error.code === '42P01') {
+          return {
+            success: false,
+            message: '✅ Segura: A chave pública NÃO tem permissão de escrita (correto)',
+          };
+        }
+        
+        return {
+          success: false,
+          message: `⚠️ Erro inesperado: ${error.message}`,
+        };
+      }
+
+      // Se não houver erro, isso é RUIM - significa que tem permissão de escrita
+      // Tenta remover o registro de teste
+      try {
+        await supabase()
+          .from('services_done')
+          .delete()
+          .eq('year', 9999)
+          .eq('comments', 'TESTE DE SEGURANÇA - DEVE SER REMOVIDO');
+      } catch (deleteError) {
+        console.error('Erro ao limpar teste:', deleteError);
+      }
+
+      return {
+        success: true,
+        message: '⚠️ ATENÇÃO: A chave pública TEM permissão de escrita! Verifique as políticas RLS.',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Erro ao testar permissão: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+      };
+    }
+  },
+
+  /**
    * Verifica se as variáveis de ambiente estão configuradas
    * @returns boolean - true se configurado
    */
