@@ -83,7 +83,7 @@ const Testimonials = () => {
                 {/* Background Image */}
                 <img
                   src={testimonial.image}
-                  alt={`Foto de ${testimonial.name}`}
+                  alt={`Foto de ${testimonial.name} com passaporte italiano após conquistar a cidadania com a Onestà`}
                   className="w-full h-100 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
 
