@@ -1,14 +1,23 @@
 import { ArrowRight, Shield, Award, Users } from "lucide-react";
 
-import { getExperienceYears } from "@/lib/utils";
+import { useTotalAccumulated } from "@/hooks/use-supabase";
 
 import { Button } from "./ui/button";
 
 const Hero = () => {
-  const experienceYears = getExperienceYears();
-  const experienceLabel = `+${experienceYears} ${
-    experienceYears > 1 ? "Anos" : "Ano"
-  } de Experiência`;
+  // Função auxiliar para arredondar para baixo até a próxima centena
+  const roundDownToHundred = (num: number): number => {
+    return Math.floor(num / 100) * 100;
+  };
+
+  // Buscar dados do Supabase
+  const { data: totalClientes, error } = useTotalAccumulated();
+
+  // Lógica de display com fallback de 600
+  const clientesDisplay = (() => {
+    if (error || !totalClientes) return 1000; // Fallback em caso de erro
+    return roundDownToHundred(totalClientes); // Arredonda para baixo (ex: 680 -> 600)
+  })();
 
   return (
     <section className="relative gradient-hero overflow-hidden">
@@ -63,7 +72,7 @@ const Hero = () => {
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Users className="w-5 h-5" />
               <span className="text-sm font-medium">
-                +9.000 Clientes Atendidos
+                +{clientesDisplay} Clientes Atendidos
               </span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">

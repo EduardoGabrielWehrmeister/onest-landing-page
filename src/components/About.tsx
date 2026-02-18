@@ -1,12 +1,9 @@
 import { CheckCircle2 } from "lucide-react";
 
-import { getExperienceYears } from "@/lib/utils";
 import logoFull from "@/assets/images/logos/logo.jpeg";
 import logoSemFundo from "@/assets/images/logos//logo-sem-fundo.png";
 
 const About = () => {
-  const experienceYears = getExperienceYears();
-  const isPlural = experienceYears > 1;
   const highlights = [
     "Equipe especializada com experiência comprovada",
     "Acompanhamento personalizado em cada etapa",
@@ -74,7 +71,7 @@ const About = () => {
                     <source srcSet={logoSemFundo} type="image/png" />
                     <img
                       src={logoFull}
-                      alt="Logo Onestà Cidadania Italiana - Assessoria especializada em cidadania italiana com mais de 15 anos de experiência atendendo famílias em todo o Brasil"
+                      alt="Logo Onestà Cidadania Italiana - Assessoria especializada em cidadania italiana desde 2024 com 680+ clientes atendidos em todo Brasil"
                       className="mx-auto max-w-[200px] md:max-w-xs w-full drop-shadow-xl"
                       loading="lazy"
                       decoding="async"
