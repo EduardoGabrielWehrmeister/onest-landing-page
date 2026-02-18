@@ -6,6 +6,10 @@ import denerRamos from "../assets/images/testimonials/depoimento-onesta-cidadani
 import mariaCristinaSimeone from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-maria-cristina-simeone.jpg";
 import ivoneSantos from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-ivone-santos.jpg";
 import gabuPaulini from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-gabu-paulini.jpg";
+import familiaPaulini from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-familia-paulini.jpg";
+import wiltonDaSilva from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-wilton-da-silva.jpg";
+import anaMaura from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-ana-maura.jpg";
+import heitorMarucci from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-heitor-marucci.jpg";
 
 const Testimonials = () => {
   const testimonials = [
@@ -48,6 +52,28 @@ const Testimonials = () => {
       name: "Gabu Paulini",
       location: "",
       image: gabuPaulini,
+    },
+    {
+      name: "Família Paulini",
+      location: "",
+      image: familiaPaulini,
+    },
+    {
+      name: "Wilton Da Silva Moretto",
+      location: "",
+      image: wiltonDaSilva,
+    },
+
+    {
+      name: "Ana Maura Perles",
+      location: "",
+      image: anaMaura,
+    },
+
+    {
+      name: "Heitor Marucci",
+      location: "",
+      image: heitorMarucci,
     },
   ];
 
