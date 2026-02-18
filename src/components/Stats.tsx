@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
 import { getExperienceYears } from "@/lib/utils";
+import { useTotalAccumulated, usePrenotamiAccumulated } from "@/hooks/use-supabase";
 
 interface StatProps {
   value: number;
@@ -66,9 +67,29 @@ const Stats = () => {
   const experienceYears = getExperienceYears();
   const experienceLabel = experienceYears > 1 ? "Anos" : "Ano";
 
+  // Buscar dados do Supabase
+  const { data: totalClientes, loading: loadingTotal, error: errorTotal } = useTotalAccumulated();
+  const { data: totalPrenotami, loading: loadingPrenotami, error: errorPrenotami } = usePrenotamiAccumulated();
+
+  // Verificar se há erro em alguma das chamadas
+  const hasError = errorTotal || errorPrenotami;
+  const isLoading = loadingTotal || loadingPrenotami;
+
+  // Garantir que os valores são números, usar valores padrão se houver erro ou não houver dados
+  const clientesValue = (typeof totalClientes === 'number' ? totalClientes : 9999);
+  const prenotamiValue = (typeof totalPrenotami === 'number' ? totalPrenotami : 999);
+
   const stats = [
-    { value: 2500, suffix: "+", label: "Famílias Atendidas" },
-    { value: 15000, suffix: "+", label: "Documentos Processados" },
+    { 
+      value: clientesValue, 
+      suffix: "+", 
+      label: "Clientes Atendidos" 
+    },
+    { 
+      value: prenotamiValue, 
+      suffix: "+", 
+      label: "Agendamentos no Prenotami" 
+    },
     {
       value: experienceYears,
       suffix: "+",
@@ -103,6 +124,20 @@ const Stats = () => {
             <StatItem key={index} {...stat} />
           ))}
         </div>
+
+        {/* Loading Indicator */}
+        {isLoading && (
+          <div className="mt-4 text-center text-primary-foreground/70 text-sm">
+            Atualizando estatísticas...
+          </div>
+        )}
+
+        {/* Error Indicator */}
+        {hasError && !isLoading && (
+          <div className="mt-4 text-center text-yellow-300/90 text-sm">
+            ⚠️ Algumas estatísticas podem estar desatualizadas
+          </div>
+        )}
       </div>
     </section>
   );

@@ -63,7 +63,7 @@ const Hero = () => {
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
               <Users className="w-5 h-5" />
               <span className="text-sm font-medium">
-                +2.000 Famílias Atendidas
+                +9.000 Clientes Atendidos
               </span>
             </div>
             <div className="flex items-center justify-center gap-3 text-primary-foreground/90">
