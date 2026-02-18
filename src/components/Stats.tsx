@@ -52,12 +52,12 @@ const StatItem = ({ value, suffix = "", label }: StatProps) => {
   }, [isVisible, value]);
 
   return (
-    <div ref={ref} className="text-center">
-      <div className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-primary-foreground mb-2">
+    <div ref={ref} className="text-center min-w-0">
+      <div className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-1 sm:mb-2">
         {count.toLocaleString("pt-BR")}
         {suffix}
       </div>
-      <p className="text-primary-foreground/80 text-lg">{label}</p>
+      <p className="text-primary-foreground/80 text-sm sm:text-base md:text-lg">{label}</p>
     </div>
   );
 };
@@ -98,7 +98,7 @@ const Stats = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
           {stats.map((stat, index) => (
             <StatItem key={index} {...stat} />
           ))}
