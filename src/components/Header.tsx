@@ -48,13 +48,13 @@ const Header = () => {
             <span className="font-serif text-xl md:text-2xl font-semibold text-foreground">
               Onestà
             </span>
-            <span className="hidden sm:inline text-muted-foreground text-sm font-sans">
+            <span className="hidden lg:inline text-muted-foreground text-sm font-sans">
               Cidadania Italiana
             </span>
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.href}

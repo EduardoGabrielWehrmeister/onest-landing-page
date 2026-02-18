@@ -1,8 +1,8 @@
 import { CheckCircle2 } from "lucide-react";
 
 import { getExperienceYears } from "@/lib/utils";
-import logoFull from "@/assets/logo.jpeg";
-import logoSemFundo from "@/assets/logo-sem-fundo.png";
+import logoFull from "@/assets/images/logos/logo.jpeg";
+import logoSemFundo from "@/assets/images/logos//logo-sem-fundo.png";
 
 const About = () => {
   const experienceYears = getExperienceYears();

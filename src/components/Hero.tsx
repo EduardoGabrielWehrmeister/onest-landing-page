@@ -11,7 +11,7 @@ const Hero = () => {
   } de Experiência`;
 
   return (
-    <section className="relative min-h-screen gradient-hero overflow-hidden">
+    <section className="relative gradient-hero overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_80%,_hsl(0_0%_98%_/_0.1)_0%,_transparent_50%)]" />
@@ -46,6 +46,11 @@ const Hero = () => {
             </Button>
             <Button variant="heroOutline" size="xl" asChild>
               <a href="#servicos">Conhecer Serviços</a>
+            </Button>
+            <Button variant="heroOutline" size="xl" asChild>
+              <a href="#parcerias">
+                Sou Assessor
+              </a>
             </Button>
           </div>
 

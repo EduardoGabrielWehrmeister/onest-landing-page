@@ -1,53 +1,53 @@
-import dopoimento01 from "../assets/testimonials/Dopoimento01.jpg";
-import dopoimento02 from "../assets/testimonials/Dopoimento02.jpg";
-import dopoimento03 from "../assets/testimonials/Dopoimento03.jpg";
-import dopoimento05 from "../assets/testimonials/Dopoimento05.jpg";
-import dopoimento08 from "../assets/testimonials/Dopoimento08.jpg";
-import dopoimento09 from "../assets/testimonials/Dopoimento09.jpg";
-import dopoimento10 from "../assets/testimonials/Dopoimento10.jpg";
-import dopoimento11 from "../assets/testimonials/Dopoimento11.jpg";
+import flaviaCosta from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-flavia-costa.jpg";
+import jaquelineMenin from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-jaqueline-menin.jpg";
+import lucasLopesMoreira from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-lucas-lopes-moreira.jpg";
+import roLoren from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-ro-loren.jpg";
+import denerRamos from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-dener-ramos.jpg";
+import mariaCristinaSimeone from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-maria-cristina-simeone.jpg";
+import ivoneSantos from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-ivone-santos.jpg";
+import gabuPaulini from "../assets/images/testimonials/depoimento-onesta-cidadania-italiana-gabu-paulini.jpg";
 
 const Testimonials = () => {
   const testimonials = [
     {
       name: "Flávia Costa",
       location: "",
-      image: dopoimento03,
+      image: flaviaCosta,
     },
     {
       name: "Jaqueline Menin",
       location: "",
-      image: dopoimento11,
+      image: jaquelineMenin,
     },
     {
       name: "Lucas Lopes Moreira",
       location: "",
-      image: dopoimento05,
+      image: lucasLopesMoreira,
     },
     {
-      name: "Ro Loren",
+      name: "Roberta Lorençatto",
       location: "",
-      image: dopoimento09,
+      image: roLoren,
     },
     {
       name: "Dener Ramos",
       location: "",
-      image: dopoimento02,
+      image: denerRamos,
     },
     {
       name: "Maria Cristina Simeone",
       location: "",
-      image: dopoimento10,
+      image: mariaCristinaSimeone,
     },
     {
       name: "Ivone Santos",
       location: "",
-      image: dopoimento08,
+      image: ivoneSantos,
     },
     {
       name: "Gabu Paulini",
       location: "",
-      image: dopoimento01,
+      image: gabuPaulini,
     },
   ];
 
