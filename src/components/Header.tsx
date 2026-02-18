@@ -44,7 +44,11 @@ const Header = () => {
       <div className="section-container">
         <div className="flex items-center justify-between h-14 md:h-16">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3">
+          <a 
+            href="#" 
+            className="flex items-center gap-3"
+            aria-label="Onestà Cidadania Italiana - Página Inicial"
+          >
             <span className="font-serif text-xl md:text-2xl font-semibold text-foreground">
               Onestà
             </span>
@@ -54,13 +58,14 @@ const Header = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-4 lg:gap-8">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-8" aria-label="Navegação principal">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleScroll(e, link.href)}
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                aria-label={`Ir para seção ${link.label}`}
               >
                 {link.label}
               </a>
@@ -70,7 +75,13 @@ const Header = () => {
           {/* CTA Button */}
           <div className="hidden md:block">
             <Button variant="cta" size="default" asChild>
-              <a href="#contato" onClick={(e) => handleScroll(e, "#contato")}>Fale Conosco</a>
+              <a 
+                href="#contato" 
+                onClick={(e) => handleScroll(e, "#contato")}
+                aria-label="Entrar em contato conosco"
+              >
+                Fale Conosco
+              </a>
             </Button>
           </div>
 
@@ -78,7 +89,8 @@ const Header = () => {
           <button
             className="md:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Menu"
+            aria-label={isMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? (
               <X className="w-6 h-6 text-foreground" />
@@ -90,7 +102,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border animate-fade-in">
+          <nav className="md:hidden py-4 border-t border-border animate-fade-in" aria-label="Menu de navegação mobile">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
@@ -98,12 +110,17 @@ const Header = () => {
                   href={link.href}
                   className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 py-2"
                   onClick={(e) => handleScroll(e, link.href)}
+                  aria-label={`Ir para seção ${link.label}`}
                 >
                   {link.label}
                 </a>
               ))}
               <Button variant="cta" size="lg" className="mt-2" asChild>
-                <a href="#contato" onClick={(e) => handleScroll(e, "#contato")}>
+                <a 
+                  href="#contato" 
+                  onClick={(e) => handleScroll(e, "#contato")}
+                  aria-label="Entrar em contato conosco"
+                >
                   Fale Conosco
                 </a>
               </Button>
