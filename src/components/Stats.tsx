@@ -81,11 +81,6 @@ const Stats = () => {
 
   const stats = [
     { 
-      value: clientesValue, 
-      suffix: "+", 
-      label: "Clientes Atendidos" 
-    },
-    { 
       value: prenotamiValue, 
       suffix: "+", 
       label: "Agendamentos no Prenotami" 
@@ -95,8 +90,11 @@ const Stats = () => {
       suffix: "+",
       label: `${experienceLabel} de Experiência`,
     },
-    { value: 98, suffix: "%", label: "Taxa de Aprovação" },
-  ];
+    { 
+      value: clientesValue, 
+      suffix: "+", 
+      label: "Clientes Atendidos" 
+    }  ];
 
   return (
     <section id="numeros" className="py-20 md:py-28 gradient-hero relative overflow-hidden">
@@ -119,7 +117,7 @@ const Stats = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 lg:gap-16 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <StatItem key={index} {...stat} />
           ))}

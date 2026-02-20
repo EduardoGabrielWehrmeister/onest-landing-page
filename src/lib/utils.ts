@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-const EXPERIENCE_START_DATE = new Date("2024-08-01T00:00:00Z");
+const EXPERIENCE_START_DATE = new Date("2024-01-01T00:00:00Z");
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
