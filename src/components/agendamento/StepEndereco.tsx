@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MapPin } from "lucide-react";
 import type { FormData } from "@/hooks/useLocalStorageForm";
 
 interface Props {
@@ -17,20 +18,31 @@ const fields = [
 ];
 
 const StepEndereco = ({ formData, updateField }: Props) => (
-  <div className="space-y-6">
-    <div>
-      <h2 className="text-xl font-serif font-semibold text-foreground">Endereço</h2>
-      <p className="text-sm text-muted-foreground mt-1">Endereço de residência atual</p>
+  <div className="space-y-8">
+    {/* Header */}
+    <div className="text-center">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
+        <MapPin className="h-7 w-7 text-primary" />
+      </div>
+      <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
+        Endereço
+      </h2>
+      <p className="text-base text-muted-foreground">
+        Endereço de residência atual
+      </p>
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    {/* Form fields */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {fields.map(({ key, label, half }) => (
         <div key={key} className={`space-y-2 ${!half ? "md:col-span-2" : ""}`}>
-          <Label htmlFor={key}>{label}</Label>
+          <Label htmlFor={key} className="text-sm font-medium">{label}</Label>
           <Input
             id={key}
             value={formData[key]}
             onChange={(e) => updateField(key, e.target.value)}
             placeholder={label}
+            className="h-11"
           />
         </div>
       ))}

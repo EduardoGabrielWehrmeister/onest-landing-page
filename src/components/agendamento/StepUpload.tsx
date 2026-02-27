@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useRef } from "react";
 
 interface Props {
@@ -17,31 +18,71 @@ const StepUpload = ({ fileName, onChange }: Props) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-serif font-semibold text-foreground">Comprovante de Residência</h2>
-        <p className="text-sm text-muted-foreground mt-1">Faça upload do comprovante (simulação)</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
+          <FileCheck className="h-7 w-7 text-primary" />
+        </div>
+        <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
+          Comprovante de Residência
+        </h2>
+        <p className="text-base text-muted-foreground">
+          Faça upload do comprovante (simulação)
+        </p>
       </div>
 
       <input ref={inputRef} type="file" className="hidden" onChange={handleFile} accept=".pdf,.jpg,.jpeg,.png" />
 
+      {/* Upload area */}
       {!fileName ? (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full border-2 border-dashed border-border rounded-lg p-8 flex flex-col items-center gap-3 hover:border-primary/50 transition-colors cursor-pointer"
+          className={cn(
+            "w-full border-2 border-dashed border-border rounded-2xl p-8 md:p-12",
+            "flex flex-col items-center gap-4",
+            "hover:border-primary hover:bg-primary/5",
+            "transition-all duration-300 cursor-pointer group",
+            "hover:scale-[1.01] hover:shadow-lg"
+          )}
         >
-          <Upload className="h-10 w-10 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Clique para selecionar um arquivo</span>
-          <span className="text-xs text-muted-foreground">PDF, JPG ou PNG</span>
+          <div className={cn(
+            "flex items-center justify-center w-16 h-16 rounded-full",
+            "bg-primary/10 group-hover:bg-primary/20",
+            "transition-colors duration-300"
+          )}>
+            <Upload className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-300" />
+          </div>
+          <div className="text-center space-y-1">
+            <span className="text-base font-medium text-foreground group-hover:text-primary transition-colors">
+              Clique para selecionar um arquivo
+            </span>
+            <p className="text-sm text-muted-foreground">
+              Formatos aceitos: PDF, JPG, PNG (máx. 10MB)
+            </p>
+          </div>
         </button>
       ) : (
-        <div className="flex items-center gap-3 rounded-lg border border-border p-4">
-          <FileText className="h-5 w-5 text-primary shrink-0" />
-          <span className="text-sm text-foreground truncate flex-1">{fileName}</span>
-          <Button variant="ghost" size="icon" onClick={() => onChange("")}>
-            <X className="h-4 w-4" />
-          </Button>
+        /* File preview */
+        <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground shrink-0">
+              <FileText className="h-6 w-6" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{fileName}</p>
+              <p className="text-xs text-muted-foreground">Arquivo selecionado</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onChange("")}
+              className="shrink-0 hover:bg-destructive/10 hover:text-destructive"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       )}
     </div>

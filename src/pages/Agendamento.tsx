@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 import { useLocalStorageForm } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, Send, Calendar } from "lucide-react";
 
 import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
 import StepDadosAssessor from "@/components/agendamento/StepDadosAssessor";
@@ -15,6 +14,7 @@ import StepAnotacoes from "@/components/agendamento/StepAnotacoes";
 import StepRevisao from "@/components/agendamento/StepRevisao";
 import StepConfirmacao from "@/components/agendamento/StepConfirmacao";
 import StepSucesso from "@/components/agendamento/StepSucesso";
+import StepIndicator from "@/components/agendamento/StepIndicator";
 
 const Agendamento = () => {
   const {
@@ -31,9 +31,9 @@ const Agendamento = () => {
 
   const steps = useMemo(() => {
     const base = [
-      { label: "Tipo de Usuário", key: "tipo" },
-      ...(isAssessor ? [{ label: "Dados do Assessor", key: "assessor" }] : []),
-      { label: "Dados do Cliente", key: "cliente" },
+      { label: "Tipo", key: "tipo" },
+      ...(isAssessor ? [{ label: "Assessor", key: "assessor" }] : []),
+      { label: "Cliente", key: "cliente" },
       { label: "Pessoas", key: "pessoas" },
       { label: "Endereço", key: "endereco" },
       { label: "Comprovante", key: "upload" },
@@ -46,7 +46,6 @@ const Agendamento = () => {
   }, [isAssessor]);
 
   const totalSteps = steps.length;
-  const progressValue = ((currentStep + 1) / totalSteps) * 100;
   const currentKey = steps[currentStep]?.key;
   const isLastActionStep = currentKey === "confirmacao";
   const isSuccessStep = currentKey === "sucesso";
@@ -99,71 +98,115 @@ const Agendamento = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-start justify-center py-8 px-4">
-      <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">
-            Solicitação de Agendamento
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Preencha as informações abaixo para solicitar seu agendamento
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Hero Header */}
+      <div className="gradient-hero pt-16 pb-12 md:pt-20 md:pb-16">
+        {/* Italian Stripe */}
+        <div className="italian-stripe"></div>
+
+        <div className="section-container relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Icon */}
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-foreground/10 backdrop-blur-sm mb-6 animate-scale-up">
+              <Calendar className="w-8 h-8 md:w-10 md:h-10 text-primary-foreground" />
+            </div>
+
+            {/* Title */}
+            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-tight mb-4">
+              Solicitação de <span className="italic">Agendamento</span>
+            </h1>
+
+            {/* Description */}
+            <p className="text-base md:text-lg text-primary-foreground/80 max-w-2xl mx-auto">
+              Preencha as informações abaixo para solicitar seu agendamento no Prenotami
+            </p>
+          </div>
         </div>
 
-        {/* Progress */}
-        {!isSuccessStep && (
-          <div className="mb-6">
-            <div className="flex justify-between text-xs text-muted-foreground mb-2">
-              <span>Etapa {currentStep + 1} de {totalSteps - 1}</span>
-              <span>{steps[currentStep]?.label}</span>
-            </div>
-            <Progress value={progressValue} className="h-2" />
-          </div>
-        )}
-
-        {/* Card */}
-        <Card className="card-elevated border-0 shadow-lg">
-          <CardContent className="p-6 md:p-8">
-            <div className="animate-fade-in" key={currentStep}>
-              {renderStep()}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Navigation */}
-        {!isSuccessStep && (
-          <div className="flex justify-between mt-6">
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={currentStep === 0}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={!canGoNext()}
-              className="gap-2"
-              variant={isLastActionStep ? "cta" : "default"}
-            >
-              {isLastActionStep ? (
-                <>
-                  Enviar
-                  <Send className="h-4 w-4" />
-                </>
-              ) : (
-                <>
-                  Próximo
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </Button>
-          </div>
-        )}
+        {/* Bottom Wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0 120L60 110C120 100 240 80 360 75C480 70 600 80 720 85C840 90 960 90 1080 85C1200 80 1320 70 1380 65L1440 60V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
+              fill="hsl(0, 0%, 98%)"
+            />
+          </svg>
+        </div>
       </div>
+
+      {/* Main Content */}
+      <div className="section-container relative z-10 -mt-8">
+        <div className="max-w-3xl mx-auto">
+          {/* Stepper - Only show if not success step */}
+          {!isSuccessStep && (
+            <div className="mb-8 overflow-x-auto pb-4">
+              <div className="flex items-start justify-between min-w-max md:min-w-0 gap-2">
+                {steps.slice(0, -1).map((step, index) => (
+                  <StepIndicator
+                    key={step.key}
+                    number={index + 1}
+                    label={step.label}
+                    active={index === currentStep}
+                    completed={index < currentStep}
+                    isLast={index === steps.length - 2}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Card */}
+          <Card className="card-elevated border-0 shadow-xl">
+            <CardContent className="p-6 md:p-8 lg:p-10">
+              <div className="animate-slide-in" key={currentStep}>
+                {renderStep()}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Navigation */}
+          {!isSuccessStep && (
+            <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className="gap-2 w-full sm:w-auto"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </Button>
+              <Button
+                onClick={handleNext}
+                disabled={!canGoNext()}
+                className="gap-2 w-full sm:w-auto"
+                variant={isLastActionStep ? "cta" : "default"}
+              >
+                {isLastActionStep ? (
+                  <>
+                    Enviar Solicitação
+                    <Send className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    Próximo
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Spacer for bottom */}
+      <div className="py-12 md:py-16"></div>
     </div>
   );
 };
