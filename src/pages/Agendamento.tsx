@@ -1,53 +1,56 @@
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useLocalStorageForm } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
+  Briefcase,
   User,
   Users,
-  FileText,
   StickyNote,
-  Shield,
-  Key,
   CheckCircle,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 
+import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
 import StepDadosAssessor from "@/components/agendamento/StepDadosAssessor";
-import StepTermoResponsabilidade from "@/components/agendamento/StepTermoResponsabilidade";
-import StepClientePrincipal from "@/components/agendamento/StepClientePrincipal";
-import StepConfiguracaoOTP from "@/components/agendamento/StepConfiguracaoOTP";
-import StepContaPrenotami from "@/components/agendamento/StepContaPrenotami";
+import StepDadosTitular from "@/components/agendamento/StepDadosTitular";
 import StepRequerentesAdicionais from "@/components/agendamento/StepRequerentesAdicionais";
+import StepPreferenciaDatas from "@/components/agendamento/StepPreferenciaDatas";
 import StepObservacoes from "@/components/agendamento/StepObservacoes";
+import StepRevisaoConfirmacao from "@/components/agendamento/StepRevisaoConfirmacao";
 import StepSucesso from "@/components/agendamento/StepSucesso";
 import StepIndicator from "@/components/agendamento/StepIndicator";
 
 const Agendamento = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     formData,
     currentStep,
     setCurrentStep,
     updateField,
     updateRequerente,
-    setQuantidadeRequerentes,
+    addRequerente,
+    removeRequerente,
     resetForm,
   } = useLocalStorageForm();
 
+  const isAssessor = formData.tipoUsuario === "assessor";
+
   const steps = useMemo(
     () => [
-      { label: "Assessor", key: "assessor", icon: BadgeCheck },
-      { label: "Termo", key: "termo", icon: FileText },
-      { label: "Cliente", key: "cliente", icon: User },
-      { label: "OTP", key: "otp", icon: Shield },
-      { label: "Conta", key: "conta", icon: Key },
+      { label: "Tipo", key: "tipo", icon: User },
+      ...(isAssessor ? [{ label: "Assessor", key: "assessor", icon: Briefcase }] : []),
+      { label: "Titular", key: "titular", icon: User },
       { label: "Requerentes", key: "requerentes", icon: Users },
+      { label: "Datas", key: "datas", icon: CalendarIcon },
       { label: "Observações", key: "observacoes", icon: StickyNote },
+      { label: "Revisão", key: "revisao", icon: CheckCircle },
       { label: "Sucesso", key: "sucesso", icon: CheckCircle },
     ],
-    []
+    [isAssessor]
   );
 
   const totalSteps = steps.length;
@@ -55,117 +58,161 @@ const Agendamento = () => {
   const isSuccessStep = currentKey === "sucesso";
 
   const canGoNext = () => {
-    switch (currentKey) {
-      case "assessor":
-        return !!(
-          formData.assessorEmail &&
-          formData.assessorNome &&
-          formData.assessorTelefone
-        );
-      case "termo":
-        return formData.termoResponsabilidadeAceito === true;
-      case "cliente":
-        return !!(
-          formData.clienteNome &&
-          formData.clientePdfFile &&
-          formData.clientePdfConfirmado
-        );
-      case "otp":
-        return !!(formData.otpConfigurado && formData.otpGmailAtencao);
-      case "conta":
-        return !!(
-          formData.prenotamiEmail &&
-          formData.prenotamiSenha &&
-          formData.prenotamiEndereco &&
-          formData.prenotamiAltura &&
-          formData.prenotamiCorOlhos
-        );
-      case "requerentes": {
-        const requiredCount = Math.max(0, formData.prenotamiQuantidadePessoas - 1);
-        for (let i = 0; i < requiredCount; i++) {
-          const r = formData.requerentes[i];
-          if (
-            !r?.nomeCompleto ||
-            !r?.dataNascimento ||
-            !r?.prenotamiEmail ||
-            !r?.prenotamiSenha ||
-            !r?.endereco ||
-            !r?.altura ||
-            !r?.corOlhos
-          ) {
-            return false;
-          }
-        }
-        return true;
-      }
-      default:
-        return true;
-    }
+    // TODO: Temporarily disabled for testing
+    return true;
+
+    // switch (currentKey) {
+    //   case "tipo":
+    //     return formData.tipoUsuario !== "";
+    //   case "assessor":
+    //   case "assessor":
+    //     return !!(
+    //       formData.assessorEmail &&
+    //       formData.assessorNome &&
+    //       formData.assessorTelefone
+    //     );
+    //   case "titular":
+    //     return !!(
+    //       formData.clienteNome &&
+    //       formData.clientePdfFile &&
+    //       formData.prenotamiEmail &&
+    //       formData.prenotamiSenha &&
+    //       formData.titularCep &&
+    //       formData.titularEstadoCivil &&
+    //       formData.titularDocumentoIdentidade &&
+    //       formData.prenotamiAltura &&
+    //       formData.prenotamiCorOlhos
+    //     );
+    //   case "requerentes": {
+    //     // All added requerentes must have complete fields
+    //     for (let i = 0; i < formData.requerentes.length; i++) {
+    //       const r = formData.requerentes[i];
+    //       if (
+    //         !r?.nomeCompleto ||
+    //         !r?.dataNascimento ||
+    //         !r?.altura ||
+    //         !r?.corOlhos ||
+    //         !r?.documentoIdentidade
+    //       ) {
+    //         return false;
+    //       }
+    //     }
+    //     return true;
+    //   }
+    //   case "datas":
+    //     return true; // Optional - always allow next
+    //   case "observacoes":
+    //     return true; // Optional - always allow next
+    //   case "revisao":
+    //     return formData.revisaoConfirmado === true;
+    //   default:
+    //     return true;
+    // }
   };
 
+  const handleEditStep = useCallback((step: number) => {
+    setCurrentStep(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    setIsSubmitting(true);
+    try {
+      // TODO: Implement actual submission logic
+      // await submitForm(formData);
+
+      // For now, just move to success step
+      setTimeout(() => {
+        setCurrentStep(totalSteps - 1);
+        setIsSubmitting(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Submit error:', error);
+      setIsSubmitting(false);
+    }
+  }, [formData, totalSteps]);
+
   const handleNext = () => {
-    if (currentStep < totalSteps - 1) {
+    if (currentKey === "revisao") {
+      handleSubmit();
+    } else if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) setCurrentStep(currentStep - 1);
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const renderStep = () => {
     switch (currentKey) {
+      case "tipo":
+        return (
+          <StepTipoUsuario
+            value={formData.tipoUsuario}
+            onChange={(v) => updateField("tipoUsuario", v)}
+          />
+        );
       case "assessor":
         return <StepDadosAssessor formData={formData} updateField={updateField} />;
-      case "termo":
+      case "titular":
         return (
-          <StepTermoResponsabilidade
-            aceito={formData.termoResponsabilidadeAceito}
-            onChange={(v) => updateField("termoResponsabilidadeAceito", v)}
-          />
-        );
-      case "cliente":
-        return (
-          <StepClientePrincipal
+          <StepDadosTitular
             nome={formData.clienteNome}
             pdfFile={formData.clientePdfFile}
-            pdfConfirmado={formData.clientePdfConfirmado}
-            updateField={updateField}
-          />
-        );
-      case "otp":
-        return (
-          <StepConfiguracaoOTP
-            otpConfigurado={formData.otpConfigurado}
-            otpGmailAtencao={formData.otpGmailAtencao}
-            otpWhatsAppContato={formData.otpWhatsAppContato}
-            updateField={updateField}
-          />
-        );
-      case "conta":
-        return (
-          <StepContaPrenotami
             email={formData.prenotamiEmail}
             senha={formData.prenotamiSenha}
-            endereco={formData.prenotamiEndereco}
+            cep={formData.titularCep}
+            estadoCivil={formData.titularEstadoCivil}
+            documentoIdentidade={formData.titularDocumentoIdentidade}
             altura={formData.prenotamiAltura}
             corOlhos={formData.prenotamiCorOlhos}
-            quantidadePessoas={formData.prenotamiQuantidadePessoas}
             updateField={updateField}
-            setQuantidadeRequerentes={setQuantidadeRequerentes}
           />
         );
       case "requerentes":
         return (
           <StepRequerentesAdicionais
             requerentes={formData.requerentes}
-            quantidade={formData.prenotamiQuantidadePessoas}
             updateRequerente={updateRequerente}
+            addRequerente={addRequerente}
+            removeRequerente={removeRequerente}
+          />
+        );
+      case "datas":
+        return (
+          <StepPreferenciaDatas
+            selectedDates={formData.datasPreferencia}
+            onChange={(dates) => updateField("datasPreferencia", dates)}
           />
         );
       case "observacoes":
         return (
           <StepObservacoes value={formData.observacoes} onChange={(v) => updateField("observacoes", v)} />
+        );
+      case "revisao":
+        // Calculate step indices for edit buttons
+        const stepIndices = {
+          tipo: 0,
+          assessor: isAssessor ? 1 : undefined,
+          titular: isAssessor ? 2 : 1,
+          requerentes: isAssessor ? 3 : 2,
+          datas: isAssessor ? 4 : 3,
+          observacoes: isAssessor ? 5 : 4,
+        };
+        return (
+          <StepRevisaoConfirmacao
+            formData={formData}
+            onEditStep={handleEditStep}
+            isSubmitting={isSubmitting}
+            onConfirm={handleSubmit}
+            updateField={updateField}
+            stepIndices={stepIndices}
+          />
         );
       case "sucesso":
         return <StepSucesso onReset={resetForm} />;
@@ -245,25 +292,32 @@ const Agendamento = () => {
           {/* Navigation */}
           {!isSuccessStep && (
             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                disabled={currentStep === 0}
-                className="gap-2 w-full sm:w-auto"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Voltar
-              </Button>
-              <Button
-                onClick={handleNext}
-                disabled={!canGoNext()}
-                className="gap-2 w-full sm:w-auto"
-              >
-                <>
-                  Próximo
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              </Button>
+              {/* Hide back button on first step */}
+              {currentStep > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="gap-2 w-full sm:w-auto"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Voltar
+                </Button>
+              )}
+              {/* Hide next button on revisao step */}
+              {currentKey !== "revisao" && (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canGoNext()}
+                  className="gap-2 w-full sm:w-auto"
+                  {...(currentStep === 0 ? {} : {})}
+                  style={{ marginLeft: currentStep === 0 ? 'auto' : undefined }}
+                >
+                  <>
+                    Próximo
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                </Button>
+              )}
             </div>
           )}
         </div>

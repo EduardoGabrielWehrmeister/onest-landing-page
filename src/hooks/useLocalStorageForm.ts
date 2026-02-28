@@ -5,76 +5,62 @@ const STORAGE_KEY = "agendamento-draft";
 export interface RequerenteData {
   nomeCompleto: string;
   dataNascimento: string;
-  prenotamiEmail: string;
-  prenotamiSenha: string;
-  endereco: string;
   altura: string;
   corOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
+  documentoIdentidade: string;
 }
 
 export interface FormData {
+  // Step 0: Tipo de Usuário
+  tipoUsuario: "cliente" | "assessor" | "";
+
   // Step 1: Dados do Assessor
   assessorEmail: string;
   assessorNome: string;
   assessorTelefone: string;
 
-  // Step 2: Termo de Responsabilidade
-  termoResponsabilidadeAceito: boolean;
-
-  // Step 3: Cliente Principal
+  // Step 2: Dados do Titular (Prenotante)
   clienteNome: string;
   clientePdfFile: string;
-  clientePdfConfirmado: boolean;
-
-  // Step 4: Configuração OTP
-  otpConfigurado: boolean;
-  otpGmailAtencao: boolean;
-  otpWhatsAppContato: boolean;
-
-  // Step 5: Conta Prenotami
   prenotamiEmail: string;
   prenotamiSenha: string;
-  prenotamiEndereco: string;
+  titularCep: string;
+  titularEstadoCivil: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "";
+  titularDocumentoIdentidade: string;
   prenotamiAltura: string;
   prenotamiCorOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
-  prenotamiQuantidadePessoas: number;
 
-  // Step 6: Requerentes Adicionais
+  // Step 3: Requerentes Adicionais
   requerentes: RequerenteData[];
 
-  // Step 7: Observações
+  // Step 4: Preferência de Datas
+  datasPreferencia: string[];
+
+  // Step 5: Observações
   observacoes: string;
+
+  // Step 6: Revisão e Confirmação
+  revisaoConfirmado: boolean;
 }
 
 const defaultFormData: FormData = {
+  tipoUsuario: "",
   assessorEmail: "",
   assessorNome: "",
   assessorTelefone: "",
-  termoResponsabilidadeAceito: false,
   clienteNome: "",
   clientePdfFile: "",
-  clientePdfConfirmado: false,
-  otpConfigurado: false,
-  otpGmailAtencao: false,
-  otpWhatsAppContato: false,
   prenotamiEmail: "",
   prenotamiSenha: "",
-  prenotamiEndereco: "",
+  titularCep: "",
+  titularEstadoCivil: "",
+  titularDocumentoIdentidade: "",
   prenotamiAltura: "",
   prenotamiCorOlhos: "",
-  prenotamiQuantidadePessoas: 1,
-  requerentes: [
-    {
-      nomeCompleto: "",
-      dataNascimento: "",
-      prenotamiEmail: "",
-      prenotamiSenha: "",
-      endereco: "",
-      altura: "",
-      corOlhos: "",
-    },
-  ],
+  requerentes: [],
+  datasPreferencia: [],
   observacoes: "",
+  revisaoConfirmado: false,
 };
 
 export function useLocalStorageForm() {
@@ -117,26 +103,30 @@ export function useLocalStorageForm() {
     []
   );
 
-  const setQuantidadeRequerentes = useCallback((qty: number) => {
+  const addRequerente = useCallback(() => {
     setFormData((prev) => {
-      const requerentes = [...prev.requerentes];
-      while (requerentes.length < qty) {
-        requerentes.push({
-          nomeCompleto: "",
-          dataNascimento: "",
-          prenotamiEmail: "",
-          prenotamiSenha: "",
-          endereco: "",
-          altura: "",
-          corOlhos: "",
-        });
-      }
+      if (prev.requerentes.length >= 3) return prev;
       return {
         ...prev,
-        prenotamiQuantidadePessoas: qty,
-        requerentes: requerentes.slice(0, qty),
+        requerentes: [
+          ...prev.requerentes,
+          {
+            nomeCompleto: "",
+            dataNascimento: "",
+            altura: "",
+            corOlhos: "",
+            documentoIdentidade: "",
+          },
+        ],
       };
     });
+  }, []);
+
+  const removeRequerente = useCallback((index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      requerentes: prev.requerentes.filter((_, i) => i !== index),
+    }));
   }, []);
 
   const resetForm = useCallback(() => {
@@ -152,7 +142,8 @@ export function useLocalStorageForm() {
     setCurrentStep,
     updateField,
     updateRequerente,
-    setQuantidadeRequerentes,
+    addRequerente,
+    removeRequerente,
     resetForm,
   };
 }

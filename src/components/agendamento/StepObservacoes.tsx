@@ -15,6 +15,8 @@ const StepObservacoes = ({ value, onChange, maxLength = 100 }: Props) => {
     onChange(cleanObservations(e.target.value, maxLength));
   };
 
+  const currentLength = value.length;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -45,47 +47,11 @@ const StepObservacoes = ({ value, onChange, maxLength = 100 }: Props) => {
         {/* Character Counter */}
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            Campo opcional - Use para informações relevantes
+            Use apenas letras e números. Não utilize vírgulas ou acentos. Você pode usar hífen para separar informações.
           </p>
-          <div className="flex items-center gap-2">
-            <span
-              className={`text-xs font-medium ${
-                charCount.isNearLimit
-                  ? "text-amber-600 dark:text-amber-400"
-                  : charCount.isAtLimit
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-muted-foreground"
-              }`}
-            >
-              {charCount.remaining} restantes
-            </span>
-            <span className="text-xs text-muted-foreground">/ {maxLength}</span>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-          <div
-            className={`h-full transition-all duration-200 ${
-              charCount.isNearLimit
-                ? "bg-amber-500"
-                : charCount.isAtLimit
-                ? "bg-red-500"
-                : "bg-primary"
-            }`}
-            style={{ width: `${(charCount.current / maxLength) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Info Cards */}
-      <div className="grid gap-4">
-        <div className="rounded-lg border border-border bg-muted/30 p-4">
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-medium text-foreground">Sugestões:</span> Prefira horários
-            específicos, necessidades de acessibilidade, informações sobre crianças, ou qualquer
-            detalhe que possa ajudar no seu atendimento.
-          </p>
+          <span className="text-xs text-muted-foreground">
+            {currentLength} / {maxLength} caracteres
+          </span>
         </div>
       </div>
     </div>

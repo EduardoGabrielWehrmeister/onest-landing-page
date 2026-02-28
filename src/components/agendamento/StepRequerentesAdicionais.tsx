@@ -1,33 +1,136 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, EyeOff, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cleanAddressInput, formatHeightInput } from "@/lib/formUtils";
+import { Upload, FileCheck, X, Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { formatHeightInput } from "@/lib/formUtils";
 import type { RequerenteData } from "@/hooks/useLocalStorageForm";
 
 interface Props {
   requerentes: RequerenteData[];
-  quantidade: number;
   updateRequerente: (index: number, field: keyof RequerenteData, value: string) => void;
+  addRequerente: () => void;
+  removeRequerente: (index: number) => void;
 }
 
-const StepRequerentesAdicionais = ({ requerentes, quantidade, updateRequerente }: Props) => {
+const eyeColors = [
+  { value: "azul", label: "Azul" },
+  { value: "castanho", label: "Castanho" },
+  { value: "cinza", label: "Cinza" },
+  { value: "preto", label: "Preto" },
+  { value: "verde", label: "Verde" },
+] as const;
+
+const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerente, removeRequerente }: Props) => {
   const [showPassword, setShowPassword] = useState<Record<number, boolean>>({});
+  const [dragActive, setDragActive] = useState<Record<number, boolean>>({});
+  const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
-  const eyeColors = [
-    { value: "azul", label: "Azul" },
-    { value: "castanho", label: "Castanho" },
-    { value: "cinza", label: "Cinza" },
-    { value: "preto", label: "Preto" },
-    { value: "verde", label: "Verde" },
-  ] as const;
+  const handleFileSelect = (file: File | null, index: number) => {
+    if (file && file.type === "application/pdf") {
+      updateRequerente(index, "documentoIdentidade", file.name);
+    }
+  };
 
-  const requiredCount = Math.max(0, quantidade - 1);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0] || null;
+    handleFileSelect(file, index);
+  };
 
-  // If no additional requerentes needed
-  if (requiredCount === 0) {
+  const handleDrag = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive((prev) => ({ ...prev, [index]: true }));
+    } else if (e.type === "dragleave") {
+      setDragActive((prev) => ({ ...prev, [index]: false }));
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive((prev) => ({ ...prev, [index]: false }));
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0], index);
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    updateRequerente(index, "documentoIdentidade", "");
+    if (fileInputRefs.current[index]) {
+      fileInputRefs.current[index].value = "";
+    }
+  };
+
+  const renderPdfUpload = (index: number) => {
+    const file = requerentes[index]?.documentoIdentidade;
+
+    return (
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Documento de Identidade (PDF)</Label>
+        {!file ? (
+          <div
+            onDragEnter={(e) => handleDrag(e, index)}
+            onDragLeave={(e) => handleDrag(e, index)}
+            onDragOver={(e) => handleDrag(e, index)}
+            onDrop={(e) => handleDrop(e, index)}
+            className={cn(
+              "border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all",
+              "hover:border-primary/50 hover:bg-primary/5",
+              dragActive[index] ? "border-primary bg-primary/10" : "border-border"
+            )}
+            onClick={() => fileInputRefs.current[index]?.click()}
+          >
+            <input
+              ref={(el) => (fileInputRefs.current[index] = el)}
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={(e) => handleInputChange(e, index)}
+              className="hidden"
+            />
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Upload className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Clique para selecionar ou arraste o arquivo
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Apenas arquivos PDF</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="border border-border rounded-xl p-4 bg-card">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                  <FileCheck className="w-5 h-5 text-red-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{file}</p>
+                  <p className="text-xs text-muted-foreground">Arquivo PDF selecionado</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveFile(index)}
+                className="flex-shrink-0 p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Empty state
+  if (requerentes.length === 0) {
     return (
       <div className="space-y-8">
         <div className="text-center">
@@ -35,17 +138,27 @@ const StepRequerentesAdicionais = ({ requerentes, quantidade, updateRequerente }
             Requerentes Adicionais
           </h2>
           <p className="text-base text-muted-foreground">
-            Nenhum requerente adicional necessário
+            Adicione outros requerentes à solicitação (opcional)
           </p>
         </div>
 
         <div className="text-center py-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <span className="text-3xl">✓</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/30 mb-4">
+            <span className="text-3xl">👥</span>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Você selecionou apenas 1 pessoa. Não há requerentes adicionais para cadastrar.
+          <p className="text-sm text-muted-foreground mb-6">
+            Nenhum requerente adicional adicionado ainda.
           </p>
+          <Button
+            type="button"
+            onClick={addRequerente}
+            variant="outline"
+            className="gap-2"
+            disabled={requerentes.length >= 3}
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar requerente
+          </Button>
         </div>
       </div>
     );
@@ -59,25 +172,37 @@ const StepRequerentesAdicionais = ({ requerentes, quantidade, updateRequerente }
           Requerentes Adicionais
         </h2>
         <p className="text-base text-muted-foreground">
-          Informações dos demais requerentes
+          Informações dos demais requerentes ({requerentes.length}/3)
         </p>
       </div>
 
       {/* Requerente Cards */}
       <div className="space-y-6">
-        {requerentes.slice(0, requiredCount).map((requerente, idx) => (
+        {requerentes.map((requerente, idx) => (
           <div
             key={idx}
             className="rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-shadow"
           >
             {/* Card Header */}
-            <div className="flex items-center gap-3 mb-5 pb-4 border-b border-border">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-                <span className="text-sm font-semibold text-primary">{idx + 2}</span>
+            <div className="flex items-center justify-between mb-5 pb-4 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
+                  <span className="text-sm font-semibold text-primary">{idx + 2}</span>
+                </div>
+                <h3 className="font-semibold text-foreground">
+                  Requerente Adicional {idx + 2}
+                </h3>
               </div>
-              <h3 className="font-semibold text-foreground">
-                Requerente Adicional {idx + 2}
-              </h3>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removeRequerente(idx)}
+                className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="w-4 h-4" />
+                Remover
+              </Button>
             </div>
 
             {/* Card Fields */}
@@ -111,121 +236,68 @@ const StepRequerentesAdicionais = ({ requerentes, quantidade, updateRequerente }
                 />
               </div>
 
-              {/* Email Prenotami */}
+              {/* Altura */}
               <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-email`} className="text-sm font-medium">
-                  Email Prenotami
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id={`req-${idx}-email`}
-                    type="email"
-                    value={requerente.prenotamiEmail}
-                    onChange={(e) => updateRequerente(idx, "prenotamiEmail", e.target.value)}
-                    placeholder="seuemail@gmail.com"
-                    className="h-10 pl-10"
-                  />
-                </div>
-              </div>
-
-              {/* Senha */}
-              <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-senha`} className="text-sm font-medium">
-                  Senha Prenotami
-                </Label>
-                <div className="relative">
-                  <Input
-                    id={`req-${idx}-senha`}
-                    type={showPassword[idx] ? "text" : "password"}
-                    value={requerente.prenotamiSenha}
-                    onChange={(e) => updateRequerente(idx, "prenotamiSenha", e.target.value)}
-                    placeholder="Sua senha"
-                    className="h-10 pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      setShowPassword((prev) => ({ ...prev, [idx]: !prev[idx] }))
-                    }
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-transparent"
-                  >
-                    {showPassword[idx] ? (
-                      <EyeOff className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Endereço */}
-              <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-endereco`} className="text-sm font-medium">
-                  Endereço completo
+                <Label htmlFor={`req-${idx}-altura`} className="text-sm font-medium">
+                  Altura
                 </Label>
                 <Input
-                  id={`req-${idx}-endereco`}
+                  id={`req-${idx}-altura`}
                   type="text"
-                  value={requerente.endereco}
-                  onChange={(e) =>
-                    updateRequerente(idx, "endereco", cleanAddressInput(e.target.value))
-                  }
-                  placeholder="AV BRIGADEIRO LUIS ANTONIO 100 - COND CANADA - SAO PAULO - SP"
-                  className="h-10 uppercase"
+                  inputMode="numeric"
+                  value={requerente.altura}
+                  onChange={(e) => updateRequerente(idx, "altura", formatHeightInput(e.target.value))}
+                  placeholder="185"
+                  className="h-10"
                 />
+                <p className="text-xs text-muted-foreground">Apenas números em centímetros</p>
               </div>
 
-              {/* Altura e Cor dos Olhos - Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Altura */}
-                <div className="space-y-2">
-                  <Label htmlFor={`req-${idx}-altura`} className="text-sm font-medium">
-                    Altura
-                  </Label>
-                  <Input
-                    id={`req-${idx}-altura`}
-                    type="text"
-                    inputMode="numeric"
-                    value={requerente.altura}
-                    onChange={(e) =>
-                      updateRequerente(idx, "altura", formatHeightInput(e.target.value))
-                    }
-                    placeholder="185"
-                    className="h-10"
-                  />
-                </div>
-
-                {/* Cor dos Olhos */}
-                <div className="space-y-2">
-                  <Label htmlFor={`req-${idx}-cor-olhos`} className="text-sm font-medium">
-                    Cor dos olhos
-                  </Label>
-                  <Select
-                    value={requerente.corOlhos}
-                    onValueChange={(value) =>
-                      updateRequerente(idx, "corOlhos", value as RequerenteData["corOlhos"])
-                    }
-                  >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {eyeColors.map((color) => (
-                        <SelectItem key={color.value} value={color.value}>
-                          {color.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* Cor dos Olhos */}
+              <div className="space-y-2">
+                <Label htmlFor={`req-${idx}-cor-olhos`} className="text-sm font-medium">
+                  Cor dos olhos
+                </Label>
+                <Select
+                  value={requerente.corOlhos}
+                  onValueChange={(value) =>
+                    updateRequerente(idx, "corOlhos", value as RequerenteData["corOlhos"])
+                  }
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {eyeColors.map((color) => (
+                      <SelectItem key={color.value} value={color.value}>
+                        {color.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* PDF Upload */}
+              {renderPdfUpload(idx)}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Add Button */}
+      {requerentes.length < 3 && (
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            onClick={addRequerente}
+            variant="outline"
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar outro requerente
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
