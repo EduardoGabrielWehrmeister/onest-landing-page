@@ -10,35 +10,47 @@ export interface PersonData {
 }
 
 export interface FormData {
-  // Step 1
+  // Legacy fields (kept for compatibility with existing components)
   tipoUsuario: "cliente" | "assessor" | "";
-  // Step 2 - Assessor
   assessorNome: string;
   assessorEmail: string;
   assessorTelefone: string;
   assessorEmpresa: string;
-  // Step 3 - Cliente
   clienteNome: string;
   clienteNascimento: string;
   clienteNacionalidade: string;
   clienteEmailPrenotami: string;
   clienteTelefone: string;
-  // Step 4 - Pessoas
   quantidadePessoas: number;
   pessoas: PersonData[];
-  // Step 5 - Endereço
   rua: string;
   numero: string;
   cidade: string;
   estado: string;
   cep: string;
   pais: string;
-  // Step 6 - Upload
   nomeArquivo: string;
-  // Step 7 - Anotações
   anotacoes: string;
-  // Step 9 - Confirmação
   confirmacao: boolean;
+
+  // New flow fields
+  assessorNomeEmpresa: string;
+  declaracaoResponsabilidade: boolean;
+  clientePrincipalNome: string;
+  clientePrincipalDocumentoNome: string;
+  declaracaoArquivo: boolean;
+  declaracaoContatoWhatsapp: boolean;
+  clienteSenhaPrenotami: string;
+  clienteEnderecoCompleto: string;
+  quantidadeRequerentes: "1" | "2" | "3" | "4";
+  adicional1Sobrenome: string;
+  adicional1Nome: string;
+  adicional1CorOlhos: string;
+  adicional1Altura: string;
+  adicional1Nascimento: string;
+  adicional1DocumentoNome: string;
+  declaracaoOrdemRequerentes: boolean;
+  observacoesConsulado: string;
 }
 
 const defaultFormData: FormData = {
@@ -63,6 +75,24 @@ const defaultFormData: FormData = {
   nomeArquivo: "",
   anotacoes: "",
   confirmacao: false,
+
+  assessorNomeEmpresa: "",
+  declaracaoResponsabilidade: false,
+  clientePrincipalNome: "",
+  clientePrincipalDocumentoNome: "",
+  declaracaoArquivo: false,
+  declaracaoContatoWhatsapp: false,
+  clienteSenhaPrenotami: "",
+  clienteEnderecoCompleto: "",
+  quantidadeRequerentes: "1",
+  adicional1Sobrenome: "",
+  adicional1Nome: "",
+  adicional1CorOlhos: "",
+  adicional1Altura: "",
+  adicional1Nascimento: "",
+  adicional1DocumentoNome: "",
+  declaracaoOrdemRequerentes: false,
+  observacoesConsulado: "",
 };
 
 export function useLocalStorageForm() {
@@ -70,7 +100,9 @@ export function useLocalStorageForm() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) return { ...defaultFormData, ...JSON.parse(saved) };
-    } catch {}
+    } catch {
+      // no-op
+    }
     return defaultFormData;
   });
 
@@ -78,7 +110,9 @@ export function useLocalStorageForm() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY + "-step");
       if (saved) return parseInt(saved, 10);
-    } catch {}
+    } catch {
+      // no-op
+    }
     return 0;
   });
 
@@ -91,11 +125,11 @@ export function useLocalStorageForm() {
   }, [currentStep]);
 
   const updateField = useCallback(<K extends keyof FormData>(field: K, value: FormData[K]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   const updatePerson = useCallback((index: number, field: keyof PersonData, value: string) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const pessoas = [...prev.pessoas];
       pessoas[index] = { ...pessoas[index], [field]: value };
       return { ...prev, pessoas };
@@ -103,7 +137,7 @@ export function useLocalStorageForm() {
   }, []);
 
   const setQuantidadePessoas = useCallback((qty: number) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const pessoas = [...prev.pessoas];
       while (pessoas.length < qty) {
         pessoas.push({ nomeCompleto: "", dataNascimento: "", loginFastIt: "", senhaFastIt: "" });
