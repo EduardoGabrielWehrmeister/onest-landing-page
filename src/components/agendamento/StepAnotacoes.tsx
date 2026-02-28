@@ -1,6 +1,5 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { StickyNote } from "lucide-react";
 
 interface Props {
   value: string;
@@ -11,9 +10,6 @@ const StepAnotacoes = ({ value, onChange }: Props) => (
   <div className="space-y-8">
     {/* Header */}
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-accent/10 mb-4">
-        <StickyNote className="h-7 w-7 text-accent" />
-      </div>
       <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
         Anotações
       </h2>

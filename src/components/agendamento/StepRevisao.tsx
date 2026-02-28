@@ -1,5 +1,5 @@
 import type { FormData } from "@/hooks/useLocalStorageForm";
-import { User, Briefcase, Users, MapPin, FileText, FileCheck, Clipboard } from "lucide-react";
+import { User, Briefcase, Users, MapPin, FileText, FileCheck, Clipboard, Info } from "lucide-react";
 
 interface SectionProps {
   title: string;
@@ -31,9 +31,6 @@ const StepRevisao = ({ formData }: Props) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3">
-          <Clipboard className="h-6 w-6 text-primary" />
-        </div>
         <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
           Revisão dos Dados
         </h2>

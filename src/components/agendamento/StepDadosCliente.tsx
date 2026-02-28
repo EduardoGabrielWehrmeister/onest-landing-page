@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User } from "lucide-react";
 import type { FormData } from "@/hooks/useLocalStorageForm";
 
 interface Props {
@@ -20,9 +19,6 @@ const StepDadosCliente = ({ formData, updateField }: Props) => (
   <div className="space-y-8">
     {/* Header */}
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
-        <User className="h-7 w-7 text-primary" />
-      </div>
       <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
         Dados do Cliente
       </h2>

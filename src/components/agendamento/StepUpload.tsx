@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import { Upload, FileText, X, FileCheck } from "lucide-react";
+import { Upload, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRef } from "react";
@@ -21,9 +21,6 @@ const StepUpload = ({ fileName, onChange }: Props) => {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
-          <FileCheck className="h-7 w-7 text-primary" />
-        </div>
         <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
           Comprovante de Residência
         </h2>

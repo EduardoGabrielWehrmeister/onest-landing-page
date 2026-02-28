@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -12,9 +12,6 @@ const StepConfirmacao = ({ checked, onChange }: Props) => (
   <div className="space-y-8">
     {/* Header */}
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
-        <ShieldCheck className="h-7 w-7 text-primary" />
-      </div>
       <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
         Confirmação
       </h2>

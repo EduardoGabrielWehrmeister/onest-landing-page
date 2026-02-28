@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useLocalStorageForm } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Send, Calendar } from "lucide-react";
+import { ArrowLeft, ArrowRight, Send, GitBranch, BadgeCheck, User, Users, MapPin, FileText, StickyNote, Eye, ShieldCheck } from "lucide-react";
 
 import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
 import StepDadosAssessor from "@/components/agendamento/StepDadosAssessor";
@@ -31,16 +31,16 @@ const Agendamento = () => {
 
   const steps = useMemo(() => {
     const base = [
-      { label: "Tipo", key: "tipo" },
-      ...(isAssessor ? [{ label: "Assessor", key: "assessor" }] : []),
-      { label: "Cliente", key: "cliente" },
-      { label: "Pessoas", key: "pessoas" },
-      { label: "Endereço", key: "endereco" },
-      { label: "Comprovante", key: "upload" },
-      ...(isAssessor ? [{ label: "Anotações", key: "anotacoes" }] : []),
-      { label: "Revisão", key: "revisao" },
-      { label: "Confirmação", key: "confirmacao" },
-      { label: "Sucesso", key: "sucesso" },
+      { label: "Tipo", key: "tipo", icon: GitBranch },
+      ...(isAssessor ? [{ label: "Assessor", key: "assessor", icon: BadgeCheck }] : []),
+      { label: "Cliente", key: "cliente", icon: User },
+      { label: "Pessoas", key: "pessoas", icon: Users },
+      { label: "Endereço", key: "endereco", icon: MapPin },
+      { label: "Comprovante", key: "upload", icon: FileText },
+      ...(isAssessor ? [{ label: "Anotações", key: "anotacoes", icon: StickyNote }] : []),
+      { label: "Revisão", key: "revisao", icon: Eye },
+      { label: "Confirmação", key: "confirmacao", icon: ShieldCheck },
+      { label: "Sucesso", key: "sucesso", icon: ShieldCheck },
     ];
     return base;
   }, [isAssessor]);
@@ -100,19 +100,14 @@ const Agendamento = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
-      <div className="gradient-hero pt-16 pb-12 md:pt-20 md:pb-16">
+      <div className="gradient-hero pb-12 md:pb-16">
         {/* Italian Stripe */}
         <div className="italian-stripe"></div>
 
         <div className="section-container relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Icon */}
-            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-foreground/10 backdrop-blur-sm mb-6 animate-scale-up">
-              <Calendar className="w-8 h-8 md:w-10 md:h-10 text-primary-foreground" />
-            </div>
-
             {/* Title */}
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-tight mb-4">
+            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-tight mb-4 pt-8">
               Solicitação de <span className="italic">Agendamento</span>
             </h1>
 
@@ -150,7 +145,7 @@ const Agendamento = () => {
                 {steps.slice(0, -1).map((step, index) => (
                   <StepIndicator
                     key={step.key}
-                    number={index + 1}
+                    icon={step.icon}
                     label={step.label}
                     active={index === currentStep}
                     completed={index < currentStep}

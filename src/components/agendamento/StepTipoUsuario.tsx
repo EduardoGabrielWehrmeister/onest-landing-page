@@ -10,11 +10,8 @@ interface Props {
 
 const StepTipoUsuario = ({ value, onChange }: Props) => (
   <div className="space-y-8">
-    {/* Header with icon */}
+    {/* Header */}
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-4">
-        <User className="h-7 w-7 text-primary" />
-      </div>
       <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
         Como deseja prosseguir?
       </h2>

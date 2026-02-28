@@ -1,19 +1,20 @@
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 
 interface StepIndicatorProps {
-  number: number;
+  icon: LucideIcon;
   label: string;
   active: boolean;
   completed: boolean;
   isLast: boolean;
 }
 
-const StepIndicator = ({ number, label, active, completed, isLast }: StepIndicatorProps) => {
+const StepIndicator = ({ icon: Icon, label, active, completed, isLast }: StepIndicatorProps) => {
   return (
     <div className={cn("flex items-center", !isLast && "flex-1")}>
       <div className="flex flex-col items-center flex-1">
-        {/* Circle with number or checkmark */}
+        {/* Circle with icon or checkmark */}
         <div
           className={cn(
             "relative w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-semibold text-sm md:text-base transition-all duration-300",
@@ -25,7 +26,7 @@ const StepIndicator = ({ number, label, active, completed, isLast }: StepIndicat
           {completed ? (
             <Check className="w-5 h-5 md:w-6 md:h-6" />
           ) : (
-            <span>{number}</span>
+            <Icon className="w-5 h-5 md:w-6 md:h-6" />
           )}
 
           {/* Glow effect for active step */}
@@ -47,7 +48,6 @@ const StepIndicator = ({ number, label, active, completed, isLast }: StepIndicat
           )}
         >
           <span className="hidden sm:inline">{label}</span>
-          <span className="sm:hidden">{number}</span>
         </span>
       </div>
 
