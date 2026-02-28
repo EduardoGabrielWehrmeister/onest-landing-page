@@ -2,67 +2,79 @@ import { useState, useEffect, useCallback } from "react";
 
 const STORAGE_KEY = "agendamento-draft";
 
-export interface PersonData {
+export interface RequerenteData {
   nomeCompleto: string;
   dataNascimento: string;
-  loginFastIt: string;
-  senhaFastIt: string;
+  prenotamiEmail: string;
+  prenotamiSenha: string;
+  endereco: string;
+  altura: string;
+  corOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
 }
 
 export interface FormData {
-  // Step 1
-  tipoUsuario: "cliente" | "assessor" | "";
-  // Step 2 - Assessor
-  assessorNome: string;
+  // Step 1: Dados do Assessor
   assessorEmail: string;
+  assessorNome: string;
   assessorTelefone: string;
-  assessorEmpresa: string;
-  // Step 3 - Cliente
+
+  // Step 2: Termo de Responsabilidade
+  termoResponsabilidadeAceito: boolean;
+
+  // Step 3: Cliente Principal
   clienteNome: string;
-  clienteNascimento: string;
-  clienteNacionalidade: string;
-  clienteEmailPrenotami: string;
-  clienteTelefone: string;
-  // Step 4 - Pessoas
-  quantidadePessoas: number;
-  pessoas: PersonData[];
-  // Step 5 - Endereço
-  rua: string;
-  numero: string;
-  cidade: string;
-  estado: string;
-  cep: string;
-  pais: string;
-  // Step 6 - Upload
-  nomeArquivo: string;
-  // Step 7 - Anotações
-  anotacoes: string;
-  // Step 9 - Confirmação
-  confirmacao: boolean;
+  clientePdfFile: string;
+  clientePdfConfirmado: boolean;
+
+  // Step 4: Configuração OTP
+  otpConfigurado: boolean;
+  otpGmailAtencao: boolean;
+  otpWhatsAppContato: boolean;
+
+  // Step 5: Conta Prenotami
+  prenotamiEmail: string;
+  prenotamiSenha: string;
+  prenotamiEndereco: string;
+  prenotamiAltura: string;
+  prenotamiCorOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
+  prenotamiQuantidadePessoas: number;
+
+  // Step 6: Requerentes Adicionais
+  requerentes: RequerenteData[];
+
+  // Step 7: Observações
+  observacoes: string;
 }
 
 const defaultFormData: FormData = {
-  tipoUsuario: "",
-  assessorNome: "",
   assessorEmail: "",
+  assessorNome: "",
   assessorTelefone: "",
-  assessorEmpresa: "",
+  termoResponsabilidadeAceito: false,
   clienteNome: "",
-  clienteNascimento: "",
-  clienteNacionalidade: "",
-  clienteEmailPrenotami: "",
-  clienteTelefone: "",
-  quantidadePessoas: 1,
-  pessoas: [{ nomeCompleto: "", dataNascimento: "", loginFastIt: "", senhaFastIt: "" }],
-  rua: "",
-  numero: "",
-  cidade: "",
-  estado: "",
-  cep: "",
-  pais: "",
-  nomeArquivo: "",
-  anotacoes: "",
-  confirmacao: false,
+  clientePdfFile: "",
+  clientePdfConfirmado: false,
+  otpConfigurado: false,
+  otpGmailAtencao: false,
+  otpWhatsAppContato: false,
+  prenotamiEmail: "",
+  prenotamiSenha: "",
+  prenotamiEndereco: "",
+  prenotamiAltura: "",
+  prenotamiCorOlhos: "",
+  prenotamiQuantidadePessoas: 1,
+  requerentes: [
+    {
+      nomeCompleto: "",
+      dataNascimento: "",
+      prenotamiEmail: "",
+      prenotamiSenha: "",
+      endereco: "",
+      altura: "",
+      corOlhos: "",
+    },
+  ],
+  observacoes: "",
 };
 
 export function useLocalStorageForm() {
@@ -91,24 +103,39 @@ export function useLocalStorageForm() {
   }, [currentStep]);
 
   const updateField = useCallback(<K extends keyof FormData>(field: K, value: FormData[K]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const updatePerson = useCallback((index: number, field: keyof PersonData, value: string) => {
-    setFormData(prev => {
-      const pessoas = [...prev.pessoas];
-      pessoas[index] = { ...pessoas[index], [field]: value };
-      return { ...prev, pessoas };
-    });
-  }, []);
+  const updateRequerente = useCallback(
+    (index: number, field: keyof RequerenteData, value: string) => {
+      setFormData((prev) => {
+        const requerentes = [...prev.requerentes];
+        requerentes[index] = { ...requerentes[index], [field]: value };
+        return { ...prev, requerentes };
+      });
+    },
+    []
+  );
 
-  const setQuantidadePessoas = useCallback((qty: number) => {
-    setFormData(prev => {
-      const pessoas = [...prev.pessoas];
-      while (pessoas.length < qty) {
-        pessoas.push({ nomeCompleto: "", dataNascimento: "", loginFastIt: "", senhaFastIt: "" });
+  const setQuantidadeRequerentes = useCallback((qty: number) => {
+    setFormData((prev) => {
+      const requerentes = [...prev.requerentes];
+      while (requerentes.length < qty) {
+        requerentes.push({
+          nomeCompleto: "",
+          dataNascimento: "",
+          prenotamiEmail: "",
+          prenotamiSenha: "",
+          endereco: "",
+          altura: "",
+          corOlhos: "",
+        });
       }
-      return { ...prev, quantidadePessoas: qty, pessoas: pessoas.slice(0, qty) };
+      return {
+        ...prev,
+        prenotamiQuantidadePessoas: qty,
+        requerentes: requerentes.slice(0, qty),
+      };
     });
   }, []);
 
@@ -124,8 +151,8 @@ export function useLocalStorageForm() {
     currentStep,
     setCurrentStep,
     updateField,
-    updatePerson,
-    setQuantidadePessoas,
+    updateRequerente,
+    setQuantidadeRequerentes,
     resetForm,
   };
 }

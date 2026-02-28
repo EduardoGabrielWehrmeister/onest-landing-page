@@ -8,10 +8,24 @@ interface Props {
 }
 
 const fields = [
-  { key: "assessorNome" as const, label: "Nome completo", type: "text" },
-  { key: "assessorEmail" as const, label: "Email", type: "email" },
-  { key: "assessorTelefone" as const, label: "Telefone", type: "tel" },
-  { key: "assessorEmpresa" as const, label: "Empresa", type: "text" },
+  {
+    key: "assessorEmail" as const,
+    label: "Email",
+    type: "email",
+    placeholder: "Ex: joao@exemplo.com",
+  },
+  {
+    key: "assessorNome" as const,
+    label: "Nome / Empresa",
+    type: "text",
+    placeholder: "Ex: João Silva - Turismo Brasil",
+  },
+  {
+    key: "assessorTelefone" as const,
+    label: "Telefone",
+    type: "tel",
+    placeholder: "Ex: (11) 98765-4321",
+  },
 ];
 
 const StepDadosAssessor = ({ formData, updateField }: Props) => (
@@ -22,21 +36,23 @@ const StepDadosAssessor = ({ formData, updateField }: Props) => (
         Dados do Assessor
       </h2>
       <p className="text-base text-muted-foreground">
-        Informe seus dados profissionais
+        Informe seus dados de contato profissional
       </p>
     </div>
 
     {/* Form fields */}
     <div className="grid gap-5">
-      {fields.map(({ key, label, type }) => (
+      {fields.map(({ key, label, type, placeholder }) => (
         <div key={key} className="space-y-2">
-          <Label htmlFor={key} className="text-sm font-medium">{label}</Label>
+          <Label htmlFor={key} className="text-sm font-medium">
+            {label}
+          </Label>
           <Input
             id={key}
             type={type}
             value={formData[key]}
             onChange={(e) => updateField(key, e.target.value)}
-            placeholder={label}
+            placeholder={placeholder}
             className="h-11"
           />
         </div>

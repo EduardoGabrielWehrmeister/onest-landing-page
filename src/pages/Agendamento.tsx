@@ -2,17 +2,26 @@ import { useMemo } from "react";
 import { useLocalStorageForm } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Send, GitBranch, BadgeCheck, User, Users, MapPin, FileText, StickyNote, Eye, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  User,
+  Users,
+  FileText,
+  StickyNote,
+  Shield,
+  Key,
+  CheckCircle,
+} from "lucide-react";
 
-import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
 import StepDadosAssessor from "@/components/agendamento/StepDadosAssessor";
-import StepDadosCliente from "@/components/agendamento/StepDadosCliente";
-import StepPessoas from "@/components/agendamento/StepPessoas";
-import StepEndereco from "@/components/agendamento/StepEndereco";
-import StepUpload from "@/components/agendamento/StepUpload";
-import StepAnotacoes from "@/components/agendamento/StepAnotacoes";
-import StepRevisao from "@/components/agendamento/StepRevisao";
-import StepConfirmacao from "@/components/agendamento/StepConfirmacao";
+import StepTermoResponsabilidade from "@/components/agendamento/StepTermoResponsabilidade";
+import StepClientePrincipal from "@/components/agendamento/StepClientePrincipal";
+import StepConfiguracaoOTP from "@/components/agendamento/StepConfiguracaoOTP";
+import StepContaPrenotami from "@/components/agendamento/StepContaPrenotami";
+import StepRequerentesAdicionais from "@/components/agendamento/StepRequerentesAdicionais";
+import StepObservacoes from "@/components/agendamento/StepObservacoes";
 import StepSucesso from "@/components/agendamento/StepSucesso";
 import StepIndicator from "@/components/agendamento/StepIndicator";
 
@@ -22,46 +31,80 @@ const Agendamento = () => {
     currentStep,
     setCurrentStep,
     updateField,
-    updatePerson,
-    setQuantidadePessoas,
+    updateRequerente,
+    setQuantidadeRequerentes,
     resetForm,
   } = useLocalStorageForm();
 
-  const isAssessor = formData.tipoUsuario === "assessor";
-
-  const steps = useMemo(() => {
-    const base = [
-      { label: "Tipo", key: "tipo", icon: GitBranch },
-      ...(isAssessor ? [{ label: "Assessor", key: "assessor", icon: BadgeCheck }] : []),
+  const steps = useMemo(
+    () => [
+      { label: "Assessor", key: "assessor", icon: BadgeCheck },
+      { label: "Termo", key: "termo", icon: FileText },
       { label: "Cliente", key: "cliente", icon: User },
-      { label: "Pessoas", key: "pessoas", icon: Users },
-      { label: "Endereço", key: "endereco", icon: MapPin },
-      { label: "Comprovante", key: "upload", icon: FileText },
-      ...(isAssessor ? [{ label: "Anotações", key: "anotacoes", icon: StickyNote }] : []),
-      { label: "Revisão", key: "revisao", icon: Eye },
-      { label: "Confirmação", key: "confirmacao", icon: ShieldCheck },
-      { label: "Sucesso", key: "sucesso", icon: ShieldCheck },
-    ];
-    return base;
-  }, [isAssessor]);
+      { label: "OTP", key: "otp", icon: Shield },
+      { label: "Conta", key: "conta", icon: Key },
+      { label: "Requerentes", key: "requerentes", icon: Users },
+      { label: "Observações", key: "observacoes", icon: StickyNote },
+      { label: "Sucesso", key: "sucesso", icon: CheckCircle },
+    ],
+    []
+  );
 
   const totalSteps = steps.length;
   const currentKey = steps[currentStep]?.key;
-  const isLastActionStep = currentKey === "confirmacao";
   const isSuccessStep = currentKey === "sucesso";
 
   const canGoNext = () => {
     switch (currentKey) {
-      case "tipo": return formData.tipoUsuario !== "";
-      case "confirmacao": return formData.confirmacao;
-      default: return true;
+      case "assessor":
+        return !!(
+          formData.assessorEmail &&
+          formData.assessorNome &&
+          formData.assessorTelefone
+        );
+      case "termo":
+        return formData.termoResponsabilidadeAceito === true;
+      case "cliente":
+        return !!(
+          formData.clienteNome &&
+          formData.clientePdfFile &&
+          formData.clientePdfConfirmado
+        );
+      case "otp":
+        return !!(formData.otpConfigurado && formData.otpGmailAtencao);
+      case "conta":
+        return !!(
+          formData.prenotamiEmail &&
+          formData.prenotamiSenha &&
+          formData.prenotamiEndereco &&
+          formData.prenotamiAltura &&
+          formData.prenotamiCorOlhos
+        );
+      case "requerentes": {
+        const requiredCount = Math.max(0, formData.prenotamiQuantidadePessoas - 1);
+        for (let i = 0; i < requiredCount; i++) {
+          const r = formData.requerentes[i];
+          if (
+            !r?.nomeCompleto ||
+            !r?.dataNascimento ||
+            !r?.prenotamiEmail ||
+            !r?.prenotamiSenha ||
+            !r?.endereco ||
+            !r?.altura ||
+            !r?.corOlhos
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }
+      default:
+        return true;
     }
   };
 
   const handleNext = () => {
-    if (isLastActionStep) {
-      setCurrentStep(currentStep + 1);
-    } else if (currentStep < totalSteps - 1) {
+    if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -72,24 +115,58 @@ const Agendamento = () => {
 
   const renderStep = () => {
     switch (currentKey) {
-      case "tipo":
-        return <StepTipoUsuario value={formData.tipoUsuario} onChange={(v) => updateField("tipoUsuario", v)} />;
       case "assessor":
         return <StepDadosAssessor formData={formData} updateField={updateField} />;
+      case "termo":
+        return (
+          <StepTermoResponsabilidade
+            aceito={formData.termoResponsabilidadeAceito}
+            onChange={(v) => updateField("termoResponsabilidadeAceito", v)}
+          />
+        );
       case "cliente":
-        return <StepDadosCliente formData={formData} updateField={updateField} />;
-      case "pessoas":
-        return <StepPessoas formData={formData} updatePerson={updatePerson} setQuantidadePessoas={setQuantidadePessoas} />;
-      case "endereco":
-        return <StepEndereco formData={formData} updateField={updateField} />;
-      case "upload":
-        return <StepUpload fileName={formData.nomeArquivo} onChange={(v) => updateField("nomeArquivo", v)} />;
-      case "anotacoes":
-        return <StepAnotacoes value={formData.anotacoes} onChange={(v) => updateField("anotacoes", v)} />;
-      case "revisao":
-        return <StepRevisao formData={formData} />;
-      case "confirmacao":
-        return <StepConfirmacao checked={formData.confirmacao} onChange={(v) => updateField("confirmacao", v)} />;
+        return (
+          <StepClientePrincipal
+            nome={formData.clienteNome}
+            pdfFile={formData.clientePdfFile}
+            pdfConfirmado={formData.clientePdfConfirmado}
+            updateField={updateField}
+          />
+        );
+      case "otp":
+        return (
+          <StepConfiguracaoOTP
+            otpConfigurado={formData.otpConfigurado}
+            otpGmailAtencao={formData.otpGmailAtencao}
+            otpWhatsAppContato={formData.otpWhatsAppContato}
+            updateField={updateField}
+          />
+        );
+      case "conta":
+        return (
+          <StepContaPrenotami
+            email={formData.prenotamiEmail}
+            senha={formData.prenotamiSenha}
+            endereco={formData.prenotamiEndereco}
+            altura={formData.prenotamiAltura}
+            corOlhos={formData.prenotamiCorOlhos}
+            quantidadePessoas={formData.prenotamiQuantidadePessoas}
+            updateField={updateField}
+            setQuantidadeRequerentes={setQuantidadeRequerentes}
+          />
+        );
+      case "requerentes":
+        return (
+          <StepRequerentesAdicionais
+            requerentes={formData.requerentes}
+            quantidade={formData.prenotamiQuantidadePessoas}
+            updateRequerente={updateRequerente}
+          />
+        );
+      case "observacoes":
+        return (
+          <StepObservacoes value={formData.observacoes} onChange={(v) => updateField("observacoes", v)} />
+        );
       case "sucesso":
         return <StepSucesso onReset={resetForm} />;
       default:
@@ -181,19 +258,11 @@ const Agendamento = () => {
                 onClick={handleNext}
                 disabled={!canGoNext()}
                 className="gap-2 w-full sm:w-auto"
-                variant={isLastActionStep ? "cta" : "default"}
               >
-                {isLastActionStep ? (
-                  <>
-                    Enviar Solicitação
-                    <Send className="h-4 w-4" />
-                  </>
-                ) : (
-                  <>
-                    Próximo
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
+                <>
+                  Próximo
+                  <ArrowRight className="h-4 w-4" />
+                </>
               </Button>
             </div>
           )}
