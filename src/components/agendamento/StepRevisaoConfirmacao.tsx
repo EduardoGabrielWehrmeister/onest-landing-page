@@ -23,11 +23,15 @@ interface Props {
 }
 
 const estadoCivilLabels: Record<FormData["titularEstadoCivil"], string> = {
-  solteiro: "Solteiro(a)",
-  casado: "Casado(a)",
-  divorciado: "Divorciado(a)",
-  viuvo: "Viúvo(a)",
-  uniao_estavel: "União Estável",
+  "13": "Casado/a",
+  "14": "Divorciado/a",
+  "15": "Viúvo/a",
+  "16": "Solteiro/a",
+  "17": "Separado/a",
+  "18": "Em união civil",
+  "19": "Separado/a de União Civil",
+  "20": "Divorciado/a de União Civil",
+  "21": "Viúvo/a de União Civil",
   "": "",
 };
 

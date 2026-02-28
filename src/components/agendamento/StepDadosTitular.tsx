@@ -21,11 +21,15 @@ interface Props {
 }
 
 const estadoCivilOptions = [
-  { value: "solteiro", label: "Solteiro(a)" },
-  { value: "casado", label: "Casado(a)" },
-  { value: "divorciado", label: "Divorciado(a)" },
-  { value: "viuvo", label: "Viúvo(a)" },
-  { value: "uniao_estavel", label: "União Estável" },
+  { value: "16", label: "Solteiro/a" },
+  { value: "13", label: "Casado/a" },
+  { value: "14", label: "Divorciado/a" },
+  { value: "15", label: "Viúvo/a" },
+  { value: "17", label: "Separado/a" },
+  { value: "18", label: "Em união civil" },
+  { value: "19", label: "Separado/a de União Civil" },
+  { value: "20", label: "Divorciado/a de União Civil" },
+  { value: "21", label: "Viúvo/a de União Civil" },
 ] as const;
 
 const eyeColors = [
@@ -160,7 +164,7 @@ const StepDadosTitular = ({
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
-          Dados do Titular (Prenotante)
+          Dados do Titular (Prenotami)
         </h2>
         <p className="text-base text-muted-foreground">
           Informações pessoais e credenciais de acesso
@@ -310,6 +314,9 @@ const StepDadosTitular = ({
               ))}
             </SelectContent>
           </Select>
+          <p className="text-xs text-muted-foreground">
+            Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.
+          </p>
         </div>
       </div>
     </div>

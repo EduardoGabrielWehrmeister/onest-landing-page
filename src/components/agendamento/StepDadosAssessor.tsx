@@ -9,16 +9,16 @@ interface Props {
 
 const fields = [
   {
-    key: "assessorEmail" as const,
-    label: "Email",
-    type: "email",
-    placeholder: "Ex: joao@exemplo.com",
-  },
-  {
     key: "assessorNome" as const,
     label: "Nome / Empresa",
     type: "text",
     placeholder: "Ex: João Silva - Turismo Brasil",
+  },
+  {
+    key: "assessorEmail" as const,
+    label: "Email",
+    type: "email",
+    placeholder: "Ex: joao@exemplo.com",
   },
   {
     key: "assessorTelefone" as const,

@@ -19,13 +19,13 @@ export interface FormData {
   assessorNome: string;
   assessorTelefone: string;
 
-  // Step 2: Dados do Titular (Prenotante)
+  // Step 2: Dados do Titular (Prenotami)
   clienteNome: string;
   clientePdfFile: string;
   prenotamiEmail: string;
   prenotamiSenha: string;
   titularCep: string;
-  titularEstadoCivil: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "";
+  titularEstadoCivil: "13" | "14" | "15" | "16" | "17" | "18" | "19" | "20" | "21" | "";
   titularDocumentoIdentidade: string;
   prenotamiAltura: string;
   prenotamiCorOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
