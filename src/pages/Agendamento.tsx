@@ -10,14 +10,12 @@ import {
   Users,
   StickyNote,
   CheckCircle,
-  Calendar as CalendarIcon,
 } from "lucide-react";
 
 import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
 import StepDadosAssessor from "@/components/agendamento/StepDadosAssessor";
 import StepDadosTitular from "@/components/agendamento/StepDadosTitular";
 import StepRequerentesAdicionais from "@/components/agendamento/StepRequerentesAdicionais";
-import StepPreferenciaDatas from "@/components/agendamento/StepPreferenciaDatas";
 import StepObservacoes from "@/components/agendamento/StepObservacoes";
 import StepRevisaoConfirmacao from "@/components/agendamento/StepRevisaoConfirmacao";
 import StepSucesso from "@/components/agendamento/StepSucesso";
@@ -45,7 +43,6 @@ const Agendamento = () => {
       ...(isAssessor ? [{ label: "Assessor", key: "assessor", icon: Briefcase }] : []),
       { label: "Titular", key: "titular", icon: User },
       { label: "Requerentes", key: "requerentes", icon: Users },
-      { label: "Datas", key: "datas", icon: CalendarIcon },
       { label: "Observações", key: "observacoes", icon: StickyNote },
       { label: "Revisão", key: "revisao", icon: CheckCircle },
       { label: "Sucesso", key: "sucesso", icon: CheckCircle },
@@ -189,16 +186,14 @@ const Agendamento = () => {
             removeRequerente={removeRequerente}
           />
         );
-      case "datas":
-        return (
-          <StepPreferenciaDatas
-            selectedDates={formData.datasPreferencia}
-            onChange={(dates) => updateField("datasPreferencia", dates)}
-          />
-        );
       case "observacoes":
         return (
-          <StepObservacoes value={formData.observacoes} onChange={(v) => updateField("observacoes", v)} />
+          <StepObservacoes
+            value={formData.observacoes}
+            onChange={(v) => updateField("observacoes", v)}
+            datasRestricao={formData.datasRestricao}
+            onChangeDatasRestricao={(dates) => updateField("datasRestricao", dates)}
+          />
         );
       case "revisao":
         // Calculate step indices for edit buttons
@@ -207,8 +202,7 @@ const Agendamento = () => {
           assessor: isAssessor ? 1 : undefined,
           titular: isAssessor ? 2 : 1,
           requerentes: isAssessor ? 3 : 2,
-          datas: isAssessor ? 4 : 3,
-          observacoes: isAssessor ? 5 : 4,
+          observacoes: isAssessor ? 4 : 3,
         };
         return (
           <StepRevisaoConfirmacao

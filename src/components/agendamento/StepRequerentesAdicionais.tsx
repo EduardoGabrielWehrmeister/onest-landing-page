@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Info, User } from "lucide-react";
 import { formatHeightInput } from "@/lib/formUtils";
 import type { RequerenteData } from "@/hooks/useLocalStorageForm";
 import PdfUpload from "./PdfUpload";
@@ -27,7 +28,8 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
   // Empty state
   if (requerentes.length === 0) {
     return (
-      <div className="space-y-8">
+      <TooltipProvider>
+        <div className="space-y-8">
         <div className="text-center">
           <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
             Requerentes Adicionais
@@ -56,11 +58,13 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
           </Button>
         </div>
       </div>
+      </TooltipProvider>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <TooltipProvider>
+      <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
@@ -82,10 +86,10 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
             <div className="flex items-center justify-between mb-5 pb-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-                  <span className="text-sm font-semibold text-primary">{idx + 2}</span>
+                  <User />
                 </div>
                 <h3 className="font-semibold text-foreground">
-                  Requerente Adicional {idx + 2}
+                  Requerente Adicional
                 </h3>
               </div>
               <Button
@@ -104,25 +108,36 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
             <div className="grid gap-6">
               {/* Nome Completo */}
               <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-nome`} className="text-sm font-medium">
-                  Nome completo
-                </Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor={`req-${idx}-nome`} className="text-sm font-medium">
+                    Nome completo
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                    <p>Informe o nome completo do requerente adicional</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id={`req-${idx}-nome`}
                   type="text"
                   value={requerente.nomeCompleto}
                   onChange={(e) => updateRequerente(idx, "nomeCompleto", e.target.value)}
-                  placeholder="Ex: João Silva Santos"
+                  placeholder="Ex: Eduarda Silva Santos"
                   className="h-11"
                 />
-                <p className="text-xs text-muted-foreground">Conforme documento de identidade</p>
               </div>
 
               {/* Data de Nascimento */}
               <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-nascimento`} className="text-sm font-medium">
-                  Data de nascimento
-                </Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor={`req-${idx}-nascimento`} className="text-sm font-medium">
+                    Data de nascimento
+                  </Label>
+                </div>
                 <Input
                   id={`req-${idx}-nascimento`}
                   type="date"
@@ -130,14 +145,23 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                   onChange={(e) => updateRequerente(idx, "dataNascimento", e.target.value)}
                   className="h-11"
                 />
-                <p className="text-xs text-muted-foreground">Formato: DD/MM/AAAA</p>
               </div>
 
               {/* Altura */}
               <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-altura`} className="text-sm font-medium">
-                  Altura
-                </Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor={`req-${idx}-altura`} className="text-sm font-medium">
+                    Altura
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Informe apenas números em centímetros (ex: 185 para 1,85m)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Input
                   id={`req-${idx}-altura`}
                   type="text"
@@ -147,14 +171,23 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                   placeholder="185"
                   className="h-11"
                 />
-                <p className="text-xs text-muted-foreground">Apenas números em centímetros</p>
               </div>
 
               {/* Cor dos Olhos */}
               <div className="space-y-2">
-                <Label htmlFor={`req-${idx}-cor-olhos`} className="text-sm font-medium">
-                  Cor dos olhos
-                </Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor={`req-${idx}-cor-olhos`} className="text-sm font-medium">
+                    Cor dos olhos
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Select
                   value={requerente.corOlhos}
                   onValueChange={(value) =>
@@ -172,7 +205,6 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">Escolha a cor mais próxima</p>
               </div>
 
               {/* PDF Upload */}
@@ -181,6 +213,7 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                 fileName={requerente.documentoIdentidade}
                 onFileSelect={(file) => updateRequerente(idx, "documentoIdentidade", file?.name || "")}
                 onFileRemove={() => updateRequerente(idx, "documentoIdentidade", "")}
+                tooltipText="Frente e verso da Identidade do Requerente Adicional em formato PDF"
               />
             </div>
           </div>
@@ -202,6 +235,7 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
         </div>
       )}
     </div>
+    </TooltipProvider>
   );
 };
 

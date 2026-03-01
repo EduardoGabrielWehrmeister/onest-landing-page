@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Edit, User, Users, Calendar, StickyNote, Briefcase } from "lucide-react";
+import { Edit, User, Users, StickyNote, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FormData } from "@/hooks/useLocalStorageForm";
 
@@ -17,7 +17,6 @@ interface Props {
     assessor?: number;
     titular: number;
     requerentes: number;
-    datas: number;
     observacoes: number;
   };
 }
@@ -235,50 +234,13 @@ const StepRevisaoConfirmacao = ({ formData, onEditStep, isSubmitting, onConfirm,
           </CardContent>
         </Card>
 
-        {/* Datas Selecionadas */}
-        <Card className="border-border">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-primary" />
-                <CardTitle className="text-lg">Datas Selecionadas</CardTitle>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => onEditStep(stepIndices.datas)}
-                className="gap-2"
-              >
-                <Edit className="w-4 h-4" />
-                Editar
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {formData.datasPreferencia.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {formData.datasPreferencia
-                  .sort()
-                  .map((dateStr) => (
-                    <Badge key={dateStr} variant="secondary">
-                      {new Date(dateStr).toLocaleDateString("pt-BR")}
-                    </Badge>
-                  ))}
-              </div>
-            ) : (
-              <span className="text-sm text-muted-foreground">Nenhuma data selecionada</span>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Observações */}
+        {/* Observações e Restrições */}
         <Card className="border-border">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <StickyNote className="w-5 h-5 text-primary" />
-                <CardTitle className="text-lg">Observações</CardTitle>
+                <CardTitle className="text-lg">Observações e Restrições</CardTitle>
               </div>
               <Button
                 type="button"
@@ -292,12 +254,41 @@ const StepRevisaoConfirmacao = ({ formData, onEditStep, isSubmitting, onConfirm,
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
-            {formData.observacoes ? (
-              <p className="text-sm">{formData.observacoes}</p>
-            ) : (
-              <span className="text-sm text-muted-foreground">Nenhuma observação</span>
-            )}
+          <CardContent className="space-y-4">
+
+            {/* Seção Observações */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2">
+                Observações Adicionais
+              </p>
+              {formData.observacoes ? (
+                <p className="text-sm">{formData.observacoes}</p>
+              ) : (
+                <span className="text-sm text-muted-foreground">Nenhuma observação</span>
+              )}
+            </div>
+
+            {/* Seção Restrições de Datas */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2">
+                Restrições de Datas
+              </p>
+              {formData.datasRestricao.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {formData.datasRestricao
+                    .sort()
+                    .map((dateStr) => (
+                      <Badge key={dateStr} variant="secondary">
+                        {new Date(dateStr).toLocaleDateString("pt-BR")}
+                      </Badge>
+                    ))}
+                </div>
+              ) : (
+                <span className="text-sm text-muted-foreground">Sem restrições de datas</span>
+              )}
+            </div>
+
+
           </CardContent>
         </Card>
       </div>

@@ -39,8 +39,8 @@ export interface FormData {
   // Step 3: Requerentes Adicionais
   requerentes: RequerenteData[];
 
-  // Step 4: Preferência de Datas
-  datasPreferencia: string[];
+  // Step 4: Restrições de Datas
+  datasRestricao: string[];
 
   // Step 5: Observações
   observacoes: string;
@@ -70,7 +70,7 @@ const defaultFormData: FormData = {
   titularEstado: "",
   titularComplemento: "",
   requerentes: [],
-  datasPreferencia: [],
+  datasRestricao: [],
   observacoes: "",
   revisaoConfirmado: false,
 };
@@ -79,7 +79,15 @@ export function useLocalStorageForm() {
   const [formData, setFormData] = useState<FormData>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return { ...defaultFormData, ...JSON.parse(saved) };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Migration: datasPreferencia → datasRestricao
+        if (parsed.datasPreferencia && !parsed.datasRestricao) {
+          parsed.datasRestricao = parsed.datasPreferencia;
+          delete parsed.datasPreferencia;
+        }
+        return { ...defaultFormData, ...parsed };
+      }
     } catch {}
     return defaultFormData;
   });
