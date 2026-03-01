@@ -167,3 +167,6 @@ export function useLocalStorageForm() {
     resetForm,
   };
 }
+
+// Re-export useLocalStorage for convenience
+export { useLocalStorage } from './useLocalStorage';

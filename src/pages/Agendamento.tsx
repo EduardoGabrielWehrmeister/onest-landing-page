@@ -1,136 +1,223 @@
-import { useMemo, useState, useCallback } from "react";
-import { useLocalStorageForm } from "@/hooks/useLocalStorageForm";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useLocalStorage, useLocalStorageForm } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 import {
   ArrowLeft,
   ArrowRight,
-  Briefcase,
   User,
-  Users,
-  StickyNote,
   CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 
-import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
-import StepDadosAssessor from "@/components/agendamento/StepDadosAssessor";
-import StepDadosTitular from "@/components/agendamento/StepDadosTitular";
-import StepRequerentesAdicionais from "@/components/agendamento/StepRequerentesAdicionais";
-import StepObservacoes from "@/components/agendamento/StepObservacoes";
-import StepRevisaoConfirmacao from "@/components/agendamento/StepRevisaoConfirmacao";
+import { useFormConfig } from "@/hooks/useFormConfig";
+import { StepSelecaoServico } from "@/components/agendamento/StepSelecaoServico";
+import { DynamicFormSection } from "@/components/agendamento/DynamicFormSection";
 import StepSucesso from "@/components/agendamento/StepSucesso";
 import StepIndicator from "@/components/agendamento/StepIndicator";
+import type { FormFieldValue } from "@/lib/supabase/types";
+
+// Storage keys
+const SELECTION_STORAGE_KEY = "agendamento-selection";
+const FORM_VALUES_STORAGE_KEY = "agendamento-dynamic-values";
+
+interface ServiceSelection {
+  stateCode: string | null;
+  serviceSlug: string | null;
+}
 
 const Agendamento = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const {
-    formData,
-    currentStep,
-    setCurrentStep,
-    updateField,
-    updateRequerente,
-    addRequerente,
-    removeRequerente,
-    resetForm,
-  } = useLocalStorageForm();
-
-  const isAssessor = formData.tipoUsuario === "assessor";
-
-  const steps = useMemo(
-    () => [
-      { label: "Tipo", key: "tipo", icon: User },
-      ...(isAssessor ? [{ label: "Assessor", key: "assessor", icon: Briefcase }] : []),
-      { label: "Titular", key: "titular", icon: User },
-      { label: "Requerentes", key: "requerentes", icon: Users },
-      { label: "Observações", key: "observacoes", icon: StickyNote },
-      { label: "Revisão", key: "revisao", icon: CheckCircle },
-      { label: "Sucesso", key: "sucesso", icon: CheckCircle },
-    ],
-    [isAssessor]
+  // Seleção de estado/serviço (persistida em localStorage)
+  const [selection, setSelection] = useLocalStorage<ServiceSelection>(
+    SELECTION_STORAGE_KEY,
+    { stateCode: null, serviceSlug: null }
   );
 
-  const totalSteps = steps.length;
-  const currentKey = steps[currentStep]?.key;
+  // Valores dinâmicos dos campos (persistidos em localStorage)
+  const [formValues, setFormValues] = useLocalStorage<Record<string, FormFieldValue>>(
+    FORM_VALUES_STORAGE_KEY,
+    {}
+  );
+
+  // Erros de validação
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Ref para formValues - usado em canGoNext para evitar re-renders
+  const formValuesRef = useRef(formValues);
+  useEffect(() => {
+    formValuesRef.current = formValues;
+  }, [formValues]);
+
+  // Carregar configuração do formulário
+  const {
+    config,
+    loading: configLoading,
+    error: configError,
+    validateField,
+    validateSection,
+  } = useFormConfig(selection.stateCode, selection.serviceSlug, {
+    onError: (error) => {
+      console.error('Error loading form config:', error);
+    },
+  });
+
+  // Step atual
+  const [currentStep, setCurrentStep] = useState(() => {
+    try {
+      const saved = localStorage.getItem(SELECTION_STORAGE_KEY + "-step");
+      return saved ? parseInt(saved, 10) : 0;
+    } catch {
+      return 0;
+    }
+  });
+
+  // Salvar step no localStorage
+  useEffect(() => {
+    localStorage.setItem(SELECTION_STORAGE_KEY + "-step", String(currentStep));
+  }, [currentStep]);
+
+  // Determinar se devemos mostrar o step de seleção
+  const showSelectionStep = !selection.stateCode || !selection.serviceSlug;
+
+  // Calcular steps visíveis baseados na configuração
+  // Retornar todas as seções, filtramos no render
+  const visibleSections = useMemo(() => {
+    if (!config) return [];
+    return config.sections;
+  }, [config]);
+
+  // Adicionar steps de seleção e sucesso
+  const allSteps = useMemo(() => {
+    const steps = [];
+
+    if (showSelectionStep) {
+      steps.push({ label: "Seleção", key: "selection", icon: User });
+    }
+
+    visibleSections.forEach((section) => {
+      steps.push({
+        label: section.title.split(" ")[0], // Primeira palavra do título
+        key: section.slug,
+        icon: undefined, // Será mapeado depois se necessário
+      });
+    });
+
+    // Adicionar revisão e sucesso apenas se não for step de seleção
+    if (!showSelectionStep) {
+      steps.push({ label: "Revisão", key: "revisao", icon: CheckCircle });
+      steps.push({ label: "Sucesso", key: "sucesso", icon: CheckCircle });
+    }
+
+    return steps;
+  }, [showSelectionStep, visibleSections]);
+
+  const totalSteps = allSteps.length;
+  const currentKey = allSteps[currentStep]?.key;
   const isSuccessStep = currentKey === "sucesso";
+  const isReviewStep = currentKey === "revisao";
+  const isSelectionStep = currentKey === "selection";
 
-  const canGoNext = () => {
-    // TODO: Temporarily disabled for testing
+  // Atualizar valor de um campo
+  const updateValue = useCallback((fieldKey: string, value: FormFieldValue) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [fieldKey]: value,
+    }));
+
+    // Limpar erro do campo ao atualizar
+    setFieldErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldKey];
+      return newErrors;
+    });
+  }, [setFormValues]);
+
+  // Callbacks para seleção de serviço
+  const handleStateChange = useCallback((stateCode: string | null) => {
+    setSelection((prev) => ({ ...prev, stateCode }));
+    // Limpar valores do formulário ao mudar estado
+    setFormValues({});
+    setFieldErrors({});
+    setCurrentStep(0);
+  }, [setSelection, setFormValues, setFieldErrors, setCurrentStep]);
+
+  const handleServiceChange = useCallback((serviceSlug: string | null) => {
+    setSelection((prev) => ({ ...prev, serviceSlug }));
+    // Limpar valores do formulário ao mudar serviço
+    setFormValues({});
+    setFieldErrors({});
+    setCurrentStep(0);
+  }, [setSelection, setFormValues, setFieldErrors, setCurrentStep]);
+
+  // Validar step atual - usa ref para formValues para evitar re-renders
+  const canGoNext = useCallback((): boolean => {
+    if (isSelectionStep) {
+      return !!selection.stateCode && !!selection.serviceSlug;
+    }
+
+    if (isReviewStep) {
+      return formValuesRef.current['revisaoConfirmado'] === true;
+    }
+
+    // Validar seção atual
+    const currentSectionIndex = currentStep - (showSelectionStep ? 1 : 0);
+    if (currentSectionIndex >= 0 && currentSectionIndex < visibleSections.length) {
+      const result = validateSection(currentSectionIndex, formValuesRef.current);
+
+      // Atualizar erros
+      if (!result.valid) {
+        setFieldErrors(result.errors);
+      }
+
+      return result.valid;
+    }
+
     return true;
+  }, [isSelectionStep, isReviewStep, selection.stateCode, selection.serviceSlug, currentStep, showSelectionStep, visibleSections.length, validateSection]);
 
-    // switch (currentKey) {
-    //   case "tipo":
-    //     return formData.tipoUsuario !== "";
-    //   case "assessor":
-    //   case "assessor":
-    //     return !!(
-    //       formData.assessorEmail &&
-    //       formData.assessorNome &&
-    //       formData.assessorTelefone
-    //     );
-    //   case "titular":
-    //     return !!(
-    //       formData.clienteNome &&
-    //       formData.clientePdfFile &&
-    //       formData.prenotamiEmail &&
-    //       formData.prenotamiSenha &&
-    //       formData.titularCep &&
-    //       formData.titularEstadoCivil &&
-    //       formData.titularDocumentoIdentidade &&
-    //       formData.prenotamiAltura &&
-    //       formData.prenotamiCorOlhos
-    //     );
-    //   case "requerentes": {
-    //     // All added requerentes must have complete fields
-    //     for (let i = 0; i < formData.requerentes.length; i++) {
-    //       const r = formData.requerentes[i];
-    //       if (
-    //         !r?.nomeCompleto ||
-    //         !r?.dataNascimento ||
-    //         !r?.altura ||
-    //         !r?.corOlhos ||
-    //         !r?.documentoIdentidade
-    //       ) {
-    //         return false;
-    //       }
-    //     }
-    //     return true;
-    //   }
-    //   case "datas":
-    //     return true; // Optional - always allow next
-    //   case "observacoes":
-    //     return true; // Optional - always allow next
-    //   case "revisao":
-    //     return formData.revisaoConfirmado === true;
-    //   default:
-    //     return true;
-    // }
-  };
-
-  const handleEditStep = useCallback((step: number) => {
-    setCurrentStep(step);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
+  // Submeter formulário
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
-    try {
-      // TODO: Implement actual submission logic
-      // await submitForm(formData);
+    setSubmitError(null);
 
-      // For now, just move to success step
-      setTimeout(() => {
-        setCurrentStep(totalSteps - 1);
-        setIsSubmitting(false);
-      }, 1000);
+    try {
+      // TODO: Implementar submissão real usando formSubmissionService
+      // const submissionData = {
+      //   form_configuration_id: config!.id,
+      //   user_type: formValuesRef.current['tipoUsuario'] as 'cliente' | 'assessor',
+      //   titular_data: formValuesRef.current,
+      //   requerentes_adicionais: formValuesRef.current['requerentes'] || [],
+      //   datas_restricao: formValuesRef.current['datasRestricao'] || [],
+      //   observacoes: formValuesRef.current['observacoes'] as string || '',
+      //   status: 'submitted' as const,
+      // };
+
+      // const result = await formSubmissionService.create(submissionData);
+
+      // if (result.error || !result.data) {
+      //   throw new Error(result.error?.message || 'Erro ao enviar formulário');
+      // }
+
+      // Simular submissão bem-sucedida
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setCurrentStep(totalSteps - 1); // Ir para step de sucesso
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao enviar formulário';
+      setSubmitError(message);
       console.error('Submit error:', error);
+    } finally {
       setIsSubmitting(false);
     }
-  }, [formData, totalSteps]);
+  }, [config, totalSteps]);
 
+  // Navegação
   const handleNext = () => {
-    if (currentKey === "revisao") {
+    if (isReviewStep) {
       handleSubmit();
     } else if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
@@ -145,80 +232,144 @@ const Agendamento = () => {
     }
   };
 
+  const handleReset = useCallback(() => {
+    setSelection({ stateCode: null, serviceSlug: null });
+    setFormValues({});
+    setFieldErrors({});
+    setCurrentStep(0);
+    localStorage.removeItem(SELECTION_STORAGE_KEY + "-step");
+  }, [setSelection, setFormValues]);
+
+  // Renderizar step atual
   const renderStep = () => {
-    switch (currentKey) {
-      case "tipo":
-        return (
-          <StepTipoUsuario
-            value={formData.tipoUsuario}
-            onChange={(v) => updateField("tipoUsuario", v)}
-          />
-        );
-      case "assessor":
-        return <StepDadosAssessor formData={formData} updateField={updateField} />;
-      case "titular":
-        return (
-          <StepDadosTitular
-            nome={formData.clienteNome}
-            pdfFile={formData.clientePdfFile}
-            email={formData.prenotamiEmail}
-            senha={formData.prenotamiSenha}
-            cep={formData.titularCep}
-            logradouro={formData.titularLogradouro}
-            numero={formData.titularNumero}
-            bairro={formData.titularBairro}
-            cidade={formData.titularCidade}
-            estado={formData.titularEstado}
-            complemento={formData.titularComplemento}
-            estadoCivil={formData.titularEstadoCivil}
-            documentoIdentidade={formData.titularDocumentoIdentidade}
-            altura={formData.prenotamiAltura}
-            corOlhos={formData.prenotamiCorOlhos}
-            updateField={updateField}
-          />
-        );
-      case "requerentes":
-        return (
-          <StepRequerentesAdicionais
-            requerentes={formData.requerentes}
-            updateRequerente={updateRequerente}
-            addRequerente={addRequerente}
-            removeRequerente={removeRequerente}
-          />
-        );
-      case "observacoes":
-        return (
-          <StepObservacoes
-            value={formData.observacoes}
-            onChange={(v) => updateField("observacoes", v)}
-            datasRestricao={formData.datasRestricao}
-            onChangeDatasRestricao={(dates) => updateField("datasRestricao", dates)}
-          />
-        );
-      case "revisao":
-        // Calculate step indices for edit buttons
-        const stepIndices = {
-          tipo: 0,
-          assessor: isAssessor ? 1 : undefined,
-          titular: isAssessor ? 2 : 1,
-          requerentes: isAssessor ? 3 : 2,
-          observacoes: isAssessor ? 4 : 3,
-        };
-        return (
-          <StepRevisaoConfirmacao
-            formData={formData}
-            onEditStep={handleEditStep}
-            isSubmitting={isSubmitting}
-            onConfirm={handleSubmit}
-            updateField={updateField}
-            stepIndices={stepIndices}
-          />
-        );
-      case "sucesso":
-        return <StepSucesso onReset={resetForm} />;
-      default:
-        return null;
+    // Loading
+    if (!showSelectionStep && configLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Carregando formulário...</p>
+        </div>
+      );
     }
+
+    // Erro de configuração
+    if (!showSelectionStep && configError) {
+      return (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {configError.message || 'Erro ao carregar configuração do formulário. Tente novamente.'}
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    // Step de seleção
+    if (isSelectionStep) {
+      return (
+        <StepSelecaoServico
+          selectedState={selection.stateCode}
+          onStateChange={handleStateChange}
+          selectedService={selection.serviceSlug}
+          onServiceChange={handleServiceChange}
+        />
+      );
+    }
+
+    // Step de sucesso
+    if (isSuccessStep) {
+      return <StepSucesso onReset={handleReset} />;
+    }
+
+    // Step de revisão
+    if (isReviewStep) {
+      return (
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-serif font-bold">Revisão e Confirmação</h2>
+            <p className="text-muted-foreground">
+              Revise todas as informações antes de enviar
+            </p>
+          </div>
+
+          {/* Resumo das informações */}
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h3 className="font-semibold mb-2">{config?.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                Estado: {config?.state.name} | Serviço: {config?.service_type.name}
+              </p>
+            </div>
+
+            {/* Listar todos os campos preenchidos */}
+            <div className="space-y-2">
+              {visibleSections.flatMap((section) =>
+                section.fields
+                  .filter(f => formValues[f.field_key])
+                  .map((field) => (
+                    <div key={field.id} className="flex justify-between py-2 border-b">
+                      <span className="text-muted-foreground">{field.label}</span>
+                      <span className="font-medium">
+                        {Array.isArray(formValues[field.field_key])
+                          ? `${(formValues[field.field_key] as any[]).length} itens`
+                          : String(formValues[field.field_key] || '-')}
+                      </span>
+                    </div>
+                  ))
+              )}
+            </div>
+
+            {/* Checkbox de confirmação */}
+            {config && visibleSections.find(s => s.slug === 'revisao')?.fields.map(field => (
+              field.field_key === 'revisaoConfirmado' ? (
+                <div key={field.id} className="flex items-start space-x-2 pt-4">
+                  <input
+                    type="checkbox"
+                    id="revisaoConfirmado"
+                    checked={formValues['revisaoConfirmado'] === true}
+                    onChange={(e) => updateValue('revisaoConfirmado', e.target.checked)}
+                    className="mt-1"
+                  />
+                  <label
+                    htmlFor="revisaoConfirmado"
+                    className="text-sm cursor-pointer"
+                  >
+                    Confirmo que todas as informações estão corretas
+                  </label>
+                </div>
+              ) : null
+            ))}
+          </div>
+
+          {submitError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{submitError}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+      );
+    }
+
+    // Seções dinâmicas
+    const currentSectionIndex = currentStep - (showSelectionStep ? 1 : 0);
+    const currentSection = visibleSections[currentSectionIndex];
+
+    if (currentSection) {
+      // Retornar todos os campos da seção (sem filtrar por visibilidade)
+      // A filtragem pode ser feita no componente se necessário
+      return (
+        <DynamicFormSection
+          section={currentSection}
+          values={formValues}
+          onChange={updateValue}
+          errors={fieldErrors}
+          formName="agendamento-form"
+        />
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -263,17 +414,17 @@ const Agendamento = () => {
       <div className="section-container relative z-10 -mt-8">
         <div className="max-w-3xl mx-auto">
           {/* Stepper - Only show if not success step */}
-          {!isSuccessStep && (
+          {!isSuccessStep && !configLoading && (
             <div className="mb-8 overflow-x-auto pb-4">
               <div className="flex items-start justify-between min-w-max md:min-w-0 gap-2">
-                {steps.slice(0, -1).map((step, index) => (
+                {allSteps.slice(0, isSuccessStep ? undefined : -1).map((step, index) => (
                   <StepIndicator
                     key={step.key}
                     icon={step.icon}
                     label={step.label}
                     active={index === currentStep}
                     completed={index < currentStep}
-                    isLast={index === steps.length - 2}
+                    isLast={index === allSteps.length - (isSuccessStep ? 1 : 2)}
                   />
                 ))}
               </div>
@@ -290,32 +441,45 @@ const Agendamento = () => {
           </Card>
 
           {/* Navigation */}
-          {!isSuccessStep && (
+          {!isSuccessStep && !configLoading && (
             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
               {/* Hide back button on first step */}
               {currentStep > 0 && (
                 <Button
                   variant="outline"
                   onClick={handleBack}
+                  disabled={isSubmitting}
                   className="gap-2 w-full sm:w-auto"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Voltar
                 </Button>
               )}
-              {/* Hide next button on revisao step */}
-              {currentKey !== "revisao" && (
+
+              {/* Hide next button on revisao step during submit */}
+              {(!isReviewStep || !isSubmitting) && currentKey !== "sucesso" && (
                 <Button
                   onClick={handleNext}
-                  disabled={!canGoNext()}
+                  disabled={!canGoNext() || isSubmitting || configLoading}
                   className="gap-2 w-full sm:w-auto"
-                  {...(currentStep === 0 ? {} : {})}
                   style={{ marginLeft: currentStep === 0 ? 'auto' : undefined }}
                 >
-                  <>
-                    Próximo
-                    <ArrowRight className="h-4 w-4" />
-                  </>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : isReviewStep ? (
+                    <>
+                      Enviar
+                      <CheckCircle className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Próximo
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               )}
             </div>
