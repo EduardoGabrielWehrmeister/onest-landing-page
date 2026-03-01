@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
-import { Upload, FileCheck, X } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Upload, FileCheck, X, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PdfUploadProps {
@@ -9,6 +10,7 @@ interface PdfUploadProps {
   onFileSelect: (file: File | null) => void;
   onFileRemove: () => void;
   accept?: string;
+  tooltipText?: string;
 }
 
 /**
@@ -20,7 +22,8 @@ const PdfUpload = ({
   fileName,
   onFileSelect,
   onFileRemove,
-  accept = ".pdf,application/pdf"
+  accept = ".pdf,application/pdf",
+  tooltipText
 }: PdfUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -64,7 +67,21 @@ const PdfUpload = ({
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium">{title}</Label>
+      {tooltipText ? (
+        <div className="flex items-center gap-1.5">
+          <Label className="text-sm font-medium">{title}</Label>
+          <Tooltip>
+            <TooltipTrigger>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{tooltipText}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      ) : (
+        <Label className="text-sm font-medium">{title}</Label>
+      )}
       {!fileName ? (
         <div
           onDragEnter={handleDrag}

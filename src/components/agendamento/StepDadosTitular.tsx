@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, EyeOff, Mail } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Eye, EyeOff, Mail, Info } from "lucide-react";
 import { cleanAddressInput, formatHeightInput, fetchAddressFromCEP } from "@/lib/formUtils";
 import type { FormData } from "@/hooks/useLocalStorageForm";
 import PdfUpload from "./PdfUpload";
@@ -27,15 +28,15 @@ interface Props {
 }
 
 const estadoCivilOptions = [
-  { value: "16", label: "Solteiro/a" },
-  { value: "13", label: "Casado/a" },
-  { value: "14", label: "Divorciado/a" },
-  { value: "15", label: "Viúvo/a" },
-  { value: "17", label: "Separado/a" },
-  { value: "18", label: "Em união civil" },
-  { value: "19", label: "Separado/a de União Civil" },
-  { value: "20", label: "Divorciado/a de União Civil" },
-  { value: "21", label: "Viúvo/a de União Civil" },
+  { value: "16", label: "Solteiro(a)" },
+  { value: "13", label: "Casado(a)" },
+  { value: "14", label: "Divorciado(a)" },
+  { value: "15", label: "Viúvo(a)" },
+  { value: "17", label: "Separado(a)" },
+  { value: "18", label: "Em união estável" },
+  { value: "19", label: "Separado(a) de união estável" },
+  { value: "20", label: "Dissolvido(a) de união estável" },
+  { value: "21", label: "Viúvo(a) de companheiro(a)" },
 ] as const;
 
 const eyeColors = [
@@ -98,7 +99,8 @@ const StepDadosTitular = ({
   };
 
   return (
-    <div className="space-y-8">
+    <TooltipProvider>
+      <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
@@ -112,9 +114,19 @@ const StepDadosTitular = ({
       <div className="grid gap-6">
         {/* Nome Completo */}
         <div className="space-y-2">
-          <Label htmlFor="clienteNome" className="text-sm font-medium">
-            Nome completo
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="clienteNome" className="text-sm font-medium">
+              Nome completo
+            </Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Informe o nome completo do titular da conta Prenotami</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Input
             id="clienteNome"
             type="text"
@@ -123,38 +135,48 @@ const StepDadosTitular = ({
             placeholder="Ex: Maria da Silva Santos"
             className="h-11"
           />
-          <p className="text-xs text-muted-foreground">
-            Informe o nome completo conforme documento de identidade
-          </p>
         </div>
 
         {/* Email Prenotami */}
         <div className="space-y-2">
-          <Label htmlFor="prenotamiEmail" className="text-sm font-medium">
-            Email Prenotami
-          </Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="prenotamiEmail" className="text-sm font-medium">
+              Email Prenotami
+            </Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Informe o email do titular da conta Prenotami</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
             <Input
               id="prenotamiEmail"
               type="email"
               value={email}
               onChange={(e) => updateField("prenotamiEmail", e.target.value)}
-              placeholder="Ex: joao@gmail.com"
-              className="h-11 pl-10"
+              placeholder="Ex: maria.santos@gmail.com"
+              className="h-11"
             />
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Mail className="w-3 h-3" />
-            <span>O sistema funciona apenas com contas Gmail</span>
-          </div>
         </div>
 
         {/* Senha */}
         <div className="space-y-2">
-          <Label htmlFor="prenotamiSenha" className="text-sm font-medium">
-            Senha Prenotami
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="prenotamiSenha" className="text-sm font-medium">
+              Senha Prenotami
+            </Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Informe a senha do titular da conta Prenotami</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <div className="relative">
             <Input
               id="prenotamiSenha"
@@ -172,14 +194,23 @@ const StepDadosTitular = ({
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground">Mínimo 8 caracteres</p>
         </div>
 
         {/* CEP */}
         <div className="space-y-2">
-          <Label htmlFor="titularCep" className="text-sm font-medium">
-            CEP
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="titularCep" className="text-sm font-medium">
+              CEP
+            </Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Apenas números (8 dígitos)</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <div className="relative">
             <Input
               id="titularCep"
@@ -187,7 +218,7 @@ const StepDadosTitular = ({
               inputMode="numeric"
               value={cep}
               onChange={(e) => handleCepChange(cleanAddressInput(e.target.value))}
-              placeholder="12345678"
+              placeholder="05410001"
               className="h-11 uppercase pr-10"
               disabled={isFetchingAddress}
             />
@@ -197,12 +228,9 @@ const StepDadosTitular = ({
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <p className="text-xs text-muted-foreground">Apenas números (8 dígitos)</p>
-            {addressError && (
-              <p className="text-xs text-destructive">{addressError}</p>
-            )}
-          </div>
+          {addressError && (
+            <p className="text-xs text-destructive">{addressError}</p>
+          )}
         </div>
 
         {/* Endereço */}
@@ -210,7 +238,7 @@ const StepDadosTitular = ({
           {/* Logradouro */}
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="titularLogradouro" className="text-sm font-medium">
-              Logradouro
+              Rua / Avenida
             </Label>
             <Input
               id="titularLogradouro"
@@ -224,9 +252,11 @@ const StepDadosTitular = ({
 
           {/* Número */}
           <div className="space-y-2">
-            <Label htmlFor="titularNumero" className="text-sm font-medium">
-              Número
-            </Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="titularNumero" className="text-sm font-medium">
+                Número
+              </Label>
+            </div>
             <Input
               id="titularNumero"
               type="text"
@@ -235,14 +265,15 @@ const StepDadosTitular = ({
               placeholder="Ex: 1000"
               className="h-11"
             />
-            <p className="text-xs text-muted-foreground">Opcional</p>
           </div>
 
           {/* Complemento */}
           <div className="space-y-2">
-            <Label htmlFor="titularComplemento" className="text-sm font-medium">
-              Complemento
-            </Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="titularComplemento" className="text-sm font-medium">
+                Complemento (Opcional)
+              </Label>
+            </div>
             <Input
               id="titularComplemento"
               type="text"
@@ -251,7 +282,6 @@ const StepDadosTitular = ({
               placeholder="Ex: Apto 101"
               className="h-11"
             />
-            <p className="text-xs text-muted-foreground">Opcional</p>
           </div>
 
           {/* Bairro */}
@@ -303,9 +333,12 @@ const StepDadosTitular = ({
 
         {/* Estado Civil */}
         <div className="space-y-2">
-          <Label htmlFor="titularEstadoCivil" className="text-sm font-medium">
-            Estado Civil
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="titularEstadoCivil" className="text-sm font-medium">
+              Estado Civil
+            </Label>
+
+          </div>
           <Select value={estadoCivil} onValueChange={(value) => updateField("titularEstadoCivil", value as FormData["titularEstadoCivil"])}>
             <SelectTrigger className="h-11">
               <SelectValue placeholder="Selecione o estado civil" />
@@ -318,30 +351,23 @@ const StepDadosTitular = ({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">Conforme documento de identidade</p>
         </div>
 
-        {/* Comprovante PDF */}
-        <PdfUpload
-          title="Comprovante de identidade (PDF)"
-          fileName={pdfFile}
-          onFileSelect={(file) => updateField("clientePdfFile", file?.name || "")}
-          onFileRemove={() => updateField("clientePdfFile", "")}
-        />
-
-        {/* Documento de Identidade */}
-        <PdfUpload
-          title="Documento de Identidade (PDF)"
-          fileName={documentoIdentidade}
-          onFileSelect={(file) => updateField("titularDocumentoIdentidade", file?.name || "")}
-          onFileRemove={() => updateField("titularDocumentoIdentidade", "")}
-        />
-
-        {/* Altura */}
+                {/* Altura */}
         <div className="space-y-2">
-          <Label htmlFor="prenotamiAltura" className="text-sm font-medium">
-            Altura
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="prenotamiAltura" className="text-sm font-medium">
+              Altura
+            </Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Informe apenas números em centímetros (ex: 185 para 1,85m)</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Input
             id="prenotamiAltura"
             type="text"
@@ -351,16 +377,23 @@ const StepDadosTitular = ({
             placeholder="185"
             className="h-11"
           />
-          <p className="text-xs text-muted-foreground">
-            Informe apenas números em centímetros (ex: 185 para 1,85m)
-          </p>
         </div>
 
         {/* Cor dos Olhos */}
         <div className="space-y-2">
-          <Label htmlFor="prenotamiCorOlhos" className="text-sm font-medium">
-            Cor dos olhos
-          </Label>
+          <div className="flex items-center gap-1.5">
+            <Label htmlFor="prenotamiCorOlhos" className="text-sm font-medium">
+              Cor dos olhos
+            </Label>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <Select value={corOlhos} onValueChange={(value) => updateField("prenotamiCorOlhos", value as FormData["prenotamiCorOlhos"])}>
             <SelectTrigger className="h-11">
               <SelectValue placeholder="Selecione a cor dos olhos" />
@@ -373,12 +406,28 @@ const StepDadosTitular = ({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
-            Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.
-          </p>
         </div>
+
+        {/* Documento de Identidade */}
+        <PdfUpload
+          title="Documento de Identidade (PDF)"
+          fileName={documentoIdentidade}
+          onFileSelect={(file) => updateField("titularDocumentoIdentidade", file?.name || "")}
+          onFileRemove={() => updateField("titularDocumentoIdentidade", "")}
+          tooltipText="Frente e verso da Identidade do Titular em promato de PDF"
+        />
+
+        {/* Comprovante de Residência (Opcional) */}
+        <PdfUpload
+          title="Comprovante de Residência (PDF) - Opcional"
+          fileName={pdfFile}
+          onFileSelect={(file) => updateField("clientePdfFile", file?.name || "")}
+          onFileRemove={() => updateField("clientePdfFile", "")}
+          tooltipText="Conta de luz, água ou telefone dos últimos 3 meses"
+        />
       </div>
     </div>
+    </TooltipProvider>
   );
 };
 

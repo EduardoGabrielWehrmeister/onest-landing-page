@@ -23,15 +23,15 @@ interface Props {
 }
 
 const estadoCivilLabels: Record<FormData["titularEstadoCivil"], string> = {
-  "13": "Casado/a",
-  "14": "Divorciado/a",
-  "15": "Viúvo/a",
-  "16": "Solteiro/a",
-  "17": "Separado/a",
-  "18": "Em união civil",
-  "19": "Separado/a de União Civil",
-  "20": "Divorciado/a de União Civil",
-  "21": "Viúvo/a de União Civil",
+  "13": "Casado(a)",
+  "14": "Divorciado(a)",
+  "15": "Viúvo(a)",
+  "16": "Solteiro(a)",
+  "17": "Separado(a)",
+  "18": "Em união estável",
+  "19": "Separado(a) de união estável",
+  "20": "Dissolvido(a) de união estável",
+  "21": "Viúvo(a) de companheiro(a)",
   "": "",
 };
 
@@ -181,7 +181,7 @@ const StepRevisaoConfirmacao = ({ formData, onEditStep, isSubmitting, onConfirm,
                 <span className="font-medium">{corOlhosLabels[formData.prenotamiCorOlhos] || "-"}</span>
               </div>
               <div className="flex">
-                <span className="text-muted-foreground w-40">Comprovante PDF:</span>
+                <span className="text-muted-foreground w-40">Comprovante de Residência:</span>
                 <span className="font-medium">{formData.clientePdfFile || "-"}</span>
               </div>
               <div className="flex">
