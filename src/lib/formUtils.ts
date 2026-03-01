@@ -41,7 +41,6 @@ export function cleanObservations(text: string, maxLength: number = 100): string
   return removeAccents(text)
     .replace(/[^a-zA-Z0-9\s\-]/g, "") // Keep only letters, numbers, space, hyphen
     .replace(/\s+/g, " ")
-    .trim()
     .slice(0, maxLength);
 }
 
