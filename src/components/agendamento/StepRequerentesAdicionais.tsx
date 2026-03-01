@@ -1,12 +1,12 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Upload, FileCheck, X, Plus, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Plus, Trash2 } from "lucide-react";
 import { formatHeightInput } from "@/lib/formUtils";
 import type { RequerenteData } from "@/hooks/useLocalStorageForm";
+import PdfUpload from "./PdfUpload";
 
 interface Props {
   requerentes: RequerenteData[];
@@ -24,111 +24,6 @@ const eyeColors = [
 ] as const;
 
 const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerente, removeRequerente }: Props) => {
-  const [showPassword, setShowPassword] = useState<Record<number, boolean>>({});
-  const [dragActive, setDragActive] = useState<Record<number, boolean>>({});
-  const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
-
-  const handleFileSelect = (file: File | null, index: number) => {
-    if (file && file.type === "application/pdf") {
-      updateRequerente(index, "documentoIdentidade", file.name);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0] || null;
-    handleFileSelect(file, index);
-  };
-
-  const handleDrag = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive((prev) => ({ ...prev, [index]: true }));
-    } else if (e.type === "dragleave") {
-      setDragActive((prev) => ({ ...prev, [index]: false }));
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive((prev) => ({ ...prev, [index]: false }));
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files[0], index);
-    }
-  };
-
-  const handleRemoveFile = (index: number) => {
-    updateRequerente(index, "documentoIdentidade", "");
-    if (fileInputRefs.current[index]) {
-      fileInputRefs.current[index].value = "";
-    }
-  };
-
-  const renderPdfUpload = (index: number) => {
-    const file = requerentes[index]?.documentoIdentidade;
-
-    return (
-      <div className="space-y-2">
-        <Label className="text-sm font-medium">Documento de Identidade (PDF)</Label>
-        {!file ? (
-          <div
-            onDragEnter={(e) => handleDrag(e, index)}
-            onDragLeave={(e) => handleDrag(e, index)}
-            onDragOver={(e) => handleDrag(e, index)}
-            onDrop={(e) => handleDrop(e, index)}
-            className={cn(
-              "border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all",
-              "hover:border-primary/50 hover:bg-primary/5",
-              dragActive[index] ? "border-primary bg-primary/10" : "border-border"
-            )}
-            onClick={() => fileInputRefs.current[index]?.click()}
-          >
-            <input
-              ref={(el) => (fileInputRefs.current[index] = el)}
-              type="file"
-              accept=".pdf,application/pdf"
-              onChange={(e) => handleInputChange(e, index)}
-              className="hidden"
-            />
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Upload className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  Clique para selecionar ou arraste o arquivo
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Apenas arquivos PDF</p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="border border-border rounded-xl p-4 bg-card">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                  <FileCheck className="w-5 h-5 text-red-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{file}</p>
-                  <p className="text-xs text-muted-foreground">Arquivo PDF selecionado</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveFile(index)}
-                className="flex-shrink-0 p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   // Empty state
   if (requerentes.length === 0) {
     return (
@@ -206,7 +101,7 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
             </div>
 
             {/* Card Fields */}
-            <div className="grid gap-5">
+            <div className="grid gap-6">
               {/* Nome Completo */}
               <div className="space-y-2">
                 <Label htmlFor={`req-${idx}-nome`} className="text-sm font-medium">
@@ -218,8 +113,9 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                   value={requerente.nomeCompleto}
                   onChange={(e) => updateRequerente(idx, "nomeCompleto", e.target.value)}
                   placeholder="Ex: João Silva Santos"
-                  className="h-10"
+                  className="h-11"
                 />
+                <p className="text-xs text-muted-foreground">Conforme documento de identidade</p>
               </div>
 
               {/* Data de Nascimento */}
@@ -232,8 +128,9 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                   type="date"
                   value={requerente.dataNascimento}
                   onChange={(e) => updateRequerente(idx, "dataNascimento", e.target.value)}
-                  className="h-10"
+                  className="h-11"
                 />
+                <p className="text-xs text-muted-foreground">Formato: DD/MM/AAAA</p>
               </div>
 
               {/* Altura */}
@@ -248,7 +145,7 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                   value={requerente.altura}
                   onChange={(e) => updateRequerente(idx, "altura", formatHeightInput(e.target.value))}
                   placeholder="185"
-                  className="h-10"
+                  className="h-11"
                 />
                 <p className="text-xs text-muted-foreground">Apenas números em centímetros</p>
               </div>
@@ -264,8 +161,8 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                     updateRequerente(idx, "corOlhos", value as RequerenteData["corOlhos"])
                   }
                 >
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Selecione" />
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Selecione a cor dos olhos" />
                   </SelectTrigger>
                   <SelectContent>
                     {eyeColors.map((color) => (
@@ -275,10 +172,16 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-xs text-muted-foreground">Escolha a cor mais próxima</p>
               </div>
 
               {/* PDF Upload */}
-              {renderPdfUpload(idx)}
+              <PdfUpload
+                title="Documento de Identidade (PDF)"
+                fileName={requerente.documentoIdentidade}
+                onFileSelect={(file) => updateRequerente(idx, "documentoIdentidade", file?.name || "")}
+                onFileRemove={() => updateRequerente(idx, "documentoIdentidade", "")}
+              />
             </div>
           </div>
         ))}

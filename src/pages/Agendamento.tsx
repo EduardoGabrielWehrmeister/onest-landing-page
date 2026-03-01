@@ -167,6 +167,12 @@ const Agendamento = () => {
             email={formData.prenotamiEmail}
             senha={formData.prenotamiSenha}
             cep={formData.titularCep}
+            logradouro={formData.titularLogradouro}
+            numero={formData.titularNumero}
+            bairro={formData.titularBairro}
+            cidade={formData.titularCidade}
+            estado={formData.titularEstado}
+            complemento={formData.titularComplemento}
             estadoCivil={formData.titularEstadoCivil}
             documentoIdentidade={formData.titularDocumentoIdentidade}
             altura={formData.prenotamiAltura}

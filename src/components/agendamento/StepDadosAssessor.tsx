@@ -7,27 +7,6 @@ interface Props {
   updateField: <K extends keyof FormData>(field: K, value: FormData[K]) => void;
 }
 
-const fields = [
-  {
-    key: "assessorNome" as const,
-    label: "Nome / Empresa",
-    type: "text",
-    placeholder: "Ex: João Silva - Turismo Brasil",
-  },
-  {
-    key: "assessorEmail" as const,
-    label: "Email",
-    type: "email",
-    placeholder: "Ex: joao@exemplo.com",
-  },
-  {
-    key: "assessorTelefone" as const,
-    label: "Telefone",
-    type: "tel",
-    placeholder: "Ex: (11) 98765-4321",
-  },
-];
-
 const StepDadosAssessor = ({ formData, updateField }: Props) => (
   <div className="space-y-8">
     {/* Header */}
@@ -41,22 +20,54 @@ const StepDadosAssessor = ({ formData, updateField }: Props) => (
     </div>
 
     {/* Form fields */}
-    <div className="grid gap-5">
-      {fields.map(({ key, label, type, placeholder }) => (
-        <div key={key} className="space-y-2">
-          <Label htmlFor={key} className="text-sm font-medium">
-            {label}
-          </Label>
-          <Input
-            id={key}
-            type={type}
-            value={formData[key]}
-            onChange={(e) => updateField(key, e.target.value)}
-            placeholder={placeholder}
-            className="h-11"
-          />
-        </div>
-      ))}
+    <div className="grid gap-6">
+      {/* Nome / Empresa */}
+      <div className="space-y-2">
+        <Label htmlFor="assessorNome" className="text-sm font-medium">
+          Nome / Empresa
+        </Label>
+        <Input
+          id="assessorNome"
+          type="text"
+          value={formData.assessorNome}
+          onChange={(e) => updateField("assessorNome", e.target.value)}
+          placeholder="Ex: João Silva - Turismo Brasil"
+          className="h-11"
+        />
+        <p className="text-xs text-muted-foreground">Informe o nome completo ou nome da empresa</p>
+      </div>
+
+      {/* Email */}
+      <div className="space-y-2">
+        <Label htmlFor="assessorEmail" className="text-sm font-medium">
+          Email
+        </Label>
+        <Input
+          id="assessorEmail"
+          type="email"
+          value={formData.assessorEmail}
+          onChange={(e) => updateField("assessorEmail", e.target.value)}
+          placeholder="Ex: joao@exemplo.com"
+          className="h-11"
+        />
+        <p className="text-xs text-muted-foreground">Email para contato profissional</p>
+      </div>
+
+      {/* Telefone */}
+      <div className="space-y-2">
+        <Label htmlFor="assessorTelefone" className="text-sm font-medium">
+          Telefone
+        </Label>
+        <Input
+          id="assessorTelefone"
+          type="tel"
+          value={formData.assessorTelefone}
+          onChange={(e) => updateField("assessorTelefone", e.target.value)}
+          placeholder="Ex: (11) 98765-4321"
+          className="h-11"
+        />
+        <p className="text-xs text-muted-foreground">Formato: (11) 98765-4321</p>
+      </div>
     </div>
   </div>
 );

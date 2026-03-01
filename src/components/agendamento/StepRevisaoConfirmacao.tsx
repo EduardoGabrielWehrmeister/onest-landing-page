@@ -305,7 +305,7 @@ const StepRevisaoConfirmacao = ({ formData, onEditStep, isSubmitting, onConfirm,
       {/* Confirmation Checkbox */}
       <label
         className={cn(
-          "flex items-start gap-4 rounded-xl border-2 p-5 cursor-pointer transition-all",
+          "flex items-start gap-6 rounded-xl border-2 p-5 cursor-pointer transition-all",
           "hover:border-primary/30 hover:bg-primary/5",
           formData.revisaoConfirmado ? "border-primary bg-primary/5" : "border-border bg-card"
         )}

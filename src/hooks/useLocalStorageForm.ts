@@ -29,6 +29,12 @@ export interface FormData {
   titularDocumentoIdentidade: string;
   prenotamiAltura: string;
   prenotamiCorOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
+  titularLogradouro: string;
+  titularNumero: string;
+  titularBairro: string;
+  titularCidade: string;
+  titularEstado: string;
+  titularComplemento: string;
 
   // Step 3: Requerentes Adicionais
   requerentes: RequerenteData[];
@@ -57,6 +63,12 @@ const defaultFormData: FormData = {
   titularDocumentoIdentidade: "",
   prenotamiAltura: "",
   prenotamiCorOlhos: "",
+  titularLogradouro: "",
+  titularNumero: "",
+  titularBairro: "",
+  titularCidade: "",
+  titularEstado: "",
+  titularComplemento: "",
   requerentes: [],
   datasPreferencia: [],
   observacoes: "",
