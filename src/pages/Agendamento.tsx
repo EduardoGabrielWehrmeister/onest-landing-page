@@ -26,6 +26,7 @@ const FORM_VALUES_STORAGE_KEY = "agendamento-dynamic-values";
 interface ServiceSelection {
   stateCode: string | null;
   serviceSlug: string | null;
+  userType?: 'cliente' | 'assessor' | null;
 }
 
 const Agendamento = () => {
@@ -60,8 +61,8 @@ const Agendamento = () => {
     error: configError,
     validateField,
     validateSection,
-  } = useFormConfig(selection.stateCode, selection.serviceSlug, {
-    onError: (error) => {
+  } = useFormConfig(selection.stateCode, selection.serviceSlug, selection.userType || undefined, {
+    onError: (error: Error) => {
       console.error('Error loading form config:', error);
     },
   });
@@ -154,10 +155,18 @@ const Agendamento = () => {
     setCurrentStep(0);
   }, [setSelection, setFormValues, setFieldErrors, setCurrentStep]);
 
+  const handleUserTypeChange = useCallback((userType: 'cliente' | 'assessor' | null) => {
+    setSelection((prev) => ({ ...prev, userType }));
+    // Limpar valores do formulário ao mudar tipo de usuário
+    setFormValues({});
+    setFieldErrors({});
+    setCurrentStep(0);
+  }, [setSelection, setFormValues, setFieldErrors, setCurrentStep]);
+
   // Validar step atual - usa ref para formValues para evitar re-renders
   const canGoNext = useCallback((): boolean => {
     if (isSelectionStep) {
-      return !!selection.stateCode && !!selection.serviceSlug;
+      return !!selection.stateCode && !!selection.serviceSlug && !!selection.userType;
     }
 
     if (isReviewStep) {
@@ -178,7 +187,7 @@ const Agendamento = () => {
     }
 
     return true;
-  }, [isSelectionStep, isReviewStep, selection.stateCode, selection.serviceSlug, currentStep, showSelectionStep, visibleSections.length, validateSection]);
+  }, [isSelectionStep, isReviewStep, selection.stateCode, selection.serviceSlug, selection.userType, currentStep, showSelectionStep, visibleSections.length, validateSection]);
 
   // Submeter formulário
   const handleSubmit = useCallback(async () => {
@@ -272,6 +281,8 @@ const Agendamento = () => {
           onStateChange={handleStateChange}
           selectedService={selection.serviceSlug}
           onServiceChange={handleServiceChange}
+          userType={selection.userType}
+          onUserTypeChange={handleUserTypeChange}
         />
       );
     }

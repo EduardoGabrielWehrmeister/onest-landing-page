@@ -12,6 +12,8 @@ import type {
   ConditionalOperator,
 } from '@/lib/supabase/types';
 
+export type UserType = 'cliente' | 'assessor';
+
 export interface UseFormConfigOptions {
   /** Se deve usar cache (default: true) */
   useCache?: boolean;
@@ -46,6 +48,7 @@ export interface UseFormConfigReturn {
 export function useFormConfig(
   stateCode: string | null,
   serviceSlug: string | null,
+  userType?: UserType,
   options: UseFormConfigOptions = {}
 ): UseFormConfigReturn {
   const { useCache = true, onError } = options;
@@ -326,10 +329,28 @@ export function useFormConfig(
   const visibleSections = useMemo(() => {
     if (!config) return [];
 
-    // Por padrão, retornamos todas as seções
-    // A visibilidade será avaliada dinamicamente com base nos valores
-    return config.sections;
-  }, [config]);
+    // Filtrar seções baseadas no tipo de usuário (se fornecido)
+    // Se a seção é condicional e tem depends_on_value, verificar se corresponde ao userType
+    return config.sections.filter(section => {
+      // Se a seção não é condicional, sempre visível
+      if (!section.is_conditional) {
+        return true;
+      }
+
+      // Se a seção é condicional mas não tem valor de dependência, visível por padrão
+      if (!section.depends_on_value) {
+        return true;
+      }
+
+      // Se userType foi fornecido, verificar se corresponde ao valor esperado
+      if (userType) {
+        return section.depends_on_value.toLowerCase() === userType.toLowerCase();
+      }
+
+      // Se não tem userType, retornar seções não-condicionais apenas
+      return false;
+    });
+  }, [config, userType]);
 
   return {
     config,

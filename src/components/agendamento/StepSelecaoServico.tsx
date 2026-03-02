@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { MapPin, FileText, Loader2 } from 'lucide-react';
+import { MapPin, FileText, Loader2, User, Briefcase } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -13,9 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent } from '@/components/ui/card';
 import { statesService, serviceTypesService } from '@/services/base.service';
 import type { State, ServiceType } from '@/lib/supabase/types';
+
+export type UserType = 'cliente' | 'assessor';
 
 export interface StepSelecaoServicoProps {
   /** Estado selecionado (código UF) */
@@ -26,6 +29,10 @@ export interface StepSelecaoServicoProps {
   selectedService: string | null;
   /** Callback quando serviço muda */
   onServiceChange: (serviceSlug: string | null) => void;
+  /** Tipo de pessoa selecionado */
+  userType?: UserType | null;
+  /** Callback quando tipo de pessoa muda */
+  onUserTypeChange?: (userType: UserType | null) => void;
   /** Se o formulário está em modo de edição (apenas um estado/serviço específico) */
   fixedStateCode?: string;
   fixedServiceSlug?: string;
@@ -39,6 +46,8 @@ export function StepSelecaoServico({
   onStateChange,
   selectedService,
   onServiceChange,
+  userType,
+  onUserTypeChange,
   fixedStateCode,
   fixedServiceSlug,
 }: StepSelecaoServicoProps) {
@@ -236,6 +245,71 @@ export function StepSelecaoServico({
         )}
       </div>
 
+      {/* Seleção de Tipo de Pessoa */}
+      {onUserTypeChange && (
+        <div className="space-y-3">
+          <Label className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Tipo de Pessoa
+          </Label>
+          <RadioGroup
+            value={userType || ''}
+            onValueChange={(value) => onUserTypeChange(value as UserType | null)}
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
+            {/* Opção Cliente */}
+            <Card
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                userType === 'cliente'
+                  ? 'ring-2 ring-primary bg-primary/5'
+                  : 'hover:border-primary/50'
+              }`}
+              onClick={() => onUserTypeChange('cliente')}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <RadioGroupItem value="cliente" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <User className="h-5 w-5 text-primary" />
+                      <span className="font-semibold">Cliente</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Estou agendando para mim mesmo
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Opção Assessor */}
+            <Card
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                userType === 'assessor'
+                  ? 'ring-2 ring-primary bg-primary/5'
+                  : 'hover:border-primary/50'
+              }`}
+              onClick={() => onUserTypeChange('assessor')}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <RadioGroupItem value="assessor" className="mt-1" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Briefcase className="h-5 w-5 text-primary" />
+                      <span className="font-semibold">Assessor</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Sou um assessor/agência de turismo
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </RadioGroup>
+        </div>
+      )}
+
       {/* Cards de Informação */}
       {selectedState && (
         <Card className="bg-muted/50">
@@ -268,6 +342,31 @@ export function StepSelecaoServico({
                     {services.find((s) => s.slug === selectedService)?.description}
                   </p>
                 )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {userType && onUserTypeChange && (
+        <Card className="bg-muted/50">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              {userType === 'cliente' ? (
+                <User className="h-5 w-5 text-primary mt-0.5" />
+              ) : (
+                <Briefcase className="h-5 w-5 text-primary mt-0.5" />
+              )}
+              <div className="flex-1">
+                <h3 className="font-semibold text-sm">Tipo de Pessoa</h3>
+                <p className="text-sm text-muted-foreground">
+                  {userType === 'cliente' ? 'Cliente' : 'Assessor'}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {userType === 'cliente'
+                    ? 'Você está agendando como cliente'
+                    : 'Você está agendando como assessor profissional'}
+                </p>
               </div>
             </div>
           </CardContent>
