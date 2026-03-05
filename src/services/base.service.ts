@@ -451,7 +451,7 @@ export const formConfigService = {
   async getFormConfig(
     stateCode: string,
     serviceSlug: string,
-    useCache: boolean = true
+    useCache: boolean = false
   ): Promise<ApiResponse<FormConfigurationWithSections | null>> {
     try {
       // Verificar cache
@@ -536,12 +536,14 @@ export const formConfigService = {
         service_type: serviceResult.data,
         sections: (sections || []).map(section => ({
           ...section,
-          fields: (section.form_fields || []).map((field: any) => ({
-            ...field,
-            // Mapear nomes do Supabase para os tipos TypeScript
-            options: field.field_options || [],
-            validations: field.field_validations || [],
-          })),
+          fields: (section.form_fields || [])
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+            .map((field: any) => ({
+              ...field,
+              // Mapear nomes do Supabase para os tipos TypeScript
+              options: field.field_options || [],
+              validations: field.field_validations || [],
+            })),
         })),
       };
 

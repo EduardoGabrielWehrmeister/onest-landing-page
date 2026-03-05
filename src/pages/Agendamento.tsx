@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from "react";
-import { useLocalStorage, useLocalStorageForm } from "@/hooks/useLocalStorageForm";
+import { useLocalStorage } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,6 +10,7 @@ import {
   User,
   CheckCircle,
   AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 
 import { useFormConfig } from "@/hooks/useFormConfig";
@@ -32,6 +33,7 @@ interface ServiceSelection {
 const Agendamento = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [hasConfirmedSelection, setHasConfirmedSelection] = useState(false);
 
   // Seleção de estado/serviço (persistida em localStorage)
   const [selection, setSelection] = useLocalStorage<ServiceSelection>(
@@ -54,18 +56,22 @@ const Agendamento = () => {
     formValuesRef.current = formValues;
   }, [formValues]);
 
-  // Carregar configuração do formulário
+  // Carregar configuração do formulário (só após usuário confirmar seleção)
   const {
     config,
+    visibleSections,
     loading: configLoading,
     error: configError,
-    validateField,
-    validateSection,
-  } = useFormConfig(selection.stateCode, selection.serviceSlug, selection.userType || undefined, {
-    onError: (error: Error) => {
-      console.error('Error loading form config:', error);
-    },
-  });
+  } = useFormConfig(
+    hasConfirmedSelection ? selection.stateCode : null,
+    hasConfirmedSelection ? selection.serviceSlug : null,
+    hasConfirmedSelection ? selection.userType : undefined,
+    {
+      onError: (error: Error) => {
+        console.error('Error loading form config:', error);
+      },
+    }
+  );
 
   // Step atual
   const [currentStep, setCurrentStep] = useState(() => {
@@ -83,14 +89,7 @@ const Agendamento = () => {
   }, [currentStep]);
 
   // Determinar se devemos mostrar o step de seleção
-  const showSelectionStep = !selection.stateCode || !selection.serviceSlug;
-
-  // Calcular steps visíveis baseados na configuração
-  // Retornar todas as seções, filtramos no render
-  const visibleSections = useMemo(() => {
-    if (!config) return [];
-    return config.sections;
-  }, [config]);
+  const showSelectionStep = !hasConfirmedSelection;
 
   // Adicionar steps de seleção e sucesso
   const allSteps = useMemo(() => {
@@ -100,11 +99,15 @@ const Agendamento = () => {
       steps.push({ label: "Seleção", key: "selection", icon: User });
     }
 
+    // Adicionar seções do formulário, exceto "revisao" (será adicionada manualmente)
     visibleSections.forEach((section) => {
+      // Pular seção de revisão pois será adicionada manualmente depois
+      if (section.slug === 'revisao') return;
+
       steps.push({
         label: section.title.split(" ")[0], // Primeira palavra do título
         key: section.slug,
-        icon: undefined, // Será mapeado depois se necessário
+        icon: User, // Ícone padrão para seções de formulário
       });
     });
 
@@ -163,32 +166,6 @@ const Agendamento = () => {
     setCurrentStep(0);
   }, [setSelection, setFormValues, setFieldErrors, setCurrentStep]);
 
-  // Validar step atual - usa ref para formValues para evitar re-renders
-  const canGoNext = useCallback((): boolean => {
-    if (isSelectionStep) {
-      return !!selection.stateCode && !!selection.serviceSlug && !!selection.userType;
-    }
-
-    if (isReviewStep) {
-      return formValuesRef.current['revisaoConfirmado'] === true;
-    }
-
-    // Validar seção atual
-    const currentSectionIndex = currentStep - (showSelectionStep ? 1 : 0);
-    if (currentSectionIndex >= 0 && currentSectionIndex < visibleSections.length) {
-      const result = validateSection(currentSectionIndex, formValuesRef.current);
-
-      // Atualizar erros
-      if (!result.valid) {
-        setFieldErrors(result.errors);
-      }
-
-      return result.valid;
-    }
-
-    return true;
-  }, [isSelectionStep, isReviewStep, selection.stateCode, selection.serviceSlug, selection.userType, currentStep, showSelectionStep, visibleSections.length, validateSection]);
-
   // Submeter formulário
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
@@ -226,6 +203,21 @@ const Agendamento = () => {
 
   // Navegação
   const handleNext = () => {
+    // Se estiver no step de seleção, verificar campos antes de avançar
+    if (isSelectionStep) {
+      // Só avança se todos os campos estiverem preenchidos
+      if (selection.stateCode && selection.serviceSlug && selection.userType) {
+        setHasConfirmedSelection(true);
+        setCurrentStep(currentStep + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      // Se não tiver todos os campos, não faz nada
+      return;
+    }
+
+    // TEMPORARIAMENTE DESABILITADO: Sem validação para testes
+    // TODO: Reabilitar validações quando terminar de testar
+
     if (isReviewStep) {
       handleSubmit();
     } else if (currentStep < totalSteps - 1) {
@@ -241,13 +233,16 @@ const Agendamento = () => {
     }
   };
 
-  const handleReset = useCallback(() => {
-    setSelection({ stateCode: null, serviceSlug: null });
-    setFormValues({});
-    setFieldErrors({});
-    setCurrentStep(0);
-    localStorage.removeItem(SELECTION_STORAGE_KEY + "-step");
-  }, [setSelection, setFormValues]);
+    const handleReset = useCallback(() => {
+      localStorage.clear(); // 🔥 apaga TUDO
+
+      setSelection({ stateCode: null, serviceSlug: null, userType: null });
+      setFormValues({});
+      setFieldErrors({});
+      setCurrentStep(0);
+      setHasConfirmedSelection(false);
+      setSubmitError(null);
+    }, []);
 
   // Renderizar step atual
   const renderStep = () => {
@@ -392,8 +387,22 @@ const Agendamento = () => {
 
         <div className="section-container relative z-10">
           <div className="max-w-4xl mx-auto text-center">
+            {/* Header com botão de reiniciar */}
+            <div className="flex justify-between items-center mb-4 pt-4">
+              <div></div> {/* Spacer para centralizar o título */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reiniciar
+              </Button>
+            </div>
+
             {/* Title */}
-            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-tight mb-4 pt-8">
+            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-tight mb-4">
               Solicitação de <span className="italic">Agendamento</span>
             </h1>
 
@@ -471,7 +480,7 @@ const Agendamento = () => {
               {(!isReviewStep || !isSubmitting) && currentKey !== "sucesso" && (
                 <Button
                   onClick={handleNext}
-                  disabled={!canGoNext() || isSubmitting || configLoading}
+                  disabled={isSubmitting || configLoading}
                   className="gap-2 w-full sm:w-auto"
                   style={{ marginLeft: currentStep === 0 ? 'auto' : undefined }}
                 >

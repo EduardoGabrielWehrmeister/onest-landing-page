@@ -3,12 +3,20 @@
  * @description Renderiza uma seção completa com todos os seus campos dinâmicos
  */
 
-import { User, Briefcase, Users, StickyNote, CheckCircle, FileText, Info } from 'lucide-react';
-import { DynamicFieldsGrid } from './DynamicField';
+import {
+  User,
+  Briefcase,
+  Users,
+  StickyNote,
+  CheckCircle,
+  FileText,
+  Info,
+} from "lucide-react";
+import { DynamicFieldsGrid } from "./DynamicField";
 import type {
   FormSectionWithFields,
   FormFieldValue,
-} from '@/lib/supabase/types';
+} from "@/lib/supabase/types";
 
 export interface DynamicFormSectionProps {
   /** Seção a ser renderizada */
@@ -31,13 +39,13 @@ export interface DynamicFormSectionProps {
  * Mapeamento de ícones para seções
  */
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  'user': User,
-  'briefcase': Briefcase,
-  'users': Users,
-  'sticky-note': StickyNote,
-  'check-circle': CheckCircle,
-  'file-text': FileText,
-  'info': Info,
+  user: User,
+  briefcase: Briefcase,
+  users: Users,
+  "sticky-note": StickyNote,
+  "check-circle": CheckCircle,
+  "file-text": FileText,
+  info: Info,
 };
 
 /**
@@ -49,12 +57,12 @@ export function DynamicFormSection({
   onChange,
   errors = {},
   disabled = false,
-  formName = 'form',
+  formName = "form",
   visibleFields,
 }: DynamicFormSectionProps) {
   // Filtrar campos visíveis (se fornecido)
   const fieldsToRender = visibleFields
-    ? section.fields.filter(f => visibleFields.includes(f.field_key))
+    ? section.fields.filter((f) => visibleFields.includes(f.field_key))
     : section.fields;
 
   // Se não há campos para renderizar, não mostrar seção
@@ -63,29 +71,20 @@ export function DynamicFormSection({
   }
 
   // Obter ícone da seção
-  const IconComponent = ICON_MAP[section.icon_name || 'info'] || Info;
+  const IconComponent = ICON_MAP[section.icon_name || "info"] || Info;
 
   return (
     <div className="space-y-6 animate-slide-in">
       {/* Cabeçalho da Seção */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          {IconComponent && (
-            <div className="flex-shrink-0">
-              <IconComponent className="h-6 w-6 text-primary" />
-            </div>
-          )}
-          <div className="flex-1">
-            <h2 className="text-2xl font-serif font-bold text-foreground">
-              {section.title}
-            </h2>
-            {section.description && (
-              <p className="text-sm text-muted-foreground mt-1">
-                {section.description}
-              </p>
-            )}
-          </div>
-        </div>
+      <div className="text-center space-y-2">
+        <h2 className="text-2xl md:text-3xl font-serif font-bold text-foreground mb-2">
+          {section.title}
+        </h2>
+        {section.description && (
+          <p className="text-base text-muted-foreground">
+            {section.description}
+          </p>
+        )}
       </div>
 
       {/* Campos da Seção */}

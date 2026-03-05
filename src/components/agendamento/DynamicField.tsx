@@ -20,7 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import PdfUpload from "./PdfUpload";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, HelpCircle } from 'lucide-react';
+import { CalendarIcon, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type {
   FormFieldWithOptions,
@@ -28,7 +28,6 @@ import type {
   FieldOption,
 } from '@/lib/supabase/types';
 import { formatPhoneInput } from '@/lib/formUtils';
-import { useState } from 'react';
 
 export interface DynamicFieldProps {
   /** Configuração do campo */
@@ -75,7 +74,7 @@ export function DynamicField({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">{field.tooltip_text}</p>

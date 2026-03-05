@@ -85,7 +85,8 @@ export function StepSelecaoServico({
     }
 
     fetchStates();
-  }, [fixedStateCode, onStateChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixedStateCode]);
 
   // Buscar tipos de serviço
   useEffect(() => {
@@ -114,7 +115,8 @@ export function StepSelecaoServico({
     }
 
     fetchServices();
-  }, [fixedServiceSlug, onServiceChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixedServiceSlug]);
 
   // Se tem estado e serviço fixos, mostrar mensagem em vez de seleção
   const isFixed = fixedStateCode && fixedServiceSlug;
@@ -308,69 +310,6 @@ export function StepSelecaoServico({
             </Card>
           </RadioGroup>
         </div>
-      )}
-
-      {/* Cards de Informação */}
-      {selectedState && (
-        <Card className="bg-muted/50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-primary mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm">Estado Selecionado</h3>
-                <p className="text-sm text-muted-foreground">
-                  {states.find((s) => s.code === selectedState)?.name}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {selectedService && (
-        <Card className="bg-muted/50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-primary mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm">Serviço Selecionado</h3>
-                <p className="text-sm text-muted-foreground">
-                  {services.find((s) => s.slug === selectedService)?.name}
-                </p>
-                {services.find((s) => s.slug === selectedService)?.description && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {services.find((s) => s.slug === selectedService)?.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {userType && onUserTypeChange && (
-        <Card className="bg-muted/50">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              {userType === 'cliente' ? (
-                <User className="h-5 w-5 text-primary mt-0.5" />
-              ) : (
-                <Briefcase className="h-5 w-5 text-primary mt-0.5" />
-              )}
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm">Tipo de Pessoa</h3>
-                <p className="text-sm text-muted-foreground">
-                  {userType === 'cliente' ? 'Cliente' : 'Assessor'}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {userType === 'cliente'
-                    ? 'Você está agendando como cliente'
-                    : 'Você está agendando como assessor profissional'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       )}
     </div>
   );
