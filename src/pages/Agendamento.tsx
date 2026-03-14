@@ -18,7 +18,7 @@ import { StepSelecaoServico } from "@/components/agendamento/StepSelecaoServico"
 import { DynamicFormSection } from "@/components/agendamento/DynamicFormSection";
 import StepSucesso from "@/components/agendamento/StepSucesso";
 import StepIndicator from "@/components/agendamento/StepIndicator";
-import type { FormFieldValue } from "@/lib/supabase/types";
+import type { FormFieldValue, State, ServiceType } from "@/lib/supabase/types";
 
 // Storage keys
 const SELECTION_STORAGE_KEY = "agendamento-selection";
@@ -91,6 +91,18 @@ const Agendamento = () => {
   // Determinar se devemos mostrar o step de seleção
   const showSelectionStep = !hasConfirmedSelection;
 
+  // Efeito para garantir que estamos no step correto após a configuração carregar
+  useEffect(() => {
+    // Quando a configuração termina de carregar e estava no step de seleção,
+    // garantir que vamos para o primeiro step do formulário
+    if (!configLoading && config && hasConfirmedSelection && !showSelectionStep) {
+      // Se ainda está no step 0 (seleção), mover para step 1 (primeira seção)
+      if (currentStep === 0) {
+        setCurrentStep(1);
+      }
+    }
+  }, [configLoading, config, hasConfirmedSelection, showSelectionStep, currentStep]);
+
   // Adicionar steps de seleção e sucesso
   const allSteps = useMemo(() => {
     const steps = [];
@@ -125,6 +137,9 @@ const Agendamento = () => {
   const isSuccessStep = currentKey === "sucesso";
   const isReviewStep = currentKey === "revisao";
   const isSelectionStep = currentKey === "selection";
+
+  // Ajustar currentStep para o StepIndicator compensar a remoção do step de seleção
+  const adjustedCurrentStep = showSelectionStep ? currentStep : currentStep - 1;
 
   // Atualizar valor de um campo
   const updateValue = useCallback((fieldKey: string, value: FormFieldValue) => {
@@ -358,8 +373,10 @@ const Agendamento = () => {
     }
 
     // Seções dinâmicas
-    const currentSectionIndex = currentStep - (showSelectionStep ? 1 : 0);
-    const currentSection = visibleSections[currentSectionIndex];
+    // Se está no step de seleção, não renderizar seção nenhuma
+    // Caso contrário, currentStep 1 = índice 0, currentStep 2 = índice 1, etc.
+    const currentSectionIndex = showSelectionStep ? -1 : currentStep - 1;
+    const currentSection = currentSectionIndex >= 0 ? visibleSections[currentSectionIndex] : null;
 
     if (currentSection) {
       // Retornar todos os campos da seção (sem filtrar por visibilidade)
@@ -442,8 +459,8 @@ const Agendamento = () => {
                     key={step.key}
                     icon={step.icon}
                     label={step.label}
-                    active={index === currentStep}
-                    completed={index < currentStep}
+                    active={index === adjustedCurrentStep}
+                    completed={index < adjustedCurrentStep}
                     isLast={index === allSteps.length - (isSuccessStep ? 1 : 2)}
                   />
                 ))}
@@ -454,7 +471,7 @@ const Agendamento = () => {
           {/* Card */}
           <Card className="card-elevated border-0 shadow-xl">
             <CardContent className="p-6 md:p-8 lg:p-10">
-              <div className="animate-slide-in" key={currentStep}>
+              <div>
                 {renderStep()}
               </div>
             </CardContent>
