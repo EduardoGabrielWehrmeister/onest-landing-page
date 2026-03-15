@@ -61,7 +61,7 @@ const Hero = () => {
             </Button>
 
             <Button variant="heroOutline" size="xl" asChild>
-              <a href="/agendamento">Agendamentos</a>
+              <a href="/agendamento-dinamico">Agendamentos</a>
             </Button>
           </div>
 

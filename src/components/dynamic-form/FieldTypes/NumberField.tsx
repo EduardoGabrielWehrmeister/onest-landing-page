@@ -1,0 +1,60 @@
+/**
+ * NumberField Component
+ *
+ * Renders a number input field
+ */
+
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import type { FormFieldProps } from '@/lib/supabase/formTypes';
+import { getGridClasses } from '@/lib/formGridUtils';
+
+export const NumberField = ({
+  field,
+  value,
+  onChange,
+  error,
+  disabled = false,
+}: FormFieldProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numValue = e.target.value === '' ? '' : Number(e.target.value);
+
+    // Validate min/max if specified
+    if (field.min_value !== undefined && numValue !== '' && numValue < field.min_value) {
+      return; // Don't update if below minimum
+    }
+    if (field.max_value !== undefined && numValue !== '' && numValue > field.max_value) {
+      return; // Don't update if above maximum
+    }
+
+    onChange(numValue);
+  };
+
+  const gridClasses = getGridClasses(field.grid_columns, field.grid_md_columns);
+
+  return (
+    <div className={`form-field ${gridClasses}`}>
+      <Label htmlFor={field.field_key} className="mb-2 block">
+        {field.label}
+        {field.is_required && <span className="text-red-500 ml-1">*</span>}
+      </Label>
+      {field.help_text && (
+        <p className="text-sm text-muted-foreground mb-2">
+          {field.help_text}
+        </p>
+      )}
+      <Input
+        id={field.field_key}
+        type="number"
+        placeholder={field.placeholder}
+        value={value || ''}
+        onChange={handleChange}
+        min={field.min_value}
+        max={field.max_value}
+        disabled={disabled}
+        className={error ? 'border-red-500' : ''}
+      />
+      {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+    </div>
+  );
+};
