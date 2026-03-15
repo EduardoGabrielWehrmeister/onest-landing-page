@@ -54,6 +54,83 @@ export const DynamicForm = ({
     setValues(initialValues);
   }, [JSON.stringify(initialValues)]);
 
+  // Handle CEP fetched event - auto-fill address fields
+  useEffect(() => {
+    const handleCepFetched = (event: CustomEvent) => {
+      const addressData = event.detail;
+
+      // Map ViaCEP response to common field key patterns
+      // This supports various naming conventions commonly used
+      const addressFieldMappings: Array<{
+        patterns: string[];
+        value: string;
+      }> = [
+        {
+          patterns: ['logradouro', 'rua', 'avenida', 'street'],
+          value: addressData.logradouro || '',
+        },
+        {
+          patterns: ['bairro', 'neighborhood', 'district'],
+          value: addressData.bairro || '',
+        },
+        {
+          patterns: ['cidade', 'localidade', 'city'],
+          value: addressData.localidade || '',
+        },
+        {
+          patterns: ['estado', 'uf', 'state'],
+          value: addressData.uf || '',
+        },
+        {
+          patterns: ['complemento', 'complement'],
+          value: addressData.complemento || '',
+        },
+      ];
+
+      // Find which fields exist in the form configuration and update them
+      const updates: Record<string, string> = {};
+      for (const section of config.sections) {
+        for (const fieldComplete of section.fields) {
+          const fieldKey = fieldComplete.field.field_key;
+          const fieldKeyLower = fieldKey.toLowerCase();
+
+          // Try to find a matching address field
+          for (const mapping of addressFieldMappings) {
+            // Check if the field key matches any of the patterns
+            const matches = mapping.patterns.some(pattern => {
+              // Try exact match
+              if (fieldKeyLower === pattern) return true;
+              // Try suffix match (e.g., "titularLogradouro" contains "logradouro")
+              if (fieldKeyLower.includes(pattern)) return true;
+              // Try prefix match (e.g., "logradouroEndereco" contains "logradouro")
+              if (pattern.includes(fieldKeyLower)) return true;
+              return false;
+            });
+
+            if (matches && mapping.value) {
+              updates[fieldKey] = mapping.value;
+              break;
+            }
+          }
+        }
+      }
+
+      // Update the form values
+      if (Object.keys(updates).length > 0) {
+        console.log('Auto-filling address fields:', updates);
+        setValues((prev) => ({ ...prev, ...updates }));
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('cep-fetched', handleCepFetched as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('cep-fetched', handleCepFetched as EventListener);
+    };
+  }, [config]);
+
   // Handle field change
   const handleChange = useCallback(
     (fieldKey: string, value: any) => {
