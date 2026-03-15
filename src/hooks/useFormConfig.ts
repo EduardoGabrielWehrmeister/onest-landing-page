@@ -329,25 +329,35 @@ export function useFormConfig(
   const visibleSections = useMemo(() => {
     if (!config) return [];
 
-    // Filtrar seções baseadas no tipo de usuário (se fornecido)
-    // Se a seção é condicional e tem depends_on_value, verificar se corresponde ao userType
     return config.sections.filter(section => {
       // Se a seção não é condicional, sempre visível
       if (!section.is_conditional) {
         return true;
       }
 
-      // Se a seção é condicional mas não tem valor de dependência, visível por padrão
-      if (!section.depends_on_value) {
+      // Caso 1: Seção tem depends_on_field_id definido
+      // Isso indica uma lógica condicional baseada em valores de campos do formulário
+      if (section.depends_on_field_id) {
+        // Neste caso, a visibilidade é determinada dinamicamente pelo valor do campo
+        // Por enquanto, retornamos true pois a avaliação real acontece em runtime
+        // quando o usuário interage com o formulário
         return true;
       }
 
-      // Se userType foi fornecido, verificar se corresponde ao valor esperado
-      if (userType) {
-        return section.depends_on_value.toLowerCase() === userType.toLowerCase();
+      // Caso 2: Seção NÃO tem depends_on_field_id mas tem depends_on_value
+      // Este é um caso especial para seções que dependem do tipo de usuário
+      // Exemplo: seção "assessor" que só aparece para assessores
+      if (section.depends_on_value) {
+        // Se userType foi fornecido, verificar se corresponde ao valor esperado
+        if (userType) {
+          return section.depends_on_value.toLowerCase() === userType.toLowerCase();
+        }
+        // Se não tem userType, a seção condicional fica oculta
+        return false;
       }
 
-      // Se não tem userType, retornar seções não-condicionais apenas
+      // Caso 3: Seção marcada como condicional mas sem dependências definidas
+      // Por segurança, retornamos false
       return false;
     });
   }, [config, userType]);

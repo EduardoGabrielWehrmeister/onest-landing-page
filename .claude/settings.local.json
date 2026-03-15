@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(curl -s http://localhost:808)"
+      "Bash(curl -s http://localhost:808)",
+      "Bash(npm run type-check)"
     ]
   }
 }

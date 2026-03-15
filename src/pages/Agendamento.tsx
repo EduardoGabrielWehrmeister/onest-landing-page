@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorageForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,12 +49,6 @@ const Agendamento = () => {
 
   // Erros de validação
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-  // Ref para formValues - usado em canGoNext para evitar re-renders
-  const formValuesRef = useRef(formValues);
-  useEffect(() => {
-    formValuesRef.current = formValues;
-  }, [formValues]);
 
   // Carregar configuração do formulário (só após usuário confirmar seleção)
   const {
@@ -154,7 +148,7 @@ const Agendamento = () => {
       delete newErrors[fieldKey];
       return newErrors;
     });
-  }, [setFormValues]);
+  }, [setFormValues, setFieldErrors]);
 
   // Callbacks para seleção de serviço
   const handleStateChange = useCallback((stateCode: string | null) => {

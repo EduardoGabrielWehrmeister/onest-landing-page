@@ -3,6 +3,7 @@
  * @description Renderiza diferentes tipos de campos baseado na configuração do banco
  */
 
+import { memo, useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,6 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import PdfUpload from "./PdfUpload";
+import MultipleDatesPicker from "./MultipleDatesPicker";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, Info } from 'lucide-react';
@@ -42,6 +44,8 @@ export interface DynamicFieldProps {
   disabled?: boolean;
   /** Nome do formulário (para radio group) */
   formName?: string;
+  /** Chave do campo (opcional, usado para otimização) */
+  fieldKey?: string;
 }
 
 /**
@@ -54,6 +58,7 @@ export function DynamicField({
   error,
   disabled = false,
   formName = 'form',
+  fieldKey,
 }: DynamicFieldProps) {
   const inputId = `field-${field.field_key}`;
   const errorId = error ? `error-${field.field_key}` : undefined;
@@ -343,12 +348,16 @@ export function DynamicField({
         );
 
       case 'calendar_multiple':
-        // Implementar se necessário para múltiplas datas
         return (
           <FieldWrapper>
-            <div className="text-sm text-muted-foreground">
-              Campo de múltiplas datas (calendar_multiple) - a ser implementado
-            </div>
+            <MultipleDatesPicker
+              value={value as string[] || []}
+              onChange={onChange}
+              placeholder={field.placeholder || 'Selecione as datas'}
+              disabled={disabled}
+              error={error}
+              name={inputId}
+            />
           </FieldWrapper>
         );
 
@@ -372,6 +381,11 @@ export function DynamicField({
 
   return renderField();
 }
+
+/**
+ * Export memoizado para evitar re-renders desnecessários
+ */
+export default memo(DynamicField);
 
 /**
  * Renderiza múltiplos campos dinâmicos em um grid
@@ -399,6 +413,14 @@ export function DynamicFieldsGrid({
   disabled = false,
   formName = 'form',
 }: DynamicFieldsGridProps) {
+  // Create memoized handlers to prevent unnecessary re-renders
+  const fieldHandlers = useMemo(() => {
+    return fields.reduce((acc, field) => {
+      acc[field.field_key] = (value: FormFieldValue) => onChange(field.field_key, value);
+      return acc;
+    }, {} as Record<string, (value: FormFieldValue) => void>);
+  }, [fields, onChange]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {fields.map((field) => (
@@ -406,7 +428,7 @@ export function DynamicFieldsGrid({
           key={field.id}
           field={field}
           value={values[field.field_key]}
-          onChange={(value) => onChange(field.field_key, value)}
+          onChange={fieldHandlers[field.field_key]}
           error={errors[field.field_key]}
           disabled={disabled}
           formName={formName}
