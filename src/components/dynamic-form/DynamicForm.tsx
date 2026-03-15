@@ -18,6 +18,7 @@ interface DynamicFormProps {
   submitLabel?: string;
   disabled?: boolean;
   showSubmitButton?: boolean;
+  userType?: 'cliente' | 'assessor';
 }
 
 export const DynamicForm = ({
@@ -28,12 +29,25 @@ export const DynamicForm = ({
   submitLabel = 'Continuar',
   disabled = false,
   showSubmitButton = true,
+  userType,
 }: DynamicFormProps) => {
   // Form state
   const [values, setValues] = useState<Record<string, any>>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Filter sections based on user type
+  const sectionsToShow = config.sections.filter((sectionComplete) => {
+    const section = sectionComplete.section;
+
+    // Show "Dados do Assessor" section only for assessors
+    if (section.slug === 'assessor' && userType === 'cliente') {
+      return false;
+    }
+
+    return true;
+  });
 
   // Update values when initialValues change
   useEffect(() => {
@@ -148,8 +162,8 @@ export const DynamicForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="dynamic-form">
-      {/* Render all sections */}
-      {config.sections.map((sectionComplete) => (
+      {/* Render filtered sections */}
+      {sectionsToShow.map((sectionComplete) => (
         <div key={sectionComplete.section.id} className="mb-8">
           <FormSection
             sectionComplete={sectionComplete}

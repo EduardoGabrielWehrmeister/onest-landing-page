@@ -130,6 +130,7 @@ const AgendamentoDinamico = () => {
                 onSubmit={handleSubmit}
                 submitLabel="Enviar Solicitação"
                 onCancel={() => setCurrentPhase('selection')}
+                userType={formData.tipoUsuario}
               />
             </CardContent>
           </Card>
