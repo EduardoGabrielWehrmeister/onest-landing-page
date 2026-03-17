@@ -53,6 +53,8 @@ export const FormField = ({
       return <FieldTypes.AddressAutocompleteField {...commonProps} />;
     case 'calendar_multiple':
       return <FieldTypes.CalendarMultipleField {...commonProps} />;
+    case 'requerentes_adicionais':
+      return <FieldTypes.RequerentesAdicionaisField {...commonProps} />;
     default:
       // Fallback to text field for unknown types
       console.warn(`Unknown field type: ${field.field_type}, using TextField`);

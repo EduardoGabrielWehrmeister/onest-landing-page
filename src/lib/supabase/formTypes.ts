@@ -91,6 +91,14 @@ export interface FormField {
 // Field Types
 // ============================================================================
 
+export interface RequerenteData {
+  nomeCompleto: string;
+  dataNascimento: string;
+  altura: string;
+  corOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
+  documentoIdentidade: File | null;
+}
+
 export type FieldType =
   | 'text'
   | 'email'
@@ -104,7 +112,8 @@ export type FieldType =
   | 'date'
   | 'file'
   | 'address_autocomplete'
-  | 'calendar_multiple';
+  | 'calendar_multiple'
+  | 'requerentes_adicionais';
 
 // ============================================================================
 // Field Options (for select/radio/checkbox)

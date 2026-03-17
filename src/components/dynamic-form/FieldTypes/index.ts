@@ -4,6 +4,7 @@
  * Exports all field type components for easy import
  */
 
+export { FieldLabel } from '../FieldLabel';
 export { TextField } from './TextField';
 export { EmailField } from './EmailField';
 export { PhoneField } from './PhoneField';
@@ -17,3 +18,4 @@ export { PasswordField } from './PasswordField';
 export { FileField } from './FileField';
 export { AddressAutocompleteField } from './AddressAutocompleteField';
 export { CalendarMultipleField } from './CalendarMultipleField';
+export { RequerentesAdicionaisField } from './RequerentesAdicionaisField';

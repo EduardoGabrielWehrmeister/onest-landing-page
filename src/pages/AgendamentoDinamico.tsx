@@ -185,7 +185,7 @@ const AgendamentoDinamico = () => {
 
             {/* Description */}
             <p className="text-base md:text-lg text-primary-foreground/80 max-w-2xl mx-auto">
-              Preencha as informações abaixo para solicitar seu agendamento no Prenotami
+              Preencha as informações abaixo com base na solicitação que deseja fazer
             </p>
           </div>
         </div>

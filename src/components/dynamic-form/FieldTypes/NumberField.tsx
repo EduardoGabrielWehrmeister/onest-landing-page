@@ -4,8 +4,10 @@
  * Renders a number input field
  */
 
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 import type { FormFieldProps } from '@/lib/supabase/formTypes';
 import { getGridClasses } from '@/lib/formGridUtils';
 
@@ -34,10 +36,22 @@ export const NumberField = ({
 
   return (
     <div className={`form-field ${gridClasses}`}>
-      <Label htmlFor={field.field_key} className="mb-2 block">
-        {field.label}
-        {field.is_required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
+      <div className="flex items-center gap-1.5 mb-2">
+        <Label htmlFor={field.field_key} className="text-sm font-medium">
+          {field.label}
+          {field.is_required && <span className="text-red-500 ml-1">*</span>}
+        </Label>
+        {field.tooltip_text && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help flex-shrink-0" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">{field.tooltip_text}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       {field.help_text && (
         <p className="text-sm text-muted-foreground mb-2">
           {field.help_text}
@@ -49,9 +63,6 @@ export const NumberField = ({
         placeholder={field.placeholder}
         value={value || ''}
         onChange={handleChange}
-        min={field.min_value}
-        max={field.max_value}
-        disabled={disabled}
         className={error ? 'border-red-500' : ''}
       />
       {error && <p className="text-sm text-red-500 mt-1">{error}</p>}

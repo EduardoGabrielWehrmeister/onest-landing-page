@@ -15,7 +15,7 @@ const StepTipoUsuario = ({ value, onChange }: Props) => (
     </div>
     <RadioGroup value={value} onValueChange={(v) => onChange(v as "cliente" | "assessor")} className="grid gap-4">
       {[
-        { val: "cliente", label: "Cliente", desc: "Estou solicitando para mim ou minha família", icon: User },
+        { val: "cliente", label: "Cliente", desc: "Estou solicitando para mim e minha família", icon: User },
         { val: "assessor", label: "Assessor", desc: "Estou solicitando em nome de um cliente", icon: Briefcase },
       ].map(({ val, label, desc, icon: Icon }) => (
         <Label

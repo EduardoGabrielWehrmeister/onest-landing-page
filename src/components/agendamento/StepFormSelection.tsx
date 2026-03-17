@@ -179,7 +179,7 @@ export const StepFormSelection = ({
                   <div>
                     <p className="font-medium text-base">Cliente</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Estou solicitando para mim mesmo
+                      Estou solicitando para mim e minha família
                     </p>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export const StepFormSelection = ({
                 <div className="flex items-start space-x-3">
                   <FileText className="h-6 w-6 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-base">Assessor / Consultoria</p>
+                    <p className="font-medium text-base">Assessor</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       Estou solicitando em nome de um cliente
                     </p>

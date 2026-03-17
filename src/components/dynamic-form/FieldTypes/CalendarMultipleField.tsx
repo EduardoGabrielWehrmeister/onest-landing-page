@@ -7,7 +7,8 @@
 import { useState } from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Calendar, X } from 'lucide-react';
+import { Calendar, X, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { FormFieldProps } from '@/lib/supabase/formTypes';
 import { getGridClasses } from '@/lib/formGridUtils';
 
@@ -68,10 +69,22 @@ export const CalendarMultipleField = ({
 
   return (
     <div className={`form-field ${gridClasses}`}>
-      <Label className="mb-2 block">
-        {field.label}
-        {field.is_required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
+      <div className="flex items-center gap-1.5 mb-2">
+        <Label>
+          {field.label}
+          {field.is_required && <span className="text-red-500 ml-1">*</span>}
+        </Label>
+        {field.tooltip_text && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">{field.tooltip_text}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       {field.help_text && (
         <p className="text-sm text-muted-foreground mb-2">
           {field.help_text}

@@ -6,6 +6,8 @@
 
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
 import type { FormFieldProps } from '@/lib/supabase/formTypes';
 import { getGridClasses } from '@/lib/formGridUtils';
 
@@ -21,10 +23,22 @@ export const RadioField = ({
 
   return (
     <div className={`form-field ${gridClasses}`}>
-      <Label className="mb-3 block">
-        {field.label}
-        {field.is_required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
+      <div className="flex items-center gap-1.5 mb-3">
+        <Label>
+          {field.label}
+          {field.is_required && <span className="text-red-500 ml-1">*</span>}
+        </Label>
+        {field.tooltip_text && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">{field.tooltip_text}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       {field.help_text && (
         <p className="text-sm text-muted-foreground mb-3">
           {field.help_text}
