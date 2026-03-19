@@ -116,7 +116,8 @@ export const RequerentesAdicionaisField = ({
               )}
             </div>
             <p className="text-base text-muted-foreground mb-8 max-w-md mx-auto">
-              {field.help_text || "Adicione outros requerentes à solicitação (opcional)"}
+              {field.help_text ||
+                "Adicione outros requerentes à solicitação (opcional)"}
             </p>
             <Button
               type="button"
@@ -198,6 +199,7 @@ export const RequerentesAdicionaisField = ({
                     className="text-sm font-medium"
                   >
                     Nome completo
+                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Tooltip>
                     <TooltipTrigger>
@@ -256,6 +258,7 @@ export const RequerentesAdicionaisField = ({
                     className="text-sm font-medium"
                   >
                     Altura
+                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Tooltip>
                     <TooltipTrigger>
@@ -296,6 +299,7 @@ export const RequerentesAdicionaisField = ({
                     className="text-sm font-medium"
                   >
                     Cor dos olhos
+                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Tooltip>
                     <TooltipTrigger>
@@ -339,6 +343,7 @@ export const RequerentesAdicionaisField = ({
                 <div className="flex items-center gap-1.5 mb-2">
                   <Label className="text-sm font-medium">
                     Documento de Identidade (PDF)
+                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Tooltip>
                     <TooltipTrigger>

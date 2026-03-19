@@ -4,12 +4,16 @@
  * Renders a number input field
  */
 
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
-import type { FormFieldProps } from '@/lib/supabase/formTypes';
-import { getGridClasses } from '@/lib/formGridUtils';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
+import type { FormFieldProps } from "@/lib/supabase/formTypes";
+import { getGridClasses } from "@/lib/formGridUtils";
 
 export const NumberField = ({
   field,
@@ -18,19 +22,18 @@ export const NumberField = ({
   error,
   disabled = false,
 }: FormFieldProps) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numValue = e.target.value === '' ? '' : Number(e.target.value);
 
-    // Validate min/max if specified
-    if (field.min_value !== undefined && numValue !== '' && numValue < field.min_value) {
-      return; // Don't update if below minimum
-    }
-    if (field.max_value !== undefined && numValue !== '' && numValue > field.max_value) {
-      return; // Don't update if above maximum
-    }
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  let stringValue = e.target.value;
 
-    onChange(numValue);
-  };
+  stringValue = stringValue.replace(/\D/g, '');
+
+  stringValue = stringValue.slice(0, 3);
+
+  const newValue = stringValue === '' ? '' : Number(stringValue);
+
+  onChange(newValue);
+};
 
   const gridClasses = getGridClasses(field.grid_columns, field.grid_md_columns);
 
@@ -53,17 +56,17 @@ export const NumberField = ({
         )}
       </div>
       {field.help_text && (
-        <p className="text-sm text-muted-foreground mb-2">
-          {field.help_text}
-        </p>
+        <p className="text-sm text-muted-foreground mb-2">{field.help_text}</p>
       )}
       <Input
         id={field.field_key}
-        type="number"
+        type="text"
+        inputMode="numeric"
         placeholder={field.placeholder}
-        value={value || ''}
+        value={value || ""}
         onChange={handleChange}
-        className={error ? 'border-red-500' : ''}
+        className={error ? "border-red-500" : ""}
+        disabled={disabled}
       />
       {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
     </div>
