@@ -87,43 +87,30 @@ export interface SupabaseConfig {
 /**
  * Tabelas disponíveis no banco de dados
  */
-export type DatabaseTable = 'services_done' | 'agendamentos';
+export type DatabaseTable = 'services_done' | 'agendamentos' | 'requerentes_adicionais';
 
 /**
- * Estrutura da tabela agendamentos
+ * Estrutura da tabela agendamentos (nova estrutura normalizada)
  * @description Armazena agendamentos para integração com bot de processamento
  */
 export interface Agendamento {
   id: string;
+  codigo_agendamento: string;
+  possui_assessor: boolean;
   // Dados do Titular (Prenotami)
-  email: string;
-  senha: string;
-  cor_olhos: string;
-  altura_cm: number;
-  endereco: string;
-  estado_civil: string;
-  qtde_filhos: number;
-  tipo_reserva: string;
+  titular_email: string;
+  titular_senha: string;
+  titular_cor_olhos: string;
+  titular_altura_cm: number;
+  titular_endereco: string;
+  titular_estado_civil: string;
+  titular_qtde_filhos: number;
+  // Dados do Assessor (opcionais, complementares)
+  assessor_nome_completo: string | null;
+  assessor_email: string | null;
+  assessor_telefone: string | null;
   // Quantidade de requerentes adicionais
   qtde_requerentes_adicionais: number;
-  // Requerente Adicional 1
-  adic_1_sobrenome: string | null;
-  adic_1_nome: string | null;
-  adic_1_nascimento: string | null;
-  adic_1_altura_cm: number | null;
-  adic_1_cor_olhos: string | null;
-  // Requerente Adicional 2
-  adic_2_sobrenome: string | null;
-  adic_2_nome: string | null;
-  adic_2_nascimento: string | null;
-  adic_2_altura_cm: number | null;
-  adic_2_cor_olhos: string | null;
-  // Requerente Adicional 3
-  adic_3_sobrenome: string | null;
-  adic_3_nome: string | null;
-  adic_3_nascimento: string | null;
-  adic_3_altura_cm: number | null;
-  adic_3_cor_olhos: string | null;
   // Observações
   anotacoes: string | null;
   // Campos do Bot
@@ -132,16 +119,37 @@ export interface Agendamento {
   data_inicio_restricao: string | null;
   data_fim_restricao: string | null;
   data_alvo: string | null;
-  // Timestamps
-  created_at: string;
-  updated_at: string;
+  // Timestamp
+  criado_em: string;
 }
 
 /**
  * Estrutura para inserir novos agendamentos
  * @description Campos necessários para criar um novo agendamento
  */
-export type AgendamentoInsert = Omit<Agendamento, 'id' | 'created_at' | 'updated_at'>;
+export type AgendamentoInsert = Omit<Agendamento, 'id' | 'criado_em' | 'qtde_requerentes_adicionais' | 'codigo_agendamento'>;
+
+/**
+ * Estrutura da tabela requerentes_adicionais
+ * @description Armazena requerentes adicionais vinculados aos agendamentos
+ */
+export interface RequerenteAdicional {
+  id: string;
+  agendamento_id: string;
+  sobrenome: string;
+  nome: string;
+  nascimento: string;
+  altura_cm: number | null;
+  cor_olhos: string | null;
+  ordem: number;
+  criado_em: string;
+}
+
+/**
+ * Estrutura para inserir novos requerentes adicionais
+ * @description Campos necessários para criar um novo requerente adicional
+ */
+export type RequerenteAdicionalInsert = Omit<RequerenteAdicional, 'id' | 'criado_em'>;
 
 /**
  * Operações de consulta

@@ -4,7 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import type { AgendamentoInsert } from '@/lib/supabase/types';
+import type { AgendamentoInsert, RequerenteAdicionalInsert } from '@/lib/supabase/types';
 import type { FormData } from '@/hooks/useLocalStorageForm';
 
 /**
@@ -87,62 +87,77 @@ const separarNome = (nomeCompleto: string): { sobrenome: string; nome: string } 
 };
 
 /**
- * Transforma dados do formulário para formato do banco de dados
+ * Transforma dados do formulário para formato do banco de dados (nova estrutura)
  * @param formData - Dados do formulário
- * @returns Dados formatados para inserção no Supabase
+ * @returns Dados formatados para inserção na tabela agendamentos
  */
 const transformarParaAgendamento = (formData: FormData): AgendamentoInsert => {
-  // Processar requerentes adicionais
-  const req1 = formData.requerentes[0] ? separarNome(formData.requerentes[0].nomeCompleto) : { sobrenome: '', nome: '' };
-  const req2 = formData.requerentes[1] ? separarNome(formData.requerentes[1].nomeCompleto) : { sobrenome: '', nome: '' };
-  const req3 = formData.requerentes[2] ? separarNome(formData.requerentes[2].nomeCompleto) : { sobrenome: '', nome: '' };
-
   // Processar datas de restrição
-  const dataInicio = formData.datasRestricao[0] ? formatarData(formData.datasRestricao[0]) : '';
-  const dataFim = formData.datasRestricao[1] ? formatarData(formData.datasRestricao[1]) : '';
-  const dataAlvo = formData.data_alvo ? formatarData(formData.data_alvo) : '';
+  const dataInicio = formData.datasRestricao[0] ? formatarData(formData.datasRestricao[0]) : null;
+  const dataFim = formData.datasRestricao[1] ? formatarData(formData.datasRestricao[1]) : null;
+  const dataAlvo = formData.data_alvo ? formatarData(formData.data_alvo) : null;
+
+  // Verifica se há assessor (pelo menos um campo preenchido)
+  const possuiAssessor = !!(
+    formData.assessorNome || 
+    formData.assessorEmail || 
+    formData.assessorTelefone
+  );
 
   return {
-    // Dados do Titular
-    email: formData.prenotamiEmail || '',
-    senha: formData.prenotamiSenha || '',
-    cor_olhos: formData.prenotamiCorOlhos || '',
-    altura_cm: parseInt(formData.prenotamiAltura) || 0,
-    endereco: formatarEndereco(formData),
-    estado_civil: formData.titularEstadoCivil || '',
-    qtde_filhos: formData.qtde_filhos || 0,
-    tipo_reserva: formData.tipo_reserva || '',
-    qtde_requerentes_adicionais: formData.requerentes.length || 0,
+    // Dados do Titular (com prefixo titular_)
+    titular_email: formData.prenotamiEmail || '',
+    titular_senha: formData.prenotamiSenha || '',
+    titular_cor_olhos: formData.prenotamiCorOlhos || '',
+    titular_altura_cm: parseInt(formData.prenotamiAltura) || 0,
+    titular_endereco: formatarEndereco(formData),
+    titular_estado_civil: formData.titularEstadoCivil || '',
+    titular_qtde_filhos: formData.qtde_filhos || 0,
     
-    // Requerente 1
-    adic_1_sobrenome: req1.sobrenome || null,
-    adic_1_nome: req1.nome || null,
-    adic_1_nascimento: formData.requerentes[0]?.dataNascimento ? formatarData(formData.requerentes[0].dataNascimento) : null,
-    adic_1_altura_cm: formData.requerentes[0]?.altura ? parseInt(formData.requerentes[0].altura) : null,
-    adic_1_cor_olhos: formData.requerentes[0]?.corOlhos || null,
-    
-    // Requerente 2
-    adic_2_sobrenome: req2.sobrenome || null,
-    adic_2_nome: req2.nome || null,
-    adic_2_nascimento: formData.requerentes[1]?.dataNascimento ? formatarData(formData.requerentes[1].dataNascimento) : null,
-    adic_2_altura_cm: formData.requerentes[1]?.altura ? parseInt(formData.requerentes[1].altura) : null,
-    adic_2_cor_olhos: formData.requerentes[1]?.corOlhos || null,
-    
-    // Requerente 3
-    adic_3_sobrenome: req3.sobrenome || null,
-    adic_3_nome: req3.nome || null,
-    adic_3_nascimento: formData.requerentes[2]?.dataNascimento ? formatarData(formData.requerentes[2].dataNascimento) : null,
-    adic_3_altura_cm: formData.requerentes[2]?.altura ? parseInt(formData.requerentes[2].altura) : null,
-    adic_3_cor_olhos: formData.requerentes[2]?.corOlhos || null,
+    // Dados do Assessor (opcionais)
+    assessor_nome_completo: formData.assessorNome || null,
+    assessor_email: formData.assessorEmail || null,
+    assessor_telefone: formData.assessorTelefone || null,
     
     // Observações e campos do bot
     anotacoes: formData.observacoes || null,
     email_otp: formData.email_otp || null,
     senha_email_otp: formData.senha_email_otp || null,
-    data_inicio_restricao: dataInicio || null,
-    data_fim_restricao: dataFim || null,
-    data_alvo: dataAlvo || null,
+    data_inicio_restricao: dataInicio,
+    data_fim_restricao: dataFim,
+    data_alvo: dataAlvo,
+    
+    // Campo automático - não enviar para que o banco use o DEFAULT
+    possui_assessor: possuiAssessor,
   };
+};
+
+/**
+ * Cria array de requerentes adicionais para inserção no banco
+ * @param formData - Dados do formulário
+ * @param agendamentoId - ID do agendamento pai
+ * @returns Array de requerentes adicionais para inserção
+ */
+const criarRequerentesAdicionais = (formData: FormData, agendamentoId: string): RequerenteAdicionalInsert[] => {
+  const requerentes: RequerenteAdicionalInsert[] = [];
+  
+  formData.requerentes.forEach((requerente, index) => {
+    if (index >= 3) return; // Limite de 3 requerentes
+    
+    const { sobrenome, nome } = separarNome(requerente.nomeCompleto);
+    
+    requerentes.push({
+      agendamento_id: agendamentoId,
+      sobrenome: sobrenome || '',
+      nome: nome || '',
+      nascimento: requerente.dataNascimento ? formatarData(requerente.dataNascimento) : '',
+      altura_cm: requerente.altura ? parseInt(requerente.altura) : null,
+      cor_olhos: requerente.corOlhos || null,
+      ordem: index + 1,
+    });
+  });
+  
+  return requerentes;
 };
 
 /**
@@ -161,41 +176,38 @@ const gerarCSV = (formData: FormData): string => {
     'anotacoes', 'email_otp', 'senha_email_otp', 'data_inicio_restricao', 'data_fim_restricao', 'data_alvo'
   ].join(',');
 
-  // Dados processados
-  const dados = transformarParaAgendamento(formData);
-
   // Processar requerentes para CSV
   const req1 = formData.requerentes[0] ? separarNome(formData.requerentes[0].nomeCompleto) : { sobrenome: '', nome: '' };
   const req2 = formData.requerentes[1] ? separarNome(formData.requerentes[1].nomeCompleto) : { sobrenome: '', nome: '' };
   const req3 = formData.requerentes[2] ? separarNome(formData.requerentes[2].nomeCompleto) : { sobrenome: '', nome: '' };
-
-  // Datas de restrição
-  const dataInicio = formData.datasRestricao[0] ? formatarData(formData.datasRestricao[0]) : '';
-  const dataFim = formData.datasRestricao[1] ? formatarData(formData.datasRestricao[1]) : '';
-  const dataAlvo = formData.data_alvo ? formatarData(formData.data_alvo) : '';
 
   // Data de nascimento dos requerentes
   const req1Nascimento = formData.requerentes[0]?.dataNascimento ? formatarData(formData.requerentes[0].dataNascimento) : '';
   const req2Nascimento = formData.requerentes[1]?.dataNascimento ? formatarData(formData.requerentes[1].dataNascimento) : '';
   const req3Nascimento = formData.requerentes[2]?.dataNascimento ? formatarData(formData.requerentes[2].dataNascimento) : '';
 
+  // Processar datas de restrição
+  const dataInicio = formData.datasRestricao[0] ? formatarData(formData.datasRestricao[0]) : '';
+  const dataFim = formData.datasRestricao[1] ? formatarData(formData.datasRestricao[1]) : '';
+  const dataAlvo = formData.data_alvo ? formatarData(formData.data_alvo) : '';
+
   // Linha de dados
   const row = [
-    dados.email || '',
-    dados.senha || '',
-    dados.cor_olhos || '',
-    dados.altura_cm || '',
-    dados.endereco || '',
-    dados.estado_civil || '',
-    dados.qtde_filhos || '',
-    dados.tipo_reserva || '',
-    dados.qtde_requerentes_adicionais || '',
+    formData.prenotamiEmail || '',
+    formData.prenotamiSenha || '',
+    formData.prenotamiCorOlhos || '',
+    parseInt(formData.prenotamiAltura) || '',
+    formatarEndereco(formData),
+    formData.titularEstadoCivil || '',
+    formData.qtde_filhos || '',
+    '', // tipo_reserva vazio
+    formData.requerentes.length || '',
     req1.sobrenome || '', req1.nome || '', req1Nascimento, formData.requerentes[0]?.altura || '', formData.requerentes[0]?.corOlhos || '',
     req2.sobrenome || '', req2.nome || '', req2Nascimento, formData.requerentes[1]?.altura || '', formData.requerentes[1]?.corOlhos || '',
     req3.sobrenome || '', req3.nome || '', req3Nascimento, formData.requerentes[2]?.altura || '', formData.requerentes[2]?.corOlhos || '',
-    dados.anotacoes || '',
-    dados.email_otp || '',
-    dados.senha_email_otp || '',
+    formData.observacoes || '',
+    formData.email_otp || '',
+    formData.senha_email_otp || '',
     dataInicio,
     dataFim,
     dataAlvo
@@ -273,7 +285,7 @@ export const salvarAgendamento = async (formData: FormData) => {
     // Transformar dados para formato do banco
     const dadosAgendamento = transformarParaAgendamento(formData);
     
-    // Inserir no Supabase
+    // Inserir agendamento no Supabase
     const { data, error } = await supabase()
       .from('agendamentos')
       .insert(dadosAgendamento)
@@ -290,6 +302,32 @@ export const salvarAgendamento = async (formData: FormData) => {
     }
     
     console.log('Agendamento salvo com sucesso:', data);
+    
+    // Inserir requerentes adicionais se houver
+    if (formData.requerentes.length > 0) {
+      const requerentesParaInserir = criarRequerentesAdicionais(formData, data.id);
+      
+      if (requerentesParaInserir.length > 0) {
+        const { error: errorRequerentes } = await supabase()
+          .from('requerentes_adicionais')
+          .insert(requerentesParaInserir);
+        
+        if (errorRequerentes) {
+          console.error('Erro ao salvar requerentes adicionais:', errorRequerentes);
+          // Não falhar completamente se os requerentes não salvarem, mas registrar o erro
+          return {
+            success: true,
+            data: data,
+            requerentesError: errorRequerentes.message,
+            csvUrl: undefined,
+            csvError: null,
+            error: null
+          };
+        }
+        
+        console.log('Requerentes adicionais salvos com sucesso:', requerentesParaInserir.length);
+      }
+    }
     
     // Gerar CSV e fazer upload
     const csvContent = gerarCSV(formData);
@@ -321,7 +359,7 @@ export const listarAgendamentos = async () => {
     const { data, error } = await supabase()
       .from('agendamentos')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('criado_em', { ascending: false });
     
     if (error) {
       console.error('Erro ao listar agendamentos:', error);
