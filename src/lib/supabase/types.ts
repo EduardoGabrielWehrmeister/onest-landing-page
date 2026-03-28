@@ -87,7 +87,61 @@ export interface SupabaseConfig {
 /**
  * Tabelas disponíveis no banco de dados
  */
-export type DatabaseTable = 'services_done';
+export type DatabaseTable = 'services_done' | 'agendamentos';
+
+/**
+ * Estrutura da tabela agendamentos
+ * @description Armazena agendamentos para integração com bot de processamento
+ */
+export interface Agendamento {
+  id: string;
+  // Dados do Titular (Prenotami)
+  email: string;
+  senha: string;
+  cor_olhos: string;
+  altura_cm: number;
+  endereco: string;
+  estado_civil: string;
+  qtde_filhos: number;
+  tipo_reserva: string;
+  // Quantidade de requerentes adicionais
+  qtde_requerentes_adicionais: number;
+  // Requerente Adicional 1
+  adic_1_sobrenome: string | null;
+  adic_1_nome: string | null;
+  adic_1_nascimento: string | null;
+  adic_1_altura_cm: number | null;
+  adic_1_cor_olhos: string | null;
+  // Requerente Adicional 2
+  adic_2_sobrenome: string | null;
+  adic_2_nome: string | null;
+  adic_2_nascimento: string | null;
+  adic_2_altura_cm: number | null;
+  adic_2_cor_olhos: string | null;
+  // Requerente Adicional 3
+  adic_3_sobrenome: string | null;
+  adic_3_nome: string | null;
+  adic_3_nascimento: string | null;
+  adic_3_altura_cm: number | null;
+  adic_3_cor_olhos: string | null;
+  // Observações
+  anotacoes: string | null;
+  // Campos do Bot
+  email_otp: string | null;
+  senha_email_otp: string | null;
+  data_inicio_restricao: string | null;
+  data_fim_restricao: string | null;
+  data_alvo: string | null;
+  // Timestamps
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Estrutura para inserir novos agendamentos
+ * @description Campos necessários para criar um novo agendamento
+ */
+export type AgendamentoInsert = Omit<Agendamento, 'id' | 'created_at' | 'updated_at'>;
 
 /**
  * Operações de consulta

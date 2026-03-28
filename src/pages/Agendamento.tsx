@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { useLocalStorageForm } from "@/hooks/useLocalStorageForm";
+import { salvarAgendamento } from "@/services/agendamento.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -115,19 +116,37 @@ const Agendamento = () => {
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement actual submission logic
-      // await submitForm(formData);
-
-      // For now, just move to success step
-      setTimeout(() => {
+      // Salvar no Supabase
+      const resultado = await salvarAgendamento(formData);
+      
+      if (resultado.success) {
+        console.log('Agendamento salvo com sucesso:', resultado.data);
+        
+        // Verificar se o CSV foi salvo
+        if (resultado.csvUrl) {
+          console.log('CSV salvo no Storage:', resultado.csvUrl);
+        } else if (resultado.csvError) {
+          console.warn('Erro ao salvar CSV:', resultado.csvError);
+        }
+        
+        // Limpar localStorage após salvar com sucesso
+        resetForm();
+        // Mover para step de sucesso
         setCurrentStep(totalSteps - 1);
-        setIsSubmitting(false);
-      }, 1000);
+      } else {
+        console.error('Erro ao salvar agendamento:', resultado.error);
+        alert('Erro ao salvar agendamento: ' + resultado.error);
+        // Mesmo com erro, mover para step de sucesso para não bloquear o fluxo
+        setCurrentStep(totalSteps - 1);
+      }
     } catch (error) {
       console.error('Submit error:', error);
+      alert('Erro ao enviar formulário. Por favor, tente novamente.');
+      setIsSubmitting(false);
+    } finally {
       setIsSubmitting(false);
     }
-  }, [formData, totalSteps]);
+  }, [formData, totalSteps, resetForm]);
 
   const handleNext = () => {
     if (currentKey === "revisao") {
@@ -195,7 +214,7 @@ const Agendamento = () => {
             onChangeDatasRestricao={(dates) => updateField("datasRestricao", dates)}
           />
         );
-      case "revisao":
+      case "revisao": {
         // Calculate step indices for edit buttons
         const stepIndices = {
           tipo: 0,
@@ -214,6 +233,7 @@ const Agendamento = () => {
             stepIndices={stepIndices}
           />
         );
+      }
       case "sucesso":
         return <StepSucesso onReset={resetForm} />;
       default:

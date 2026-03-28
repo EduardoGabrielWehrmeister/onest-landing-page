@@ -45,6 +45,13 @@ export interface FormData {
   // Step 5: Observações
   observacoes: string;
 
+  // Campos adicionais para integração com bot/CSV
+  qtde_filhos: number;
+  tipo_reserva: string;
+  email_otp: string;
+  senha_email_otp: string;
+  data_alvo: string;
+
   // Step 6: Revisão e Confirmação
   revisaoConfirmado: boolean;
 }
@@ -72,6 +79,11 @@ const defaultFormData: FormData = {
   requerentes: [],
   datasRestricao: [],
   observacoes: "",
+  qtde_filhos: 0,
+  tipo_reserva: "",
+  email_otp: "",
+  senha_email_otp: "",
+  data_alvo: "",
   revisaoConfirmado: false,
 };
 
