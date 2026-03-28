@@ -1,8 +1,0 @@
-{
-  "name": "send-email-api",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "nodemailer": "^8.0.4"
-  }
-}
