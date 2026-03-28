@@ -99,6 +99,46 @@ export interface RequerenteData {
   documentoIdentidade: File | null;
 }
 
+export interface PrenotamiBotQueue {
+  id: string;
+  email: string;
+  senha: string;
+  cor_olhos?: string;
+  altura_cm?: number;
+  endereco?: string;
+  estado_civil?: string;
+  qtde_filhos?: number;
+  tipo_reserva?: string;
+  qtde_requerentes_adicionais?: number;
+  adic_1_sobrenome?: string;
+  adic_1_nome?: string;
+  adic_1_nascimento?: string;
+  adic_1_altura_cm?: number;
+  adic_1_cor_olhos?: string;
+  adic_2_sobrenome?: string;
+  adic_2_nome?: string;
+  adic_2_nascimento?: string;
+  adic_2_altura_cm?: number;
+  adic_2_cor_olhos?: string;
+  adic_3_sobrenome?: string;
+  adic_3_nome?: string;
+  adic_3_nascimento?: string;
+  adic_3_altura_cm?: number;
+  adic_3_cor_olhos?: string;
+  anotacoes?: string;
+  email_otp?: string;
+  senha_email_otp?: string;
+  data_inicio_restricao?: string;
+  data_fim_restricao?: string;
+  data_alvo?: string;
+  status?: 'pending' | 'processing' | 'completed' | 'failed';
+  bot_response?: Record<string, any>;
+  processed_at?: string;
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export type FieldType =
   | 'text'
   | 'email'
@@ -164,7 +204,6 @@ export interface FormSubmissionData {
   assessor_telefone?: string;
   titular_data: Record<string, any>;
   requerentes_adicionais: Record<string, any>[];
-  datas_restricao: string[];
   observacoes?: string;
   status: 'draft' | 'submitted' | 'processing' | 'completed' | 'cancelled';
   prenotami_submission_id?: string;

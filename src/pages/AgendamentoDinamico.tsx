@@ -65,22 +65,78 @@ const AgendamentoDinamico = () => {
 
   // Handle dynamic form submission
   const handleSubmit = async (formValues: Record<string, any>) => {
-    if (!formConfig) return;
+    console.log('🚀 Iniciando envio do formulário...');
+    
+    if (!formConfig) {
+      console.error('❌ Erro: formConfig é nulo');
+      return;
+    }
+
+    console.log('📝 Dados do formulário recebidos:', formValues);
+    console.log('📋 Configuração do formulário:', {
+      id: formConfig.configuration.id,
+      sections: formConfig.sections.length
+    });
+    console.log('👤 Tipo de usuário:', formData.tipoUsuario);
+
+    // Extract assessor data if user type is assessor
+    let assessorData = undefined;
+    if (formData.tipoUsuario === 'assessor') {
+      // Find the assessor section from config
+      const assessorSection = formConfig.sections.find(
+        (s) => s.section.slug === 'assessor'
+      );
+      
+      if (assessorSection) {
+        console.log('👨‍💼 Seção do assessor encontrada');
+        console.log('  - Campos da seção:', assessorSection.fields.map(f => f.field.field_key));
+        
+        // Map form field keys to database columns
+        const fieldMapping: Record<string, string> = {
+          assessorEmail: 'email',
+          assessorNome: 'nome',
+          assessorTelefone: 'telefone'
+        };
+        
+        // Extract values from the assessor section fields
+        assessorData = {};
+        assessorSection.fields.forEach(({ field }) => {
+          const mappedKey = fieldMapping[field.field_key];
+          if (mappedKey && formValues[field.field_key] !== undefined) {
+            assessorData[mappedKey] = formValues[field.field_key];
+            console.log(`  - ${field.field_key} -> assessor_${mappedKey}:`, formValues[field.field_key]);
+          }
+        });
+        
+        console.log('👨‍💼 Dados do assessor extraídos:', assessorData);
+      }
+    }
 
     // Store all form values
+    console.log('💾 Atualizando campos no localStorage...');
     Object.entries(formValues).forEach(([key, value]) => {
+      console.log(`  - ${key}:`, value);
       updateField(key, value);
     });
 
-    // Submit to database
-    const result = await submitForm(formValues, formConfig, formData.tipoUsuario);
+    console.log('📤 Enviando dados para o banco de dados...');
+    // Submit to database with assessor data
+    const result = await submitForm(formValues, formConfig, formData.tipoUsuario, assessorData);
+
+    console.log('📥 Resultado da submissão:', result);
 
     if (result) {
+      console.log('✅ Formulário enviado com sucesso!');
       // Move to success phase
       setCurrentPhase('success');
     } else {
-      console.error('Erro ao enviar formulário:', error);
-      alert('Erro ao enviar formulário. Tente novamente.');
+      console.error('❌ Erro ao enviar formulário:', error);
+      console.error('Detalhes do erro:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details
+      });
+      alert(`Erro ao enviar formulário: ${error?.message || 'Erro desconhecido'}. Tente novamente.`);
     }
   };
 

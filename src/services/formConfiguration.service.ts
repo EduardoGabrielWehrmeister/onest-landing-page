@@ -146,6 +146,18 @@ export const formConfigurationService = {
   async submitForm(
     data: FormSubmissionData
   ): Promise<ApiResponse<FormConfiguration>> {
+    console.log('💾 formConfigurationService: Iniciando submitForm...');
+    console.log('📦 Dados a serem inseridos:', {
+      form_configuration_id: data.form_configuration_id,
+      submission_id: data.submission_id,
+      user_type: data.user_type,
+      status: data.status,
+      submitted_at: new Date().toISOString(),
+    });
+    console.log('👤 Dados do titular:', data.titular_data);
+    console.log('👥 Requerentes adicionais:', data.requerentes_adicionais);
+    console.log('📝 Observações:', data.observacoes);
+
     const { data: submission, error } = await supabase()
       .from('form_submissions')
       .insert({
@@ -154,6 +166,27 @@ export const formConfigurationService = {
       })
       .select()
       .single();
+
+    console.log('📥 Resultado da operação Supabase:', {
+      success: !error,
+      error: error,
+      submission: submission,
+    });
+
+    if (error) {
+      console.error('❌ Erro do Supabase:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    } else {
+      console.log('✅ Inserção bem-sucedida:', {
+        id: submission?.id,
+        submission_id: submission?.submission_id,
+        created_at: submission?.created_at,
+      });
+    }
 
     return { data: submission, error };
   },

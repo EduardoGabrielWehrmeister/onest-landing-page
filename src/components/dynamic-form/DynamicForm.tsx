@@ -198,41 +198,69 @@ export const DynamicForm = ({
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
-    // Validate all fields
-    for (const section of config.sections) {
+    console.log('🔍 Validando formulário...');
+    console.log('📋 Seções a validar:', sectionsToShow.map(s => s.section.slug));
+    console.log('👤 Tipo de usuário:', userType);
+
+    // Validate only the fields from sections that are being shown
+    for (const section of sectionsToShow) {
+      console.log(`  - Validando seção: ${section.section.slug}`);
       for (const fieldComplete of section.fields) {
         const { field } = fieldComplete;
         const value = values[field.field_key];
         const error = validateField(field.field_key, value);
         if (error) {
+          console.log(`    ❌ Erro no campo ${field.field_key}: ${error}`);
           newErrors[field.field_key] = error;
         }
       }
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [config, values, validateField]);
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log(`✓ Validação finalizada: ${isValid ? 'VÁLIDO' : 'INVÁLIDO'}`);
+    return isValid;
+  }, [config, values, validateField, sectionsToShow, userType]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔍 DynamicForm: Botão de submit clicado');
+    console.log('📊 Valores atuais do formulário:', values);
+    console.log('❌ Erros atuais:', errors);
+    console.log('👆 Campos tocados:', touched);
 
     // Validate all fields
+    console.log('🔎 Iniciando validação do formulário...');
     const isValid = validateForm();
+    
+    console.log('✓ Resultado da validação:', isValid ? 'VÁLIDO' : 'INVÁLIDO');
+    
     if (!isValid) {
+      console.error('❌ Formulário inválido. Erros encontrados:', errors);
+      
+      // Log detalhado dos erros
+      Object.entries(errors).forEach(([field, errorMessage]) => {
+        console.error(`  - Campo "${field}": ${errorMessage}`);
+      });
+      
       return;
     }
 
+    console.log('✅ Validação passou. Enviando formulário...');
     setIsSubmitting(true);
 
     try {
       if (onSubmit) {
+        console.log('📤 Chamando função onSubmit com os valores:', values);
         await onSubmit(values);
+        console.log('✅ onSubmit executado com sucesso');
       }
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error('❌ Erro na submissão do formulário:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'N/A');
     } finally {
+      console.log('🏁 Finalizando processo de submissão');
       setIsSubmitting(false);
     }
   };
