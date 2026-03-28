@@ -106,6 +106,7 @@ const transformarParaAgendamento = (formData: FormData): AgendamentoInsert => {
 
   return {
     // Dados do Titular (com prefixo titular_)
+    titular_nome_completo: formData.clienteNome || '',
     titular_email: formData.prenotamiEmail || '',
     titular_senha: formData.prenotamiSenha || '',
     titular_cor_olhos: formData.prenotamiCorOlhos || '',
@@ -127,9 +128,8 @@ const transformarParaAgendamento = (formData: FormData): AgendamentoInsert => {
     data_fim_restricao: dataFim,
     data_alvo: dataAlvo,
     
-    // Campo automático - não enviar para que o banco use o DEFAULT
-    possui_assessor: possuiAssessor,
-  };
+    // Campo automático - não enviar para que o banco use o DEFAULT  
+    };
 };
 
 /**
@@ -226,14 +226,16 @@ const gerarCSV = (formData: FormData): string => {
 /**
  * Faz upload do arquivo CSV para o Storage
  * @param csvContent - Conteúdo do arquivo CSV
- * @param agendamentoId - ID do agendamento para nomear o arquivo
+ * @param codigoAgendamento - Código do agendamento (5 dígitos)
+ * @param nomeTitular - Nome completo do titular
  * @returns Promise com URL pública do arquivo
  */
-const uploadCSV = async (csvContent: string, agendamentoId: string): Promise<{ success: boolean; url?: string; error?: string }> => {
+const uploadCSV = async (csvContent: string, codigoAgendamento: string, nomeTitular: string): Promise<{ success: boolean; url?: string; error?: string }> => {
   try {
-    // Gerar nome do arquivo com timestamp
+    // Gerar nome do arquivo com timestamp, código e nome do titular
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T').join('_');
-    const fileName = `agendamento_${agendamentoId}_${timestamp}.csv`;
+    const nomeFormatado = nomeTitular.replace(/\s+/g, '_'); // Substituir espaços por underscore
+    const fileName = `agendamento_${codigoAgendamento}_${nomeFormatado}_${timestamp}.csv`;
     const filePath = `Primeiro Passaporte/${fileName}`;
 
     // Converter string para Blob
@@ -268,6 +270,54 @@ const uploadCSV = async (csvContent: string, agendamentoId: string): Promise<{ s
     };
   } catch (error) {
     console.error('Erro ao fazer upload CSV (catch):', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro desconhecido'
+    };
+  }
+};
+
+/**
+ * Envia email com anexos após o agendamento
+ * @param agendamento - Dados do agendamento salvo
+ * @param csvUrl - URL pública do CSV no Supabase Storage
+ * @returns Promise com o resultado do envio
+ */
+const enviarEmailAgendamento = async (agendamento: AgendamentoInsert & { codigo_agendamento: string; criado_em: string }, csvUrl: string) => {
+  try {
+    // Determinar a URL base da API (funciona tanto em dev quanto em produção)
+    const apiBaseUrl = import.meta.env.MODE === 'production' 
+      ? '/api' 
+      : 'http://localhost:5173/api';
+    
+    const response = await fetch(`${apiBaseUrl}/send-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        agendamento,
+        csvUrl
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log('Email enviado com sucesso:', result.messageId);
+      return {
+        success: true,
+        messageId: result.messageId
+      };
+    } else {
+      console.error('Erro ao enviar email:', result.error);
+      return {
+        success: false,
+        error: result.error
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao enviar email (catch):', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido'
@@ -321,7 +371,8 @@ export const salvarAgendamento = async (formData: FormData) => {
             requerentesError: errorRequerentes.message,
             csvUrl: undefined,
             csvError: null,
-            error: null
+            error: null,
+            emailResult: null
           };
         }
         
@@ -331,14 +382,24 @@ export const salvarAgendamento = async (formData: FormData) => {
     
     // Gerar CSV e fazer upload
     const csvContent = gerarCSV(formData);
-    const uploadResult = await uploadCSV(csvContent, data.id);
+    const uploadResult = await uploadCSV(csvContent, data.codigo_agendamento, formData.clienteNome);
+    
+    // Enviar email se o CSV foi salvo com sucesso
+    let emailResult = null;
+    if (uploadResult.success && uploadResult.url) {
+      console.log('Enviando email de notificação...');
+      emailResult = await enviarEmailAgendamento(data, uploadResult.url);
+    } else if (uploadResult.error) {
+      console.warn('CSV não foi salvo, email não será enviado:', uploadResult.error);
+    }
     
     return {
       success: true,
       data: data,
       csvUrl: uploadResult.success ? uploadResult.url : undefined,
       csvError: uploadResult.error,
-      error: null
+      error: null,
+      emailResult: emailResult
     };
   } catch (error) {
     console.error('Erro ao salvar agendamento (catch):', error);

@@ -5,8 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Agendamento from "./pages/Agendamento";
+import Testes from "./pages/Testes";
 import NotFound from "./pages/NotFound";
-import SupabaseTest from "./components/SupabaseTest";
 
 const queryClient = new QueryClient();
 
@@ -15,11 +15,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      {/* <SupabaseTest /> */}
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/agendamento" element={<Agendamento />} />
+          <Route path="/testes" element={<Testes />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

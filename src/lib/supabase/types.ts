@@ -96,8 +96,8 @@ export type DatabaseTable = 'services_done' | 'agendamentos' | 'requerentes_adic
 export interface Agendamento {
   id: string;
   codigo_agendamento: string;
-  possui_assessor: boolean;
   // Dados do Titular (Prenotami)
+  titular_nome_completo: string;
   titular_email: string;
   titular_senha: string;
   titular_cor_olhos: string;

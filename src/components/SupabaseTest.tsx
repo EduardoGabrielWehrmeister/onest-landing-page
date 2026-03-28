@@ -1,180 +1,163 @@
 /**
  * Componente de Teste de Conexão com Supabase
- * @description Use este componente para verificar se a conexão está funcionando e testar permissões
+ * @description Use este componente para verificar se a conexão está funcionando
  */
 
-import { useConnectionTest, useLatestStats, useWritePermissionTest } from '@/hooks/use-supabase';
+import { useState, useEffect } from 'react';
+import { CheckCircle, XCircle, Loader2, Database } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/lib/supabase/client';
 
 export const SupabaseTest = () => {
-  const { isConnected, loading: connLoading, error: connError } = useConnectionTest();
-  const { data: statsData, loading: statsLoading, error: statsError } = useLatestStats();
-  const { testResult: permResult, loading: permLoading, runTest } = useWritePermissionTest();
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [connectionTime, setConnectionTime] = useState<number | null>(null);
+
+  const testConnection = async () => {
+    setLoading(true);
+    setError(null);
+    setIsConnected(null);
+    setConnectionTime(null);
+
+    const startTime = Date.now();
+
+    try {
+      // Testa a conexão usando uma query simples
+      const { error } = await supabase()
+        .from('agendamentos')
+        .select('id')
+        .limit(1);
+
+      const endTime = Date.now();
+      setConnectionTime(endTime - startTime);
+
+      if (error) {
+        throw error;
+      }
+
+      setIsConnected(true);
+    } catch (err) {
+      console.error('Erro ao testar conexão Supabase:', err);
+      setIsConnected(false);
+      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    testConnection();
+  }, []);
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white rounded-lg shadow-lg border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-        🔌 Teste de Conexão Supabase
-      </h2>
-
-      {/* Status da Conexão */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Status da Conexão</h3>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Database className="h-5 w-5 text-primary" />
+          Teste de Conexão Supabase
+        </CardTitle>
+        <CardDescription>
+          Verifica se a conexão com o banco de dados está funcionando corretamente.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Status da Conexão */}
         <div className="p-4 rounded-md border">
-          {connLoading && (
+          {loading && (
             <div className="flex items-center gap-2 text-blue-600">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+              <Loader2 className="h-5 w-5 animate-spin" />
               <span>Testando conexão...</span>
             </div>
           )}
-          {!connLoading && isConnected && (
-            <div className="flex items-center gap-2 text-green-600">
-              <span className="text-2xl">✅</span>
-              <span className="font-medium">Conectado ao Supabase com sucesso!</span>
+          {!loading && isConnected === true && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-green-600">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-semibold">Conectado ao Supabase com sucesso!</span>
+              </div>
+              {connectionTime && (
+                <p className="text-sm text-green-700 ml-7">
+                  Tempo de resposta: {connectionTime}ms
+                </p>
+              )}
             </div>
           )}
-          {!connLoading && !isConnected && (
-            <div className="flex items-start gap-2 text-red-600">
-              <span className="text-2xl">❌</span>
-              <div>
-                <span className="font-medium">Erro de conexão</span>
-                <p className="text-sm mt-1">{connError || 'Erro desconhecido'}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Dados de Teste */}
-      {isConnected && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">Dados de Estatísticas</h3>
-          <div className="p-4 rounded-md border bg-gray-50">
-            {statsLoading && (
-              <div className="flex items-center gap-2 text-blue-600">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
-                <span>Buscando dados...</span>
-              </div>
-            )}
-            {!statsLoading && statsError && (
-              <div className="text-red-600">
-                <span className="font-medium">Erro ao buscar dados:</span>
-                <p className="text-sm mt-1">{statsError}</p>
-              </div>
-            )}
-            {!statsLoading && !statsError && statsData && !Array.isArray(statsData) && (
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-sm text-gray-600">Ano:</span>
-                    <p className="font-bold text-lg">{statsData.year}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Total:</span>
-                    <p className="font-bold text-lg text-primary">{statsData.total?.toLocaleString('pt-BR')}+</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Passaporte:</span>
-                    <p className="font-semibold">{statsData.passaporte?.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Cidadania Fila:</span>
-                    <p className="font-semibold">{statsData.cidadania_fila?.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Identidade:</span>
-                    <p className="font-semibold">{statsData.identidade?.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Cidadania Menores:</span>
-                    <p className="font-semibold">{statsData.cidadania_menores?.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Outros:</span>
-                    <p className="font-semibold">{statsData.outros?.toLocaleString('pt-BR')}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-600">Total Prenotami:</span>
-                    <p className="font-semibold">{statsData.total_prenotami?.toLocaleString('pt-BR')}</p>
-                  </div>
+          {!loading && isConnected === false && (
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-red-600">
+                <XCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold">Erro de conexão</p>
+                  <p className="text-sm mt-1">{error || 'Erro desconhecido'}</p>
                 </div>
-                {statsData.comments && (
-                  <div className="mt-4 pt-4 border-t">
-                    <span className="text-sm text-gray-600">Comentários:</span>
-                    <p className="text-sm italic text-gray-700">{statsData.comments}</p>
-                  </div>
-                )}
               </div>
-            )}
-            {!statsLoading && !statsError && statsData && Array.isArray(statsData) && (
-              <div className="space-y-2">
-                <p className="text-sm text-gray-600 mb-2">Encontrados {statsData.length} registro(s):</p>
-                {statsData.map((item) => (
-                  <div key={item.id} className="p-3 border rounded bg-white">
-                    <p className="font-semibold">Ano: {item.year}</p>
-                    <p className="text-sm">Total: {item.total?.toLocaleString('pt-BR')}+</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            {!statsLoading && !statsError && !statsData && (
-              <p className="text-gray-600">Nenhum dado encontrado. Insira dados na tabela `services_done`.</p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Teste de Permissão de Escrita */}
-      {isConnected && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">🔒 Teste de Segurança (Permissão de Escrita)</h3>
-          <div className="p-4 rounded-md border bg-yellow-50 border-yellow-200">
-            <p className="text-sm text-gray-700 mb-3">
-              Este teste tenta inserir um registro no banco para verificar se a chave pública tem permissão de escrita.
-              Se funcionar, significa que o RLS não está configurado corretamente.
-            </p>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={runTest}
-                disabled={permLoading}
-                className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-              >
-                {permLoading ? (
-                  <span className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                    Testando...
-                  </span>
-                ) : (
-                  '🧪 Testar Permissão de Escrita'
-                )}
-              </button>
-              {permResult && (
-                <div className={`text-sm font-medium ${
-                  permResult.success ? 'text-red-600' : 'text-green-600'
+        {/* Botão para Retestar */}
+        <Button
+          onClick={testConnection}
+          disabled={loading}
+          variant="outline"
+          className="w-full"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Testando...
+            </>
+          ) : (
+            <>
+              <Database className="mr-2 h-4 w-4" />
+              Testar Conexão Novamente
+            </>
+          )}
+        </Button>
+
+        {/* Instruções */}
+        <div className="p-4 bg-blue-50 rounded-md border border-blue-200">
+          <h4 className="font-semibold text-blue-900 mb-2">💡 Instruções</h4>
+          <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+            <li>Certifique-se de que as variáveis de ambiente estão configuradas no arquivo <code className="bg-blue-100 px-1 rounded">.env.local</code></li>
+            <li>Verifique se o projeto Supabase existe e está ativo</li>
+            <li>Confirme se a chave pública (anon key) está correta</li>
+            <li>A tabela <code className="bg-blue-100 px-1 rounded">agendamentos</code> deve existir no banco</li>
+          </ul>
+        </div>
+
+        {/* Detalhes da Configuração */}
+        {!loading && (
+          <div className="p-4 bg-gray-50 rounded-md border border-gray-200">
+            <h4 className="font-semibold text-gray-900 mb-2">📋 Detalhes da Configuração</h4>
+            <div className="text-xs text-gray-700 space-y-1">
+              <div className="flex justify-between">
+                <span>Status:</span>
+                <span className={`font-semibold ${
+                  isConnected ? 'text-green-600' : isConnected === false ? 'text-red-600' : 'text-gray-600'
                 }`}>
-                  {permResult.message}
+                  {isConnected ? '✅ Conectado' : isConnected === false ? '❌ Erro' : '⏳ Testando'}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>URL do Supabase:</span>
+                <code className="text-xs bg-gray-100 px-1 rounded truncate max-w-[200px]">
+                  {import.meta.env.VITE_SUPABASE_URL || 'Não configurada'}
+                </code>
+              </div>
+              {connectionTime && (
+                <div className="flex justify-between">
+                  <span>Latência:</span>
+                  <span className="font-semibold">{connectionTime}ms</span>
                 </div>
               )}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Instruções */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-md border border-blue-200">
-        <h4 className="font-semibold text-blue-900 mb-2">💡 Instruções</h4>
-        <ol className="list-decimal list-inside space-y-1 text-sm text-blue-800">
-          <li>Configure as variáveis de ambiente no arquivo <code className="bg-blue-100 px-1 rounded">.env.local</code></li>
-          <li>Crie a tabela <code className="bg-blue-100 px-1 rounded">services_done</code> no Supabase</li>
-          <li>Habilite o Row Level Security (RLS)</li>
-          <li>Crie uma política de leitura pública</li>
-          <li>Insira dados de teste na tabela</li>
-          <li><strong>IMPORTANTE:</strong> Use o botão de teste acima para validar a segurança</li>
-        </ol>
-        <p className="mt-3 text-xs text-blue-700">
-          Consulte o arquivo <code className="bg-blue-100 px-1 rounded">SUPABASE_SETUP.md</code> para mais detalhes.
-        </p>
-      </div>
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
