@@ -121,7 +121,7 @@ Equipe Onesta`;
 /**
  * Handler principal da API
  */
-export async function handler(request: Request) {
+export default async function handler(request: Request) {
   try {
     // Verificar método HTTP
     if (request.method !== 'POST') {
@@ -161,7 +161,8 @@ export async function handler(request: Request) {
       .replace(/\s+/g, '_')
       .replace(/[^a-zA-Z0-9_]/g, '');
 
-    console.log(process.env.EMAIL_FROM,)
+    console.log('Enviando email para:', process.env.EMAIL_DESTINO);
+    console.log('De:', process.env.EMAIL_FROM);
 
     // 4. Enviar email
     const mailOptions = {
@@ -205,6 +206,3 @@ export async function handler(request: Request) {
     );
   }
 }
-
-// Exportar handler para Vercel e outros serverless platforms
-export default handler;
