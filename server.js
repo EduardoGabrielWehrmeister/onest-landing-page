@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import { uploadSingleFileToDrive, uploadAgendamentoToDrive } from './api/driveService.js';
 
 dotenv.config();
 
@@ -23,8 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 // Log de debug (opcional, ajuda a ver o que chega)
 app.use((req, res, next) => {
   console.log(`➔ Requisição recebida: ${req.method} ${req.url}`);
-  // Uncomment abaixo para ver o body no console se precisar depurar
-  // console.log('Body:', req.body); 
   next();
 });
 
@@ -157,7 +156,6 @@ function gerarHTMLAgendamento(agendamento) {
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     }
     
-    /* Header com gradiente verde */
     .header {
       background: linear-gradient(135deg, #315E33 0%, #2a522b 100%);
       padding: 40px 30px;
@@ -181,7 +179,6 @@ function gerarHTMLAgendamento(agendamento) {
       letter-spacing: 1px;
     }
     
-    /* Faixa italiana */
     .italian-stripe {
       height: 4px;
       background: linear-gradient(90deg, 
@@ -194,7 +191,6 @@ function gerarHTMLAgendamento(agendamento) {
       );
     }
     
-    /* Content */
     .content {
       padding: 40px 30px;
       background-color: #ffffff;
@@ -210,7 +206,6 @@ function gerarHTMLAgendamento(agendamento) {
       font-weight: 600;
     }
     
-    /* Agendamento Code Badge */
     .code-badge {
       display: inline-block;
       background-color: #03084C;
@@ -222,7 +217,6 @@ function gerarHTMLAgendamento(agendamento) {
       margin-bottom: 30px;
     }
     
-    /* Section Card */
     .section-card {
       background-color: #FAFAF8;
       border-radius: 8px;
@@ -258,7 +252,6 @@ function gerarHTMLAgendamento(agendamento) {
       color: #903339;
     }
     
-    /* Info Rows */
     .info-row {
       display: flex;
       justify-content: space-between;
@@ -284,7 +277,6 @@ function gerarHTMLAgendamento(agendamento) {
       text-align: right;
     }
     
-    /* Attachments Section */
     .attachments {
       background-color: #f0f7f1;
       border: 2px dashed #315E33;
@@ -310,7 +302,6 @@ function gerarHTMLAgendamento(agendamento) {
       color: #315E33;
     }
     
-    /* Footer */
     .footer {
       background-color: #FAFAF8;
       padding: 30px;
@@ -338,7 +329,6 @@ function gerarHTMLAgendamento(agendamento) {
       margin: 15px auto;
     }
     
-    /* Responsive */
     @media only screen and (max-width: 600px) {
       .email-container {
         max-width: 100% !important;
@@ -370,16 +360,13 @@ function gerarHTMLAgendamento(agendamento) {
 </head>
 <body>
   <div class="email-container">
-    <!-- Header -->
     <div class="header">
       <div class="header-logo">ONESTA</div>
       <div class="header-subtitle">SISTEMA DE AGENDAMENTO</div>
     </div>
     
-    <!-- Faixa Italiana -->
     <div class="italian-stripe"></div>
     
-    <!-- Content -->
     <div class="content">
       <p class="greeting">
         <strong>Olá!</strong> Um novo agendamento foi criado no sistema.
@@ -389,7 +376,6 @@ function gerarHTMLAgendamento(agendamento) {
         Agendamento #${agendamento.codigo_agendamento}
       </div>
       
-      <!-- Dados do Cliente -->
       <div class="section-card">
         <div class="section-title">
           👤 DADOS DO CLIENTE
@@ -437,7 +423,6 @@ function gerarHTMLAgendamento(agendamento) {
       </div>
       
       ${temAssessor ? `
-      <!-- Dados do Assessor -->
       <div class="section-card section-card-assessor">
         <div class="section-title">
           🤝 DADOS DO ASSESSOR
@@ -460,7 +445,6 @@ function gerarHTMLAgendamento(agendamento) {
       </div>
       ` : ''}
       
-      <!-- Informações Adicionais -->
       <div class="section-card section-card-info">
         <div class="section-title">
           📋 INFORMAÇÕES ADICIONAIS
@@ -492,14 +476,12 @@ function gerarHTMLAgendamento(agendamento) {
         </div>
       </div>
       
-      <!-- Data de Criação -->
       <div style="text-align: center; margin: 30px 0 20px 0;">
         <p style="font-size: 14px; color: #666666;">
           📅 <strong>Data de Criação:</strong> ${dataFormatada}
         </p>
       </div>
       
-      <!-- Anexos -->
       <div class="attachments">
         <div class="attachments-title">📎 ARQUIVOS EM ANEXO</div>
         <div class="attachments-list">
@@ -509,10 +491,8 @@ function gerarHTMLAgendamento(agendamento) {
       </div>
     </div>
     
-    <!-- Faixa Italiana -->
     <div class="italian-stripe"></div>
     
-    <!-- Footer -->
     <div class="footer">
       <div class="footer-brand">ONESTA</div>
       <div class="footer-divider"></div>
@@ -539,7 +519,6 @@ app.get('/api/health', (req, res) => {
 // Rota: Email Simples
 app.post('/api/send-simple-email', async (req, res, next) => {
   try {
-    // CORREÇÃO AQUI: Verificação segura
     const { message } = req.body || {};
 
     if (!message) {
@@ -566,7 +545,6 @@ app.post('/api/send-simple-email', async (req, res, next) => {
 // Rota: Email Completo
 app.post('/api/send-email', async (req, res, next) => {
   try {
-    // CORREÇÃO AQUI: Verificação segura
     const { agendamento, csvUrl } = req.body || {};
 
     if (!agendamento?.codigo_agendamento || !csvUrl) {
@@ -598,6 +576,20 @@ app.post('/api/send-email', async (req, res, next) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
+    
+    // Upload para Google Drive (não bloqueia o processo se falhar)
+    try {
+      await uploadAgendamentoToDrive(
+        agendamento.codigo_agendamento,
+        txtContent,
+        csvContent
+      );
+      console.log(`✅ Arquivos do agendamento ${agendamento.codigo_agendamento} enviados para o Google Drive`);
+    } catch (driveError) {
+      console.error('❌ Erro ao fazer upload para Google Drive (email foi enviado com sucesso):', driveError);
+      // Não lança o erro, apenas loga no console
+    }
+    
     return res.status(200).json({ success: true, messageId: info.messageId });
 
   } catch (error) {
@@ -611,7 +603,6 @@ app.post('/send-email', async (req, res, next) => {
     const { message } = req.body || {};
     if (!message) return res.status(400).json({ success: false, error: 'Mensagem inválida.' });
     
-    // Reutiliza a lógica da rota simples
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: process.env.EMAIL_DESTINO,
@@ -626,6 +617,43 @@ app.post('/send-email', async (req, res, next) => {
   }
 });
 
+// Rota: Teste de Upload para Google Drive
+app.post('/api/test-drive-upload', async (req, res, next) => {
+  try {
+    const { agendamentoId, fileName, fileContent, mimeType } = req.body || {};
+
+    if (!agendamentoId || !fileName || !fileContent) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Os campos agendamentoId, fileName e fileContent são obrigatórios.' 
+      });
+    }
+
+    console.log(`📤 Iniciando upload para Drive: ${fileName} (Agendamento: ${agendamentoId})`);
+
+    const result = await uploadSingleFileToDrive(
+      agendamentoId,
+      fileName,
+      fileContent,
+      mimeType || 'application/octet-stream'
+    );
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Arquivo enviado com sucesso para o Google Drive',
+      data: result
+    });
+
+  } catch (error) {
+    console.error('❌ Erro no endpoint de teste do Drive:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Erro ao enviar arquivo para o Google Drive',
+      details: error.message 
+    });
+  }
+});
+
 // ======================================================
 // 5. MIDDLEWARE DE ERRO (DEVE SER O ÚLTIMO)
 // ======================================================
@@ -637,9 +665,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ======================================================
-// 6. INICIALIZAÇÃO
-// ======================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);

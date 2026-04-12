@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import { uploadSingleFileToDrive, uploadAgendamentoToDrive } from './driveService.js';
 
 dotenv.config();
 
@@ -575,6 +576,20 @@ app.post('/api/send-email', async (req, res, next) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
+    
+    // Upload para Google Drive (não bloqueia o processo se falhar)
+    try {
+      await uploadAgendamentoToDrive(
+        agendamento.codigo_agendamento,
+        txtContent,
+        csvContent
+      );
+      console.log(`✅ Arquivos do agendamento ${agendamento.codigo_agendamento} enviados para o Google Drive`);
+    } catch (driveError) {
+      console.error('❌ Erro ao fazer upload para Google Drive (email foi enviado com sucesso):', driveError);
+      // Não lança o erro, apenas loga no console
+    }
+    
     return res.status(200).json({ success: true, messageId: info.messageId });
 
   } catch (error) {
@@ -599,6 +614,43 @@ app.post('/send-email', async (req, res, next) => {
     return res.status(200).json({ success: true, messageId: info.messageId });
   } catch (error) {
     next(error);
+  }
+});
+
+// Rota: Teste de Upload para Google Drive
+app.post('/api/test-drive-upload', async (req, res, next) => {
+  try {
+    const { agendamentoId, fileName, fileContent, mimeType } = req.body || {};
+
+    if (!agendamentoId || !fileName || !fileContent) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Os campos agendamentoId, fileName e fileContent são obrigatórios.' 
+      });
+    }
+
+    console.log(`📤 Iniciando upload para Drive: ${fileName} (Agendamento: ${agendamentoId})`);
+
+    const result = await uploadSingleFileToDrive(
+      agendamentoId,
+      fileName,
+      fileContent,
+      mimeType || 'application/octet-stream'
+    );
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Arquivo enviado com sucesso para o Google Drive',
+      data: result
+    });
+
+  } catch (error) {
+    console.error('❌ Erro no endpoint de teste do Drive:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Erro ao enviar arquivo para o Google Drive',
+      details: error.message 
+    });
   }
 });
 

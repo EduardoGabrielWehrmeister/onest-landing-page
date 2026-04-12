@@ -7,6 +7,7 @@ import { TestTube } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SupabaseTest } from '@/components/SupabaseTest';
 import { EmailTest } from '@/components/EmailTest';
+import { DriveTest } from '@/components/DriveTest';
 
 export default function Testes() {
   return (
@@ -41,6 +42,11 @@ export default function Testes() {
           {/* Teste de Envio de Email */}
           <div className="col-span-1">
             <EmailTest />
+          </div>
+
+          {/* Teste de Upload para Google Drive */}
+          <div className="col-span-1 md:col-span-2">
+            <DriveTest />
           </div>
 
           {/* Informações Adicionais */}
