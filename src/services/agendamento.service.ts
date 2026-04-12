@@ -288,7 +288,7 @@ const enviarEmailAgendamento = async (agendamento: AgendamentoInsert & { codigo_
     // Determinar a URL base da API (funciona tanto em dev quanto em produção)
     const apiBaseUrl = import.meta.env.MODE === 'production' 
       ? '/api' 
-      : 'http://localhost:5173/api';
+      : 'http://localhost:3000/api';
     
     const response = await fetch(`${apiBaseUrl}/send-email`, {
       method: 'POST',
