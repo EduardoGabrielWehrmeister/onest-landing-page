@@ -11,6 +11,7 @@ import PdfUpload from "./PdfUpload";
 interface Props {
   nome: string;
   pdfFile: string;
+  pdfFileObject?: File | null;
   email: string;
   senha: string;
   cep: string;
@@ -22,6 +23,7 @@ interface Props {
   complemento: string;
   estadoCivil: FormData["titularEstadoCivil"];
   documentoIdentidade: string;
+  documentoIdentidadeFile?: File | null;
   altura: string;
   corOlhos: FormData["prenotamiCorOlhos"];
   updateField: <K extends keyof FormData>(field: K, value: FormData[K]) => void;
@@ -50,6 +52,7 @@ const eyeColors = [
 const StepDadosTitular = ({
   nome,
   pdfFile,
+  pdfFileObject,
   email,
   senha,
   cep,
@@ -61,6 +64,7 @@ const StepDadosTitular = ({
   complemento,
   estadoCivil,
   documentoIdentidade,
+  documentoIdentidadeFile,
   altura,
   corOlhos,
   updateField,
@@ -96,6 +100,26 @@ const StepDadosTitular = ({
         setIsFetchingAddress(false);
       }
     }
+  };
+
+  const handleIdentidadeFileSelect = (file: File | null) => {
+    updateField("titularDocumentoIdentidade", file?.name || "");
+    updateField("titularDocumentoIdentidadeFile", file || null);
+  };
+
+  const handleIdentidadeFileRemove = () => {
+    updateField("titularDocumentoIdentidade", "");
+    updateField("titularDocumentoIdentidadeFile", null);
+  };
+
+  const handlePdfFileSelect = (file: File | null) => {
+    updateField("clientePdfFile", file?.name || "");
+    updateField("clientePdfFileObject", file || null);
+  };
+
+  const handlePdfFileRemove = () => {
+    updateField("clientePdfFile", "");
+    updateField("clientePdfFileObject", null);
   };
 
   return (
@@ -412,17 +436,17 @@ const StepDadosTitular = ({
         <PdfUpload
           title="Documento de Identidade (PDF)"
           fileName={documentoIdentidade}
-          onFileSelect={(file) => updateField("titularDocumentoIdentidade", file?.name || "")}
-          onFileRemove={() => updateField("titularDocumentoIdentidade", "")}
-          tooltipText="Frente e verso da Identidade do Titular em promato de PDF"
+          onFileSelect={handleIdentidadeFileSelect}
+          onFileRemove={handleIdentidadeFileRemove}
+          tooltipText="Frente e verso da Identidade do Titular em formato de PDF"
         />
 
         {/* Comprovante de Residência (Opcional) */}
         <PdfUpload
           title="Comprovante de Residência (PDF) - Opcional"
           fileName={pdfFile}
-          onFileSelect={(file) => updateField("clientePdfFile", file?.name || "")}
-          onFileRemove={() => updateField("clientePdfFile", "")}
+          onFileSelect={handlePdfFileSelect}
+          onFileRemove={handlePdfFileRemove}
           tooltipText="Conta de luz, água ou telefone dos últimos 3 meses"
         />
       </div>

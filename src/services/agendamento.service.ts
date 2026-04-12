@@ -8,6 +8,33 @@ import type { AgendamentoInsert, RequerenteAdicionalInsert } from '@/lib/supabas
 import type { FormData } from '@/hooks/useLocalStorageForm';
 
 /**
+ * Converte um arquivo File para string Base64
+ * @param file - Arquivo a ser convertido
+ * @returns Promise com string base64
+ */
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remover prefixo "data:application/pdf;base64,"
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+/**
+ * Interface para arquivos do email
+ */
+interface ArquivoEmail {
+  nome: string;
+  conteudoBase64: string;
+}
+
+/**
  * Formata data de YYYY-MM-DD para DD/MM/YYYY
  * @param date - Data no formato YYYY-MM-DD
  * @returns Data no formato DD/MM/YYYY ou string vazia
@@ -161,6 +188,42 @@ const criarRequerentesAdicionais = (formData: FormData, agendamentoId: string): 
 };
 
 /**
+ * Prepara os arquivos do formulário para envio por email
+ * @param formData - Dados do formulário
+ * @param codigoAgendamento - Código do agendamento
+ * @returns Array de arquivos em base64
+ */
+const prepararArquivosEmail = async (formData: FormData, codigoAgendamento: string): Promise<ArquivoEmail[]> => {
+  const arquivos: ArquivoEmail[] = [];
+
+  // Identidade do Titular
+  if (formData.titularDocumentoIdentidadeFile) {
+    const base64 = await fileToBase64(formData.titularDocumentoIdentidadeFile);
+    const nomeArquivo = `(${codigoAgendamento}) ${formData.clienteNome} - Identidade.pdf`;
+    arquivos.push({ nome: nomeArquivo, conteudoBase64: base64 });
+  }
+
+  // Comprovante de Residência (opcional)
+  if (formData.clientePdfFileObject) {
+    const base64 = await fileToBase64(formData.clientePdfFileObject);
+    const nomeArquivo = `(${codigoAgendamento}) ${formData.clienteNome} - Comprovante Residência.pdf`;
+    arquivos.push({ nome: nomeArquivo, conteudoBase64: base64 });
+  }
+
+  // Identidade dos Requerentes Adicionais
+  for (let i = 0; i < formData.requerentes.length; i++) {
+    const requerente = formData.requerentes[i];
+    if (requerente.documentoIdentidadeFile) {
+      const base64 = await fileToBase64(requerente.documentoIdentidadeFile);
+      const nomeArquivo = `(${codigoAgendamento}) ${requerente.nomeCompleto} - Identidade Requerente ${i + 1}.pdf`;
+      arquivos.push({ nome: nomeArquivo, conteudoBase64: base64 });
+    }
+  }
+
+  return arquivos;
+};
+
+/**
  * Gera string CSV a partir dos dados do formulário
  * @param formData - Dados do formulário
  * @returns String CSV formatada
@@ -232,10 +295,8 @@ const gerarCSV = (formData: FormData): string => {
  */
 const uploadCSV = async (csvContent: string, codigoAgendamento: string, nomeTitular: string): Promise<{ success: boolean; url?: string; error?: string }> => {
   try {
-    // Gerar nome do arquivo com timestamp, código e nome do titular
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T').join('_');
-    const nomeFormatado = nomeTitular.replace(/\s+/g, '_'); // Substituir espaços por underscore
-    const fileName = `agendamento_${codigoAgendamento}_${nomeFormatado}_${timestamp}.csv`;
+    // Gerar nome do arquivo no novo formato: (codigo) Nome.csv
+    const fileName = `(${codigoAgendamento}) ${nomeTitular}.csv`;
     const filePath = `Primeiro Passaporte/${fileName}`;
 
     // Converter string para Blob
@@ -281,14 +342,27 @@ const uploadCSV = async (csvContent: string, codigoAgendamento: string, nomeTitu
  * Envia email com anexos após o agendamento
  * @param agendamento - Dados do agendamento salvo
  * @param csvUrl - URL pública do CSV no Supabase Storage
+ * @param arquivos - Array de arquivos em base64 para anexar
+ * @param requerentesAdicionais - Array com os dados dos requerentes adicionais
  * @returns Promise com o resultado do envio
  */
-const enviarEmailAgendamento = async (agendamento: AgendamentoInsert & { codigo_agendamento: string; criado_em: string }, csvUrl: string) => {
+const enviarEmailAgendamento = async (
+  agendamento: AgendamentoInsert & { codigo_agendamento: string; criado_em: string }, 
+  csvUrl: string,
+  arquivos: ArquivoEmail[],
+  requerentesAdicionais?: Array<RequerenteAdicionalInsert & { nome_completo: string }>
+) => {
   try {
     // Determinar a URL base da API (funciona tanto em dev quanto em produção)
     const apiBaseUrl = import.meta.env.MODE === 'production' 
       ? '/api' 
       : 'http://localhost:3000/api';
+    
+    // Adicionar requerentes adicionais ao objeto de agendamento
+    const agendamentoComRequerentes = {
+      ...agendamento,
+      requerentes_adicionais: requerentesAdicionais || []
+    };
     
     const response = await fetch(`${apiBaseUrl}/send-email`, {
       method: 'POST',
@@ -296,8 +370,9 @@ const enviarEmailAgendamento = async (agendamento: AgendamentoInsert & { codigo_
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        agendamento,
-        csvUrl
+        agendamento: agendamentoComRequerentes,
+        csvUrl,
+        arquivos
       })
     });
 
@@ -354,8 +429,9 @@ export const salvarAgendamento = async (formData: FormData) => {
     console.log('Agendamento salvo com sucesso:', data);
     
     // Inserir requerentes adicionais se houver
+    let requerentesParaInserir: RequerenteAdicionalInsert[] = [];
     if (formData.requerentes.length > 0) {
-      const requerentesParaInserir = criarRequerentesAdicionais(formData, data.id);
+      requerentesParaInserir = criarRequerentesAdicionais(formData, data.id);
       
       if (requerentesParaInserir.length > 0) {
         const { error: errorRequerentes } = await supabase()
@@ -384,11 +460,20 @@ export const salvarAgendamento = async (formData: FormData) => {
     const csvContent = gerarCSV(formData);
     const uploadResult = await uploadCSV(csvContent, data.codigo_agendamento, formData.clienteNome);
     
+    // Preparar dados dos requerentes para o email
+    const requerentesParaEmail = formData.requerentes.length > 0 ? formData.requerentes.map((req, index) => ({
+      ...requerentesParaInserir?.[index],
+      nome_completo: req.nomeCompleto || ''
+    })) : [];
+    
+    // Preparar arquivos para o email
+    const arquivosEmail = await prepararArquivosEmail(formData, data.codigo_agendamento);
+    
     // Enviar email se o CSV foi salvo com sucesso
     let emailResult = null;
     if (uploadResult.success && uploadResult.url) {
       console.log('Enviando email de notificação...');
-      emailResult = await enviarEmailAgendamento(data, uploadResult.url);
+      emailResult = await enviarEmailAgendamento(data, uploadResult.url, arquivosEmail, requerentesParaEmail);
     } else if (uploadResult.error) {
       console.warn('CSV não foi salvo, email não será enviado:', uploadResult.error);
     }

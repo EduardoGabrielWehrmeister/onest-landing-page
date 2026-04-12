@@ -55,9 +55,9 @@ export const EmailTest = () => {
         assessor_telefone: "(11) 98765-4321",
         anotacoes:
           "Cliente interessado em agendamento para serviços financeiros.",
-        email_otp: "123456", // Código OTP temporário
-        senha_email_otp: "senha-email-otp",
-        data_alvo: "2026-05-01", // Data desejada para o agendamento
+        email_otp: "", // Código OTP temporário
+        senha_email_otp: "",
+        data_alvo: "", // Data desejada para o agendamento
         data_inicio_restricao: "2026-04-01", // Data em que começa a restrição
         data_fim_restricao: "2026-04-30", // Data em que termina a restrição
         criado_em: new Date().toISOString(),

@@ -11,7 +11,7 @@ import PdfUpload from "./PdfUpload";
 
 interface Props {
   requerentes: RequerenteData[];
-  updateRequerente: (index: number, field: keyof RequerenteData, value: string) => void;
+  updateRequerente: (index: number, field: keyof RequerenteData, value: string | File | null) => void;
   addRequerente: () => void;
   removeRequerente: (index: number) => void;
 }
@@ -61,6 +61,16 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
       </TooltipProvider>
     );
   }
+
+  const handleDocumentoFileSelect = (index: number, file: File | null) => {
+    updateRequerente(index, "documentoIdentidade", file?.name || "");
+    updateRequerente(index, "documentoIdentidadeFile", file || null);
+  };
+
+  const handleDocumentoFileRemove = (index: number) => {
+    updateRequerente(index, "documentoIdentidade", "");
+    updateRequerente(index, "documentoIdentidadeFile", null);
+  };
 
   return (
     <TooltipProvider>
@@ -211,8 +221,8 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
               <PdfUpload
                 title="Documento de Identidade (PDF)"
                 fileName={requerente.documentoIdentidade}
-                onFileSelect={(file) => updateRequerente(idx, "documentoIdentidade", file?.name || "")}
-                onFileRemove={() => updateRequerente(idx, "documentoIdentidade", "")}
+                onFileSelect={(file) => handleDocumentoFileSelect(idx, file)}
+                onFileRemove={() => handleDocumentoFileRemove(idx)}
                 tooltipText="Frente e verso da Identidade do Requerente Adicional em formato PDF"
               />
             </div>

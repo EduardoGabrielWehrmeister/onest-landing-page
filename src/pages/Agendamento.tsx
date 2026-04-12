@@ -11,6 +11,7 @@ import {
   Users,
   StickyNote,
   CheckCircle,
+  Play,
 } from "lucide-react";
 
 import StepTipoUsuario from "@/components/agendamento/StepTipoUsuario";
@@ -34,6 +35,7 @@ const Agendamento = () => {
     addRequerente,
     removeRequerente,
     resetForm,
+    fillDemoData,
   } = useLocalStorageForm();
 
   const isAssessor = formData.tipoUsuario === "assessor";
@@ -58,54 +60,6 @@ const Agendamento = () => {
   const canGoNext = () => {
     // TODO: Temporarily disabled for testing
     return true;
-
-    // switch (currentKey) {
-    //   case "tipo":
-    //     return formData.tipoUsuario !== "";
-    //   case "assessor":
-    //   case "assessor":
-    //     return !!(
-    //       formData.assessorEmail &&
-    //       formData.assessorNome &&
-    //       formData.assessorTelefone
-    //     );
-    //   case "titular":
-    //     return !!(
-    //       formData.clienteNome &&
-    //       formData.clientePdfFile &&
-    //       formData.prenotamiEmail &&
-    //       formData.prenotamiSenha &&
-    //       formData.titularCep &&
-    //       formData.titularEstadoCivil &&
-    //       formData.titularDocumentoIdentidade &&
-    //       formData.prenotamiAltura &&
-    //       formData.prenotamiCorOlhos
-    //     );
-    //   case "requerentes": {
-    //     // All added requerentes must have complete fields
-    //     for (let i = 0; i < formData.requerentes.length; i++) {
-    //       const r = formData.requerentes[i];
-    //       if (
-    //         !r?.nomeCompleto ||
-    //         !r?.dataNascimento ||
-    //         !r?.altura ||
-    //         !r?.corOlhos ||
-    //         !r?.documentoIdentidade
-    //       ) {
-    //         return false;
-    //       }
-    //     }
-    //     return true;
-    //   }
-    //   case "datas":
-    //     return true; // Optional - always allow next
-    //   case "observacoes":
-    //     return true; // Optional - always allow next
-    //   case "revisao":
-    //     return formData.revisaoConfirmado === true;
-    //   default:
-    //     return true;
-    // }
   };
 
   const handleEditStep = useCallback((step: number) => {
@@ -116,27 +70,22 @@ const Agendamento = () => {
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
     try {
-      // Salvar no Supabase
       const resultado = await salvarAgendamento(formData);
       
       if (resultado.success) {
         console.log('Agendamento salvo com sucesso:', resultado.data);
         
-        // Verificar se o CSV foi salvo
         if (resultado.csvUrl) {
           console.log('CSV salvo no Storage:', resultado.csvUrl);
         } else if (resultado.csvError) {
           console.warn('Erro ao salvar CSV:', resultado.csvError);
         }
         
-        // Limpar localStorage após salvar com sucesso
         resetForm();
-        // Mover para step de sucesso
         setCurrentStep(totalSteps - 1);
       } else {
         console.error('Erro ao salvar agendamento:', resultado.error);
         alert('Erro ao salvar agendamento: ' + resultado.error);
-        // Mesmo com erro, mover para step de sucesso para não bloquear o fluxo
         setCurrentStep(totalSteps - 1);
       }
     } catch (error) {
@@ -180,6 +129,7 @@ const Agendamento = () => {
           <StepDadosTitular
             nome={formData.clienteNome}
             pdfFile={formData.clientePdfFile}
+            pdfFileObject={formData.clientePdfFileObject}
             email={formData.prenotamiEmail}
             senha={formData.prenotamiSenha}
             cep={formData.titularCep}
@@ -191,6 +141,7 @@ const Agendamento = () => {
             complemento={formData.titularComplemento}
             estadoCivil={formData.titularEstadoCivil}
             documentoIdentidade={formData.titularDocumentoIdentidade}
+            documentoIdentidadeFile={formData.titularDocumentoIdentidadeFile}
             altura={formData.prenotamiAltura}
             corOlhos={formData.prenotamiCorOlhos}
             updateField={updateField}
@@ -215,7 +166,6 @@ const Agendamento = () => {
           />
         );
       case "revisao": {
-        // Calculate step indices for edit buttons
         const stepIndices = {
           tipo: 0,
           assessor: isAssessor ? 1 : undefined,
@@ -243,26 +193,32 @@ const Agendamento = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Header */}
       <div className="gradient-hero pb-12 md:pb-16">
-        {/* Italian Stripe */}
         <div className="italian-stripe"></div>
 
         <div className="section-container relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Title */}
             <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground leading-tight mb-4 pt-8">
               Solicitação de <span className="italic">Agendamento</span>
             </h1>
 
-            {/* Description */}
-            <p className="text-base md:text-lg text-primary-foreground/80 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-4">
               Preencha as informações abaixo para solicitar seu agendamento no Prenotami
             </p>
+
+            {!isSuccessStep && (
+              <Button
+                onClick={() => fillDemoData(false)}
+                variant="secondary"
+                className="gap-2 text-sm"
+              >
+                <Play className="h-4 w-4" />
+                Modo Demo - Preencher Formulário
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Bottom Wave */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg
             viewBox="0 0 1440 120"
@@ -279,10 +235,8 @@ const Agendamento = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="section-container relative z-10 -mt-8">
         <div className="max-w-3xl mx-auto">
-          {/* Stepper - Only show if not success step */}
           {!isSuccessStep && (
             <div className="mb-8 overflow-x-auto pb-4">
               <div className="flex items-start justify-between min-w-max md:min-w-0 gap-2">
@@ -300,7 +254,6 @@ const Agendamento = () => {
             </div>
           )}
 
-          {/* Card */}
           <Card className="card-elevated border-0 shadow-xl">
             <CardContent className="p-6 md:p-8 lg:p-10">
               <div className="animate-slide-in" key={currentStep}>
@@ -309,10 +262,8 @@ const Agendamento = () => {
             </CardContent>
           </Card>
 
-          {/* Navigation */}
           {!isSuccessStep && (
             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
-              {/* Hide back button on first step */}
               {currentStep > 0 && (
                 <Button
                   variant="outline"
@@ -323,19 +274,15 @@ const Agendamento = () => {
                   Voltar
                 </Button>
               )}
-              {/* Hide next button on revisao step */}
               {currentKey !== "revisao" && (
                 <Button
                   onClick={handleNext}
                   disabled={!canGoNext()}
                   className="gap-2 w-full sm:w-auto"
-                  {...(currentStep === 0 ? {} : {})}
                   style={{ marginLeft: currentStep === 0 ? 'auto' : undefined }}
                 >
-                  <>
-                    Próximo
-                    <ArrowRight className="h-4 w-4" />
-                  </>
+                  Próximo
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -343,7 +290,6 @@ const Agendamento = () => {
         </div>
       </div>
 
-      {/* Spacer for bottom */}
       <div className="py-12 md:py-16"></div>
     </div>
   );

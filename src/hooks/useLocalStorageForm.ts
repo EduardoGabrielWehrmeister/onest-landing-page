@@ -8,6 +8,7 @@ export interface RequerenteData {
   altura: string;
   corOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
   documentoIdentidade: string;
+  documentoIdentidadeFile?: File | null;
 }
 
 export interface FormData {
@@ -22,11 +23,13 @@ export interface FormData {
   // Step 2: Dados do Titular (Prenotami)
   clienteNome: string;
   clientePdfFile: string;
+  clientePdfFileObject?: File | null;
   prenotamiEmail: string;
   prenotamiSenha: string;
   titularCep: string;
   titularEstadoCivil: "13" | "14" | "15" | "16" | "17" | "18" | "19" | "20" | "21" | "";
   titularDocumentoIdentidade: string;
+  titularDocumentoIdentidadeFile?: File | null;
   prenotamiAltura: string;
   prenotamiCorOlhos: "azul" | "castanho" | "cinza" | "preto" | "verde" | "";
   titularLogradouro: string;
@@ -63,11 +66,13 @@ const defaultFormData: FormData = {
   assessorTelefone: "",
   clienteNome: "",
   clientePdfFile: "",
+  clientePdfFileObject: null,
   prenotamiEmail: "",
   prenotamiSenha: "",
   titularCep: "",
   titularEstadoCivil: "",
   titularDocumentoIdentidade: "",
+  titularDocumentoIdentidadeFile: null,
   prenotamiAltura: "",
   prenotamiCorOlhos: "",
   titularLogradouro: "",
@@ -100,7 +105,9 @@ export function useLocalStorageForm() {
         }
         return { ...defaultFormData, ...parsed };
       }
-    } catch {}
+    } catch {
+      // Ignore JSON parse errors
+    }
     return defaultFormData;
   });
 
@@ -108,7 +115,9 @@ export function useLocalStorageForm() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY + "-step");
       if (saved) return parseInt(saved, 10);
-    } catch {}
+    } catch {
+      // Ignore JSON parse errors
+    }
     return 0;
   });
 
@@ -125,7 +134,7 @@ export function useLocalStorageForm() {
   }, []);
 
   const updateRequerente = useCallback(
-    (index: number, field: keyof RequerenteData, value: string) => {
+    (index: number, field: keyof RequerenteData, value: string | File | null) => {
       setFormData((prev) => {
         const requerentes = [...prev.requerentes];
         requerentes[index] = { ...requerentes[index], [field]: value };
@@ -148,6 +157,7 @@ export function useLocalStorageForm() {
             altura: "",
             corOlhos: "",
             documentoIdentidade: "",
+            documentoIdentidadeFile: null,
           },
         ],
       };
@@ -168,6 +178,77 @@ export function useLocalStorageForm() {
     setCurrentStep(0);
   }, []);
 
+  const fillDemoData = useCallback((isAssessor: boolean = false) => {
+    const demoData: Partial<FormData> = {
+      tipoUsuario: isAssessor ? "assessor" : "cliente",
+      
+      // Dados do Assessor (se aplicável)
+      //assessorEmail: "assessor@exemplo.com",
+      //assessorNome: "João Silva Assessor",
+      //assessorTelefone: "+55 11 98765-4321",
+      
+      // Dados do Titular
+      clienteNome: "Maria Santos Oliveira",
+      clientePdfFile: "", // Deixar vazio para anexar manualmente
+      clientePdfFileObject: null,
+      prenotamiEmail: "maria.santos@email.com",
+      prenotamiSenha: "SenhaDemo123!",
+      titularCep: "01310-100",
+      titularEstadoCivil: "15", // Casado
+      titularDocumentoIdentidade: null,
+      titularDocumentoIdentidadeFile: null,
+      prenotamiAltura: "165",
+      prenotamiCorOlhos: "castanho",
+      titularLogradouro: "Av. Paulista",
+      titularNumero: "1000",
+      titularBairro: "Bela Vista",
+      titularCidade: "São Paulo",
+      titularEstado: "SP",
+      titularComplemento: "Apto 101",
+      
+      // Requerentes Adicionais
+      requerentes: [
+        {
+          nomeCompleto: "João Santos Oliveira",
+          dataNascimento: "2015-03-15",
+          altura: "140",
+          corOlhos: "castanho",
+          documentoIdentidade: null,
+          documentoIdentidadeFile: null,
+        },
+        {
+          nomeCompleto: "Ana Santos Oliveira",
+          dataNascimento: "2018-07-22",
+          altura: "115",
+          corOlhos: "verde",
+          documentoIdentidade: null,
+          documentoIdentidadeFile: null,
+        },
+      ],
+      
+      // Restrições de Datas
+      datasRestricao: [
+        "2026-05-15",
+        "2026-05-20",
+        "2026-06-01",
+      ],
+      
+      // Observações
+      observacoes: "Gostaria de agendar para período de manhã se possível. Preferência para datas após o dia 10 do mês.",
+      
+      // Campos adicionais para integração
+      qtde_filhos: 2,
+      tipo_reserva: "",
+      email_otp: "",
+      senha_email_otp: "",
+      data_alvo: "",
+      
+      revisaoConfirmado: false,
+    };
+    
+    setFormData({ ...defaultFormData, ...demoData });
+  }, []);
+
   return {
     formData,
     currentStep,
@@ -177,5 +258,6 @@ export function useLocalStorageForm() {
     addRequerente,
     removeRequerente,
     resetForm,
+    fillDemoData,
   };
 }
