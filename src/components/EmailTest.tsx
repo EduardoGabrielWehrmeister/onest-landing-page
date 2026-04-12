@@ -64,7 +64,7 @@ export const EmailTest = () => {
       };
 
       // Simular URL de CSV (não precisa ser real para teste de email)
-      const testCsvUrl = "https://example.com/test.csv";
+      const testCsvUrl = "https://iijedhpvshrufguqqedj.supabase.co/storage/v1/object/public/documentos/Primeiro%20Passaporte/agendamento_00005_sadasdas_2026-04-12_14-20-03-520Z.csv";
 
       const response = await fetch(`/api/send-email`, {
         method: "POST",
@@ -109,8 +109,7 @@ export const EmailTest = () => {
     try {
       console.log("Iniciando envio de email simples...");
 
-      const response = await fetch(
-        "http://localhost:3000/api/send-simple-email",
+      const response = await fetch("/api/send-simple-email",
         {
           method: "POST",
           headers: {
