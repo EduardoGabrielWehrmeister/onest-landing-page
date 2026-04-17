@@ -18,7 +18,7 @@ const Agendamentos = () => {
     {
       id: 2,
       title: "São Paulo - Renovação de Passaporte",
-      description: "Para quem já possui passaporte e precisa renovar",
+      description: "Para quem já possui o passaporte vencido/a vencer",
       icon: RefreshCw,
       url: "https://forms.gle/ZxV2gR62e3WN2Voz7",
       color: "from-green-600 to-green-700"
@@ -26,7 +26,7 @@ const Agendamentos = () => {
     {
       id: 3,
       title: "Curitiba e Florianópolis - Passaporte",
-      description: "Atendimento para essas cidades específicas",
+      description: "Atendimento para o Paraná e Santa Catarina",
       icon: MapPin,
       url: "https://forms.gle/KTFFEbtuRnqohA2E8",
       color: "from-red-700 to-red-800"
