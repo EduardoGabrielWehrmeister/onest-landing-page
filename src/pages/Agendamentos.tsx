@@ -9,19 +9,19 @@ const Agendamentos = () => {
   const options = [
     {
       id: 1,
-      title: "São Paulo - Renovação de Passaporte",
-      description: "Para quem já possui passaporte e precisa renovar",
-      icon: RefreshCw,
-      url: "https://forms.gle/ZxV2gR62e3WN2Voz7",
-      color: "from-green-600 to-green-700"
-    },
-    {
-      id: 2,
       title: "São Paulo - Primeiro Passaporte",
       description: "Para quem está solicitando o primeiro passaporte",
       icon: FileText,
       url: "https://forms.gle/1thPvwXtovb7Hkqp8",
       color: "from-blue-900 to-blue-800"
+    },
+    {
+      id: 2,
+      title: "São Paulo - Renovação de Passaporte",
+      description: "Para quem já possui passaporte e precisa renovar",
+      icon: RefreshCw,
+      url: "https://forms.gle/ZxV2gR62e3WN2Voz7",
+      color: "from-green-600 to-green-700"
     },
     {
       id: 3,
