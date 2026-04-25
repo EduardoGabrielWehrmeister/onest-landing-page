@@ -14,6 +14,10 @@ export interface RequerenteData {
 export interface FormData {
   // Step 0: Tipo de Usuário
   tipoUsuario: "cliente" | "assessor" | "";
+  
+  // Step 0.5: Serviço Selecionado
+  servicoSelecionado: string; // Código do serviço (ex: 'sp-primeiro-passaporte')
+  servicoId: string; // ID do serviço no banco
 
   // Step 1: Dados do Assessor
   assessorEmail: string;
@@ -61,6 +65,8 @@ export interface FormData {
 
 const defaultFormData: FormData = {
   tipoUsuario: "",
+  servicoSelecionado: "",
+  servicoId: "",
   assessorEmail: "",
   assessorNome: "",
   assessorTelefone: "",
@@ -181,6 +187,8 @@ export function useLocalStorageForm() {
   const fillDemoData = useCallback((isAssessor: boolean = false) => {
     const demoData: Partial<FormData> = {
       tipoUsuario: isAssessor ? "assessor" : "cliente",
+      servicoSelecionado: "sp-primeiro-passaporte",
+      servicoId: "",
       
       // Dados do Assessor (se aplicável)
       //assessorEmail: "assessor@exemplo.com",

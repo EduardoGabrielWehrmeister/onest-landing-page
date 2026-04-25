@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Eye, EyeOff, Mail, Info } from "lucide-react";
 import { cleanAddressInput, formatHeightInput, fetchAddressFromCEP } from "@/lib/formUtils";
 import type { FormData } from "@/hooks/useLocalStorageForm";
+import { useConfiguracaoServico } from "@/hooks/useConfiguracaoServico";
 import PdfUpload from "./PdfUpload";
 
 interface Props {
@@ -27,6 +28,7 @@ interface Props {
   altura: string;
   corOlhos: FormData["prenotamiCorOlhos"];
   updateField: <K extends keyof FormData>(field: K, value: FormData[K]) => void;
+  servicoSelecionado: string;
 }
 
 const estadoCivilOptions = [
@@ -68,10 +70,13 @@ const StepDadosTitular = ({
   altura,
   corOlhos,
   updateField,
+  servicoSelecionado,
 }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFetchingAddress, setIsFetchingAddress] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
+  
+  const { shouldShowField, isRequiredField } = useConfiguracaoServico();
 
   const handleCepChange = async (value: string) => {
     updateField("titularCep", value);
@@ -355,100 +360,118 @@ const StepDadosTitular = ({
           </div>
         </div>
 
-        {/* Estado Civil */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5">
-            <Label htmlFor="titularEstadoCivil" className="text-sm font-medium">
-              Estado Civil
-            </Label>
-
+        {/* Estado Civil - Campo Dinâmico */}
+        {shouldShowField(servicoSelecionado, 'titular', 'estadoCivil') && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="titularEstadoCivil" className="text-sm font-medium">
+                Estado Civil
+                {isRequiredField(servicoSelecionado, 'titular', 'estadoCivil') && (
+                  <span className="text-red-500 ml-1">*</span>
+                )}
+              </Label>
+            </div>
+            <Select value={estadoCivil} onValueChange={(value) => updateField("titularEstadoCivil", value as FormData["titularEstadoCivil"])}>
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Selecione o estado civil" />
+              </SelectTrigger>
+              <SelectContent>
+                {estadoCivilOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={estadoCivil} onValueChange={(value) => updateField("titularEstadoCivil", value as FormData["titularEstadoCivil"])}>
-            <SelectTrigger className="h-11">
-              <SelectValue placeholder="Selecione o estado civil" />
-            </SelectTrigger>
-            <SelectContent>
-              {estadoCivilOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        )}
 
-                {/* Altura */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5">
-            <Label htmlFor="prenotamiAltura" className="text-sm font-medium">
-              Altura
-            </Label>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Informe apenas números em centímetros (ex: 185 para 1,85m)</p>
-              </TooltipContent>
-            </Tooltip>
+                {/* Altura - Campo Dinâmico */}
+        {shouldShowField(servicoSelecionado, 'titular', 'altura') && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="prenotamiAltura" className="text-sm font-medium">
+                Altura
+                {isRequiredField(servicoSelecionado, 'titular', 'altura') && (
+                  <span className="text-red-500 ml-1">*</span>
+                )}
+              </Label>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Informe apenas números em centímetros (ex: 185 para 1,85m)</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Input
+              id="prenotamiAltura"
+              type="text"
+              inputMode="numeric"
+              value={altura}
+              onChange={(e) => updateField("prenotamiAltura", formatHeightInput(e.target.value))}
+              placeholder="185"
+              className="h-11"
+            />
           </div>
-          <Input
-            id="prenotamiAltura"
-            type="text"
-            inputMode="numeric"
-            value={altura}
-            onChange={(e) => updateField("prenotamiAltura", formatHeightInput(e.target.value))}
-            placeholder="185"
-            className="h-11"
+        )}
+
+        {/* Cor dos Olhos - Campo Dinâmico */}
+        {shouldShowField(servicoSelecionado, 'titular', 'corOlhos') && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="prenotamiCorOlhos" className="text-sm font-medium">
+                Cor dos olhos
+                {isRequiredField(servicoSelecionado, 'titular', 'corOlhos') && (
+                  <span className="text-red-500 ml-1">*</span>
+                )}
+              </Label>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Select value={corOlhos} onValueChange={(value) => updateField("prenotamiCorOlhos", value as FormData["prenotamiCorOlhos"])}>
+              <SelectTrigger className="h-11">
+                <SelectValue placeholder="Selecione a cor dos olhos" />
+              </SelectTrigger>
+              <SelectContent>
+                {eyeColors.map((color) => (
+                  <SelectItem key={color.value} value={color.value}>
+                    {color.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* Documento de Identidade - Campo Dinâmico */}
+        {shouldShowField(servicoSelecionado, 'titular', 'documentoIdentidade') && (
+          <PdfUpload
+            title={`Documento de Identidade (PDF)${isRequiredField(servicoSelecionado, 'titular', 'documentoIdentidade') ? '' : ' - Opcional'}`}
+            fileName={documentoIdentidade}
+            onFileSelect={handleIdentidadeFileSelect}
+            onFileRemove={handleIdentidadeFileRemove}
+            tooltipText="Frente e verso da Identidade do Titular em formato de PDF"
           />
-        </div>
+        )}
 
-        {/* Cor dos Olhos */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5">
-            <Label htmlFor="prenotamiCorOlhos" className="text-sm font-medium">
-              Cor dos olhos
-            </Label>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-          <Select value={corOlhos} onValueChange={(value) => updateField("prenotamiCorOlhos", value as FormData["prenotamiCorOlhos"])}>
-            <SelectTrigger className="h-11">
-              <SelectValue placeholder="Selecione a cor dos olhos" />
-            </SelectTrigger>
-            <SelectContent>
-              {eyeColors.map((color) => (
-                <SelectItem key={color.value} value={color.value}>
-                  {color.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Documento de Identidade */}
-        <PdfUpload
-          title="Documento de Identidade (PDF)"
-          fileName={documentoIdentidade}
-          onFileSelect={handleIdentidadeFileSelect}
-          onFileRemove={handleIdentidadeFileRemove}
-          tooltipText="Frente e verso da Identidade do Titular em formato de PDF"
-        />
-
-        {/* Comprovante de Residência (Opcional) */}
-        <PdfUpload
-          title="Comprovante de Residência (PDF) - Opcional"
-          fileName={pdfFile}
-          onFileSelect={handlePdfFileSelect}
-          onFileRemove={handlePdfFileRemove}
-          tooltipText="Conta de luz, água ou telefone dos últimos 3 meses"
-        />
+        {/* Comprovante de Residência - Campo Dinâmico */}
+        {shouldShowField(servicoSelecionado, 'titular', 'comprovanteResidencia') && (
+          <PdfUpload
+            title={`Comprovante de Residência (PDF)${isRequiredField(servicoSelecionado, 'titular', 'comprovanteResidencia') ? '' : ' - Opcional'}`}
+            fileName={pdfFile}
+            onFileSelect={handlePdfFileSelect}
+            onFileRemove={handlePdfFileRemove}
+            tooltipText="Conta de luz, água ou telefone dos últimos 3 meses"
+          />
+        )}
       </div>
     </div>
     </TooltipProvider>

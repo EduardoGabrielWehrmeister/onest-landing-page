@@ -122,6 +122,8 @@ const Agendamento = () => {
           <StepTipoUsuario
             value={formData.tipoUsuario}
             onChange={(v) => updateField("tipoUsuario", v)}
+            servicoSelecionado={formData.servicoSelecionado}
+            onServicoChange={(v) => updateField("servicoSelecionado", v)}
           />
         );
       case "assessor":
@@ -147,6 +149,7 @@ const Agendamento = () => {
             altura={formData.prenotamiAltura}
             corOlhos={formData.prenotamiCorOlhos}
             updateField={updateField}
+            servicoSelecionado={formData.servicoSelecionado}
           />
         );
       case "requerentes":
@@ -156,6 +159,7 @@ const Agendamento = () => {
             updateRequerente={updateRequerente}
             addRequerente={addRequerente}
             removeRequerente={removeRequerente}
+            servicoSelecionado={formData.servicoSelecionado}
           />
         );
       case "observacoes":

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2, Info, User } from "lucide-react";
 import { formatHeightInput } from "@/lib/formUtils";
 import type { RequerenteData } from "@/hooks/useLocalStorageForm";
+import { useConfiguracaoServico } from "@/hooks/useConfiguracaoServico";
 import PdfUpload from "./PdfUpload";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
   updateRequerente: (index: number, field: keyof RequerenteData, value: string | File | null) => void;
   addRequerente: () => void;
   removeRequerente: (index: number) => void;
+  servicoSelecionado: string;
 }
 
 const eyeColors = [
@@ -24,7 +26,8 @@ const eyeColors = [
   { value: "verde", label: "Verde" },
 ] as const;
 
-const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerente, removeRequerente }: Props) => {
+const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerente, removeRequerente, servicoSelecionado }: Props) => {
+  const { shouldShowField, isRequiredField } = useConfiguracaoServico();
   // Empty state
   if (requerentes.length === 0) {
     return (
@@ -141,90 +144,107 @@ const StepRequerentesAdicionais = ({ requerentes, updateRequerente, addRequerent
                 />
               </div>
 
-              {/* Data de Nascimento */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5">
-                  <Label htmlFor={`req-${idx}-nascimento`} className="text-sm font-medium">
-                    Data de nascimento
-                  </Label>
+              {/* Data de Nascimento - Campo Dinâmico */}
+              {shouldShowField(servicoSelecionado, 'requerente', 'dataNascimento') && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor={`req-${idx}-nascimento`} className="text-sm font-medium">
+                      Data de nascimento
+                      {isRequiredField(servicoSelecionado, 'requerente', 'dataNascimento') && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </Label>
+                  </div>
+                  <Input
+                    id={`req-${idx}-nascimento`}
+                    type="date"
+                    value={requerente.dataNascimento}
+                    onChange={(e) => updateRequerente(idx, "dataNascimento", e.target.value)}
+                    className="h-11"
+                  />
                 </div>
-                <Input
-                  id={`req-${idx}-nascimento`}
-                  type="date"
-                  value={requerente.dataNascimento}
-                  onChange={(e) => updateRequerente(idx, "dataNascimento", e.target.value)}
-                  className="h-11"
+              )}
+
+              {/* Altura - Campo Dinâmico */}
+              {shouldShowField(servicoSelecionado, 'requerente', 'altura') && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor={`req-${idx}-altura`} className="text-sm font-medium">
+                      Altura
+                      {isRequiredField(servicoSelecionado, 'requerente', 'altura') && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </Label>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Informe apenas números em centímetros (ex: 185 para 1,85m)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Input
+                    id={`req-${idx}-altura`}
+                    type="text"
+                    inputMode="numeric"
+                    value={requerente.altura}
+                    onChange={(e) => updateRequerente(idx, "altura", formatHeightInput(e.target.value))}
+                    placeholder="185"
+                    className="h-11"
+                  />
+                </div>
+              )}
+
+              {/* Cor dos Olhos - Campo Dinâmico */}
+              {shouldShowField(servicoSelecionado, 'requerente', 'corOlhos') && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Label htmlFor={`req-${idx}-cor-olhos`} className="text-sm font-medium">
+                      Cor dos olhos
+                      {isRequiredField(servicoSelecionado, 'requerente', 'corOlhos') && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </Label>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Select
+                    value={requerente.corOlhos}
+                    onValueChange={(value) =>
+                      updateRequerente(idx, "corOlhos", value as RequerenteData["corOlhos"])
+                    }
+                  >
+                    <SelectTrigger className="h-11">
+                      <SelectValue placeholder="Selecione a cor dos olhos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eyeColors.map((color) => (
+                        <SelectItem key={color.value} value={color.value}>
+                          {color.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* PDF Upload - Campo Dinâmico */}
+              {shouldShowField(servicoSelecionado, 'requerente', 'documentoIdentidade') && (
+                <PdfUpload
+                  title={`Documento de Identidade (PDF)${isRequiredField(servicoSelecionado, 'requerente', 'documentoIdentidade') ? '' : ' - Opcional'}`}
+                  fileName={requerente.documentoIdentidade}
+                  onFileSelect={(file) => handleDocumentoFileSelect(idx, file)}
+                  onFileRemove={() => handleDocumentoFileRemove(idx)}
+                  tooltipText="Frente e verso da Identidade do Requerente Adicional em formato PDF"
                 />
-              </div>
-
-              {/* Altura */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5">
-                  <Label htmlFor={`req-${idx}-altura`} className="text-sm font-medium">
-                    Altura
-                  </Label>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Informe apenas números em centímetros (ex: 185 para 1,85m)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Input
-                  id={`req-${idx}-altura`}
-                  type="text"
-                  inputMode="numeric"
-                  value={requerente.altura}
-                  onChange={(e) => updateRequerente(idx, "altura", formatHeightInput(e.target.value))}
-                  placeholder="185"
-                  className="h-11"
-                />
-              </div>
-
-              {/* Cor dos Olhos */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-1.5">
-                  <Label htmlFor={`req-${idx}-cor-olhos`} className="text-sm font-medium">
-                    Cor dos olhos
-                  </Label>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Somente estas cores são fornecidas pelo sistema. Escolha a cor que melhor se adapta à sua.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <Select
-                  value={requerente.corOlhos}
-                  onValueChange={(value) =>
-                    updateRequerente(idx, "corOlhos", value as RequerenteData["corOlhos"])
-                  }
-                >
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Selecione a cor dos olhos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {eyeColors.map((color) => (
-                      <SelectItem key={color.value} value={color.value}>
-                        {color.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* PDF Upload */}
-              <PdfUpload
-                title="Documento de Identidade (PDF)"
-                fileName={requerente.documentoIdentidade}
-                onFileSelect={(file) => handleDocumentoFileSelect(idx, file)}
-                onFileRemove={() => handleDocumentoFileRemove(idx)}
-                tooltipText="Frente e verso da Identidade do Requerente Adicional em formato PDF"
-              />
+              )}
             </div>
           </div>
         ))}
