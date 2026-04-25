@@ -519,6 +519,276 @@ function gerarHTMLAgendamento(agendamento) {
 `;
 }
 
+function gerarHTMLConfirmacaoCliente(agendamento) {
+  const dataFormatada = new Date(agendamento.criado_em).toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const nomePrimeiro = agendamento.titular_nome_completo.split(' ')[0];
+
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento Confirmado - ${agendamento.titular_nome_completo}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #1F1F1E;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .email-container {
+      max-width: 650px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Header com gradiente verde */
+    .header {
+      background: linear-gradient(135deg, #315E33 0%, #2a522b 100%);
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .header-logo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    
+    .header-subtitle {
+      color: #ffffff;
+      font-size: 14px;
+      opacity: 0.9;
+      letter-spacing: 1px;
+    }
+    
+    /* Faixa italiana */
+    .italian-stripe {
+      height: 4px;
+      background: linear-gradient(90deg, 
+        #315E33 0%, 
+        #315E33 33.33%, 
+        #ffffff 33.33%, 
+        #ffffff 66.66%, 
+        #903339 66.66%, 
+        #903339 100%
+      );
+    }
+    
+    /* Content */
+    .content {
+      padding: 40px 30px;
+      background-color: #ffffff;
+      text-align: center;
+    }
+    
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #315E33 0%, #2a522b 100%);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      font-size: 40px;
+      color: white;
+    }
+    
+    .greeting {
+      font-size: 24px;
+      color: #1F1F1E;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .message {
+      font-size: 16px;
+      color: #666666;
+      margin-bottom: 30px;
+      line-height: 1.8;
+    }
+    
+    .code-badge {
+      display: inline-block;
+      background-color: #03084C;
+      color: #ffffff;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+    }
+    
+    .info-box {
+      background-color: #FAFAF8;
+      border-radius: 8px;
+      padding: 25px;
+      margin: 30px 0;
+      border-left: 4px solid #315E33;
+      text-align: left;
+    }
+    
+    .info-box-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #315E33;
+      margin-bottom: 15px;
+    }
+    
+    .info-box p {
+      font-size: 14px;
+      color: #666666;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+    
+    .info-box p:last-child {
+      margin-bottom: 0;
+    }
+    
+    /* Footer */
+    .footer {
+      background-color: #FAFAF8;
+      padding: 30px;
+      text-align: center;
+      border-top: 1px solid #e5e5e5;
+    }
+    
+    .footer-text {
+      font-size: 13px;
+      color: #666666;
+      line-height: 1.8;
+    }
+    
+    .footer-brand {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 18px;
+      color: #315E33;
+      margin-bottom: 10px;
+    }
+    
+    .footer-divider {
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, #315E33 0%, #D4A574 100%);
+      margin: 15px auto;
+    }
+    
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .email-container {
+        max-width: 100% !important;
+        border-radius: 0 !important;
+      }
+      
+      .header {
+        padding: 30px 20px;
+      }
+      
+      .content {
+        padding: 30px 20px;
+      }
+      
+      .greeting {
+        font-size: 20px;
+      }
+      
+      .code-badge {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-logo">ONESTA</div>
+      <div class="header-subtitle">SISTEMA DE AGENDAMENTO</div>
+    </div>
+    
+    <!-- Faixa Italiana -->
+    <div class="italian-stripe"></div>
+    
+    <!-- Content -->
+    <div class="content">
+      <div class="success-icon">✓</div>
+      
+      <p class="greeting">Olá, ${nomePrimeiro}!</p>
+      
+      <p class="message">
+        Temos ótimas notícias! Seu agendamento para o passaporte italiano foi realizado <strong>com sucesso</strong>. 🎉
+      </p>
+      
+      <div class="code-badge">
+        Agendamento #${agendamento.codigo_agendamento}
+      </div>
+      
+      <p class="message">
+        Sua solicitação foi registrada em nosso sistema e nossa equipe já está trabalhando para processar seu agendamento.
+      </p>
+      
+      <div class="info-box">
+        <div class="info-box-title">📋 O que acontece agora?</div>
+        <p>• Sua solicitação está sendo analisada por nossa equipe especializada</p>
+        <p>• Você receberá atualizações sobre o andamento do seu processo</p>
+        <p>• Se necessário, entraremos em contato por email ou telefone</p>
+        <p>• Mantenha seus dados atualizados para facilitar a comunicação</p>
+      </div>
+      
+      <p class="message" style="margin-top: 30px;">
+        Agradecemos pela confiança em escolher a Onesta para esta jornada tão importante em busca da sua cidadania italiana. 🇮🇹
+      </p>
+    </div>
+    
+    <!-- Faixa Italiana -->
+    <div class="italian-stripe"></div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <div class="footer-brand">ONESTA</div>
+      <div class="footer-divider"></div>
+      <p class="footer-text">
+        Este email confirma o recebimento do seu agendamento.<br>
+        Data de confirmação: ${dataFormatada}<br><br>
+        Por favor, não responda a este email.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
 // ======================================================
 // 4. ROTAS
 // ======================================================
@@ -555,7 +825,7 @@ app.post('/api/send-simple-email', async (req, res, next) => {
   }
 });
 
-// Rota: Email Completo
+// Rota: Email Completo (Administrativo)
 app.post('/api/send-email', async (req, res, next) => {
   try {
     // CORREÇÃO AQUI: Verificação segura
@@ -613,6 +883,55 @@ app.post('/api/send-email', async (req, res, next) => {
     return res.status(200).json({ success: true, messageId: info.messageId });
 
   } catch (error) {
+    next(error);
+  }
+});
+
+// Rota: Email de Confirmação para o Cliente
+app.post('/api/send-client-email', async (req, res, next) => {
+  try {
+    const { agendamento } = req.body || {};
+
+    if (!agendamento?.codigo_agendamento || !agendamento?.titular_email || !agendamento?.titular_nome_completo) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Dados do agendamento (código, email e nome) são obrigatórios.' 
+      });
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: agendamento.titular_email,
+      subject: `✅ Agendamento Confirmado - Seu Passaporte Italiano`,
+      text: `Olá, ${agendamento.titular_nome_completo}!
+
+Temos ótimas notícias! Seu agendamento para o passaporte italiano foi realizado com sucesso.
+
+Código do Agendamento: ${agendamento.codigo_agendamento}
+
+Sua solicitação foi registrada em nosso sistema e nossa equipe já está trabalhando para processar seu agendamento.
+
+O que acontece agora?
+• Sua solicitação está sendo analisada por nossa equipe especializada
+• Você receberá atualizações sobre o andamento do seu processo
+• Se necessário, entraremos em contato por email ou telefone
+• Mantenha seus dados atualizados para facilitar a comunicação
+
+Agradecemos pela confiança em escolher a Onesta para esta jornada tão importante em busca da sua cidadania italiana.
+
+Data de confirmação: ${new Date(agendamento.criado_em).toLocaleString('pt-BR')}
+
+Por favor, não responda a este email.`,
+      html: gerarHTMLConfirmacaoCliente(agendamento)
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Email de confirmação enviado para cliente: ${agendamento.titular_email} - ${info.messageId}`);
+    
+    return res.status(200).json({ success: true, messageId: info.messageId });
+
+  } catch (error) {
+    console.error('Erro ao enviar email para cliente:', error);
     next(error);
   }
 });

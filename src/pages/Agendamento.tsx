@@ -26,6 +26,8 @@ import StepIndicator from "@/components/agendamento/StepIndicator";
 const Agendamento = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isLocalEnvironment = import.meta.env.DEV;
+
   const {
     formData,
     currentStep,
@@ -206,7 +208,7 @@ const Agendamento = () => {
               Preencha as informações abaixo para solicitar seu agendamento no Prenotami
             </p>
 
-            {!isSuccessStep && (
+            {isLocalEnvironment && !isSuccessStep && (
               <Button
                 onClick={() => fillDemoData(false)}
                 variant="secondary"

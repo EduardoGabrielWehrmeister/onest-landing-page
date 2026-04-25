@@ -339,6 +339,54 @@ const uploadCSV = async (csvContent: string, codigoAgendamento: string, nomeTitu
 };
 
 /**
+ * Envia email de confirmação para o cliente
+ * @param agendamento - Dados do agendamento salvo
+ * @returns Promise com o resultado do envio
+ */
+const enviarEmailCliente = async (
+  agendamento: AgendamentoInsert & { codigo_agendamento: string; criado_em: string }
+) => {
+  try {
+    // Determinar a URL base da API (funciona tanto em dev quanto em produção)
+    const apiBaseUrl = import.meta.env.MODE === 'production' 
+      ? '/api' 
+      : 'http://localhost:3000/api';
+    
+    const response = await fetch(`${apiBaseUrl}/send-client-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        agendamento
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log('Email de confirmação enviado para cliente:', result.messageId);
+      return {
+        success: true,
+        messageId: result.messageId
+      };
+    } else {
+      console.error('Erro ao enviar email para cliente:', result.error);
+      return {
+        success: false,
+        error: result.error
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao enviar email para cliente (catch):', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro desconhecido'
+    };
+  }
+};
+
+/**
  * Envia email com anexos após o agendamento
  * @param agendamento - Dados do agendamento salvo
  * @param csvUrl - URL pública do CSV no Supabase Storage
@@ -379,20 +427,20 @@ const enviarEmailAgendamento = async (
     const result = await response.json();
 
     if (result.success) {
-      console.log('Email enviado com sucesso:', result.messageId);
+      console.log('Email administrativo enviado com sucesso:', result.messageId);
       return {
         success: true,
         messageId: result.messageId
       };
     } else {
-      console.error('Erro ao enviar email:', result.error);
+      console.error('Erro ao enviar email administrativo:', result.error);
       return {
         success: false,
         error: result.error
       };
     }
   } catch (error) {
-    console.error('Erro ao enviar email (catch):', error);
+    console.error('Erro ao enviar email administrativo (catch):', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro desconhecido'
@@ -469,13 +517,23 @@ export const salvarAgendamento = async (formData: FormData) => {
     // Preparar arquivos para o email
     const arquivosEmail = await prepararArquivosEmail(formData, data.codigo_agendamento);
     
-    // Enviar email se o CSV foi salvo com sucesso
+    // Enviar email administrativo se o CSV foi salvo com sucesso
     let emailResult = null;
     if (uploadResult.success && uploadResult.url) {
-      console.log('Enviando email de notificação...');
+      console.log('Enviando email de notificação administrativo...');
       emailResult = await enviarEmailAgendamento(data, uploadResult.url, arquivosEmail, requerentesParaEmail);
     } else if (uploadResult.error) {
       console.warn('CSV não foi salvo, email não será enviado:', uploadResult.error);
+    }
+    
+    // Enviar email de confirmação para o cliente (não bloqueia o fluxo se falhar)
+    let emailClienteResult = null;
+    try {
+      console.log('Enviando email de confirmação para o cliente...');
+      emailClienteResult = await enviarEmailCliente(data);
+    } catch (error) {
+      console.error('Erro ao enviar email para cliente (não crítico):', error);
+      // Não falhar o fluxo se o email do cliente falhar
     }
     
     return {
@@ -484,7 +542,8 @@ export const salvarAgendamento = async (formData: FormData) => {
       csvUrl: uploadResult.success ? uploadResult.url : undefined,
       csvError: uploadResult.error,
       error: null,
-      emailResult: emailResult
+      emailResult: emailResult,
+      emailClienteResult: emailClienteResult
     };
   } catch (error) {
     console.error('Erro ao salvar agendamento (catch):', error);
